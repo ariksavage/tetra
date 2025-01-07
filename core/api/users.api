@@ -3,12 +3,11 @@
 namespace Tetra\API;
 
 require_once(__DIR__ . '/base.api');
-
 require_once(CORE_ROOT . '/models/user.model');
 
 use \Tetra\Models\User;
 
-class users extends base {
+class Users extends Base {
 
   public function __construct()
   {
@@ -26,23 +25,9 @@ class users extends base {
     return $query;
   }
 
-  public function loginPOST()
-  {
-    $username = $this->postValue('username');
-    $password = $this->postValue('password');
-    $sessionExpiresDays = $this->configValue('session_expires_days');
-    $user = new User();
-    if ($token = $user->login($username, $password, $sessionExpiresDays)) {
-      $this->addData('token', $token);
-      $this->success('user', $user, "Welcome, {$user->name()}");
-    } else {
-      $this->error('Login failed', 401, 'Login');
-    }
-  }
-
   public function logoutGET()
   {
-    global $currentUser;
+    $currentUser = $this->getCurrentUser();
     if($currentUser->logout()) {
       $this->successMsg("Successfully logged out.");
     }

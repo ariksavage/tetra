@@ -46,11 +46,6 @@ class Base {
    */
   public $message;
 
-  /**
-   * @var NULL
-   * Error
-   * Will always be null, unless an error is thrown elsewhere in code.
-   */
 
   public function __construct($table = null, $model = null, $plural = null, $singular = null) {
     $this->data = new \stdClass();
@@ -58,6 +53,17 @@ class Base {
     $this->model = $model;
     $this->plural = $plural;
     $this->singular = $singular;
+    $this->checkAuth();
+  }
+
+  public function requiresAuth() {
+    return true;
+  }
+
+  protected function checkAuth() {
+    if ($this->requiresAuth() && !$this->getCurrentUser()) {
+      $this->error('Login required', 401);
+    }
   }
 
   public function savePOST()
