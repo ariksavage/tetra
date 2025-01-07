@@ -12,7 +12,7 @@ date_default_timezone_set('UTC');
 
 define('CORE_ROOT', __dir__);
 define('SERVER_ROOT', realpath(CORE_ROOT . '/../'));
-define('CONFIG_PATH', __dir__ . '/../config');
+define('CONFIG_PATH', __dir__ . '/../../config');
 
 require_once(CORE_ROOT . '/functions.php');
 require_once(CORE_ROOT . '/models/user.model');

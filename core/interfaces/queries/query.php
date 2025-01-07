@@ -23,10 +23,9 @@ class Query
   }
 
   protected function connect() {
-    $tetraConfig = CONFIG_PATH . '/tetra.config';
+    $tetraConfig = CONFIG_PATH . '/db.config';
     if (file_exists($tetraConfig)){
-      $coreConfig = (object) \yaml_parse_file(CONFIG_PATH . '/tetra.config', 0);
-      $config = (object) $coreConfig->db;
+      $config = (object) \yaml_parse_file($tetraConfig, 0);
     } else {
       \Tetra\error("Tetra config not found.", "Tetra", 500, ["config_file" => $tetraConfig]);
     }

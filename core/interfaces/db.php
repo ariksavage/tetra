@@ -9,8 +9,12 @@ class DB extends \mysqli
 
   public function __construct()
   {
-    $coreConfig = (object) yaml_parse_file(CONFIG_PATH . '/tetra.config', 0);
-    $config = (object) $coreConfig->db;
+    $tetraConfig = CONFIG_PATH . '/db.config';
+    if (file_exists($tetraConfig)){
+      $config = (object) \yaml_parse_file($tetraConfig, 0);
+    } else {
+      \Tetra\error("Tetra config not found.", "Tetra", 500, ["config_file" => $tetraConfig]);
+    }
     parent::__construct($config->host, $config->user, $config->password, $config->name);
   }
 
