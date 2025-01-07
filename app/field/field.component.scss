@@ -1,0 +1,39 @@
+:host {
+  display: block;
+  position: relative;
+  margin-top: 1em;
+
+  &.checkbox {
+    .label {
+      display: inline-block;
+    }
+
+    .input {
+      display: inline-block;
+      width: auto;
+    }
+  }
+}
+
+.label {
+  display: block;
+  font-weight: bold;
+  margin: 0 0 .2em;
+}
+
+.input {
+  display: block;
+  width: 100%;
+  font-size: 1em;
+}
+
+.error {
+  margin: .4em 0 0;
+  font-size: .8em;
+  color: var(--danger);
+}
+teextarea {
+  padding: .3ex;
+  font-size: 1em;
+  line-height: 1.5;
+}

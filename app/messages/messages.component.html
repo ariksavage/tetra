@@ -1,0 +1,6 @@
+<ul class="messages" *ngIf="list().length > 0">
+  <li *ngFor="let message of list()" id="message-{{message.id}}" class="message" [ngClass]="message.type">
+    <button class="dismiss-btn icon" (click)="remove(message.id)"><i class="fa-solid fa-times"></i></button>
+    <span class="message-text">{{message.text}}</span>
+  </li>
+</ul>

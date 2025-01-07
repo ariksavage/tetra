@@ -1,0 +1,53 @@
+:host {
+  display: flex;
+}
+
+.field-label {
+  flex: 0 1 auto;
+  white-space: nowrap;
+}
+.field-body {
+  flex: 1 0 300px;
+  // min-width: 300px;
+  // max-width: 600px;
+  margin: auto;
+  display: flex;
+  padding: 0 1em;
+  align-items: center;
+}
+.file-input-wrap {
+  width: 100%;
+
+  border-radius: 1em;
+  display: flex;
+  border: 2px dashed #333;
+  min-height: 100px;
+  align-items: center;
+  justify-content: center;
+  background: #ddd;
+  text-align: center;
+}
+.file-input {
+  margin: auto;
+  width: auto;
+}
+.preview {
+  flex: 0 1 50%;
+  max-width: 50%;
+  + .file-input-wrap {
+    display: none;
+  }
+}
+
+.inputs {
+  flex: 1 0 40%;
+  padding: 1em;
+}
+.input, .preview {
+  margin-bottom: 1em;
+}
+input,
+textarea,
+.input {
+  width: 100%;
+}

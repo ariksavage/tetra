@@ -1,0 +1,17 @@
+RewriteEngine on
+
+# core/users/get/1
+# ?type=users&action=index
+RewriteRule ^core/([^/]+)$ index.php?apitype=$1&action=index
+
+# core/users/get
+# ?apitype=users&action=get
+RewriteRule ^core/([^/]+)/([^/]+)$ index.php?apitype=$1&action=$2
+
+# core/users/get/1
+# ?apitype=users&action=get&id=1
+RewriteRule ^core/([^/]+)/([^/]+)/([^/]+)$ index.php?apitype=$1&action=$2&id=$3
+
+# core/certificates/course/:courseId/:userId
+# ?apitype=users&action=get&id=1
+RewriteRule ^core/([^/]+)/([^/]+)/([^/]+)/([^/]+)$ index.php?apitype=$1&action=$2&id=$3&id2=$4

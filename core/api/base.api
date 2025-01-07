@@ -1,0 +1,222 @@
+<?php
+namespace Tetra\API;
+
+require_once(CORE_ROOT . '/config.trait');
+require_once(CORE_ROOT . '/interfaces/queries/queries.trait');
+
+class Base {
+
+  use \Tetra\Config;
+  use \Tetra\Queries;
+
+  /**
+   * @var String
+   */
+  protected $table;
+
+  /**
+   * @var String
+   */
+  protected $model;
+
+  /**
+   * @var String
+   */
+  protected $plural;
+
+  /**
+   * @var String
+   */
+  protected $singular;
+
+  /**
+   * @var Object
+   * Data
+   */
+  public $data;
+
+  /**
+   * @var String
+   * Message
+   */
+  public $message;
+
+  /**
+   * @var NULL
+   * Error
+   * Will always be null, unless an error is thrown elsewhere in code.
+   */
+
+  public function __construct($table, $model, $plural, $singular) {
+    $this->data = new \stdClass();
+    $this->table = $table;
+    $this->model = $model;
+    $this->plural = $plural;
+    $this->singular = $singular;
+  }
+
+  public function savePOST()
+  {
+    $key = strtolower($this->singular);
+    $data = $this->postValue($key);
+    $model = new $this->model($data);
+    $success = $model->save();
+    if ($success) {
+      $this->success($this->singular, $model, "Successfully saved {$this->singular}.");
+    } else {
+      \Tetra\error("Could not save {$this->singular}.", $this->plural, $code = 500, $data);
+    }
+  }
+
+  /**
+   * List items belonging to this API's table
+   */
+  public function listPOST()
+  {
+    $query = $this->listQuery();
+
+    $list  = $query->execute(false, $this->model);
+    if (count($list)){
+      $this->success($this->plural, $list);
+    } else {
+      \Tetra\error("No results found", $this->plural, 404);
+    }
+  }
+
+  public function deleteDELETE($id)
+  {
+    $model = new $this->model();
+    $model->byId($id);
+    if (!$model->id){
+      \Tetra\error("{$this->singular} $id does not exist", $this->plural);
+    }
+    if ($model->remove()) {
+      $this->successMsg("Deleted {$this->singular} $id");
+    }
+  }
+
+  public function idGET($id)
+  {
+    $model = new $this->model();
+    $model->byId($id);
+    $this->success($this->singular, $model);
+  }
+
+  /**
+   * Get a list of columns to be used for search queries.
+   * To be overridden by specific APIs.
+   * 
+   * @return Array<String> List of column names.
+   */
+  protected function searchColumns()
+  {
+    return [];
+  }
+
+  /**
+   * Build a query to list items.
+   * May be expanded by specific APIs
+   */
+  protected function listQuery()
+  {
+    $query = $this->select()->from($this->table);
+    $page = $this->postValue('page', 1, 'integer');
+    $per = $this->postValue('per', 20, 'integer');
+    $search = $this->postValue('search');
+    if ($search){
+      $query->andGroup();
+      foreach($this->searchColumns() as $k => $column){
+        if ($k > 0) {
+          $query->or();
+        }
+        $query->where($column, 'CONTAINS', $search);
+
+      }
+      $query->endGroup();
+    }
+    $query->paginate($page, $per);
+    return $query;
+  }
+
+  /**
+   * Get a value from $postdata
+   * 
+   * @param String $key Object key to be retrieved
+   * 
+   * @return Mixed Postdata value
+   */
+  protected function postValue($key, $default = '', $type = 'string')
+  {
+    global $postdata;
+    $value = $default;
+    if (isset($postdata->$key)) {
+      $value = $postdata->$key;
+    }
+    switch($type) {
+      case 'integer':
+        $value = intval($value);
+        break;
+      case 'float':
+        $value = floatval($value);
+        break;
+      case 'string':
+      default:
+        break;
+    }
+    return $value;
+  }
+
+  /**
+   * Set a parameter of the API's data.
+   * 
+   * @param String $key  Data key to be set.
+   * @param Mixed  $data Data to be set to the value of $key.
+   * 
+   * @return $this.
+   */
+  public function addData($key = '', $data = null)
+  {
+    if ($key){
+      $key = strtolower($key);
+      $this->data->$key = $data;
+    }
+    return $this;
+  }
+
+  /**
+   * End the API interaction as successful.
+   * 
+   * @param String $key     Data key to be set.
+   * @param Mixed  $data    Data to be set to the value of $key.
+   * @param String $message User facing success message.
+   * 
+   * @return JSON.
+   */
+  public function success($key = '', $data = null, $message = null)
+  {
+    if ($data) {
+      if ($key) {
+        $key = strtolower($key);
+        $this->addData($key, $data);
+      } else {
+        $this->data = $data;
+      }
+    }
+    $this->message = $message;
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($this);
+  }
+
+  /**
+   * End the API interaction with a success message, and no data.
+   * 
+   * @param String $message User facing success message.
+   * 
+   * @return JSON.
+   */
+  public function successMsg($message)
+  {
+    return $this->success('', null, $message);
+  }
+}
+?>

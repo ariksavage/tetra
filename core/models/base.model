@@ -1,0 +1,204 @@
+<?php
+namespace Tetra\Models;
+
+require_once(CORE_ROOT . '/interfaces/queries/queries.trait');
+
+class Base {
+  use \Tetra\Queries;
+
+  /**
+  * @var String
+  * Database table
+  */
+  protected $table;
+
+  /**
+   * @var Integer
+   * Item ID
+   */
+  public $id;
+
+  /**
+   * @var Date
+   * Date Created
+   */
+  public $date_created;
+
+  /**
+   * @var Date
+   * Date Modified
+   */
+  public $date_modified;
+
+  public function __construct($table, $data = null, $flags = [])
+  {
+    $this->table = $table;
+    if ($data) {
+      $this->mapData($data);
+    }
+    return $this;
+  }
+
+  public function byId($id)
+  {
+    $data = $this->select()
+      ->where('id', '=', $id)
+      ->execute(true);
+    if($data) {
+      $this->mapData($data);
+      return $this;
+    } else {
+      return false;
+    }
+  }
+
+  public function refresh()
+  {
+    $this->byId($this->id);
+  }
+
+  public function save()
+  {
+    if ($data = $this->beforeSave()) {
+      if ($this->id) {
+        // update query
+        $q = $this->update()
+          ->set($data)
+          ->where('id', '=', $this->id)
+          ->execute();
+      } else {
+        // insert query
+        $this->id = $this->insert($data)
+          ->execute();
+      }
+      $this->refresh();
+      return true;
+    }
+    return false;
+  }
+
+  public function remove()
+  {
+    if ($this->beforeDelete()) {
+      if ($this->delete($this->id)->execute()) {
+        return $this->afterDelete();
+      }
+    }
+    return false;
+  }
+
+  protected function mapData(&$data)
+  { 
+    foreach($data as $key => $value) {
+      switch($key) {
+        // Number fields
+        case 'id':
+          $this->$key = $this->numberValue($value);
+          unset($data->$key);
+          break;
+        // Date fields
+        case 'date_created':
+        case 'date_modified':
+          $this->$key = $this->dateValue($value);
+          unset($data->$key);
+          break;
+        default:
+          break;
+      }
+    }
+    return true;
+  }
+
+  protected function numberValue($value)
+  {
+    $value = trim($value);
+    $float = floatval($value);
+    $int = intval($value);
+    if (!$value) {
+      return 0;
+    } else if (strval($int) == strval($value)) {
+      return $int;
+    } else if (strval($float) == strval($value)) {
+      return $float;
+    }
+  }
+
+  protected function dateValue($value)
+  {
+    if ($value) {
+      return strtotime($value);
+    } else {
+      return null;
+    }
+  }
+
+  protected function booleanValue($value)
+  {
+    return !!$value;
+  }
+
+  protected function stringValue($value)
+  {
+    if (!$value) {
+      return '';
+    }
+    return trim(strval($value));
+  }
+
+  protected function afterLoad()
+  {
+    return true;
+  }
+
+  protected function beforeSave()
+  {
+    $data = $this->toArray();
+    unset($data['id']);
+    unset($data['date_modified']);
+    unset($data['date_created']);
+    return $data;
+  }
+
+  protected function beforeDelete()
+  {
+    return true;
+  }
+
+  protected function afterDelete()
+  {
+    return true;
+  }
+
+  protected function timeStamp($value = null) {
+    return date('Y-m-d h:i:s', $value);
+  }
+
+  /**
+   * Convert the model to a JSON String.
+   */
+  public function toString()
+  {
+    $json = json_encode($this);
+    return $json;
+  }
+
+  /**
+   * Convert the model to a simplified object
+   */
+  public function toObject()
+  {
+    $json = $this->toString();
+    $object = json_decode($json);
+    return $object;
+  }
+
+  /**
+   * Convert the model to a simplified array.
+   */
+  public function toArray()
+  {
+    $object = $this->toObject();
+    $array = (array) $object;
+    return $array;
+  }
+}

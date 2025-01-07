@@ -1,0 +1,5 @@
+<label class="label" [attr.for]="id()" *ngIf="label">{{label}}</label>
+<!-- <input class="input" [attr.id]="id()" (blur)="onBlur($event)" (focus)="onFocus($event)" [attr.placeholder]="placeholder" [attr.type]="type" [(ngModel)]="model" (change)="onChange($event)" (keydown)="onKeyDown($event)"/> -->
+<input type="file" class="file-input"
+       (change)="onFileSelected($event)" #fileUpload>
+<p class="error" *ngIf="error">{{error}}</p>
