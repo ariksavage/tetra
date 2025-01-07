@@ -1,8 +1,8 @@
 #! /bin/bash
 echo "Installing TETRA"
 
-# echo "Testing database connection..."
-# sleep 1;
+echo "Testing database connection..."
+sleep 1;
 is_ddev=$(printenv "IS_DDEV_PROJECT");
 if [ $is_ddev ]; then
 
@@ -38,11 +38,24 @@ read -p 'First Name: ' firstname
 read -p 'Last name: ' lastname
 json="{\"username\": \"$username\", \"password\": \"$password\", }"
 hash=$(php -r "echo password_hash('$password', PASSWORD_BCRYPT, ['cost' => 12]);")
-user_q="INSERT INTO users (username, password, email, first_name, last_name) VALUES ( '$username', '$hash', '$email', '$firstname', '$lastname')"
+user_q="INSERT INTO \`users\` (\`username\`, \`password\`, \`email\`, \`first_name\`, \`last_name\`) VALUES ( '$username', '$hash', '$email', '$firstname', '$lastname')"
 if mysql -u "$db_user" -p"$db_pass" -h "$db_host" "$db_name" -e "$user_q"; then
   # add roles, permissions
-  role_q="INSERT INTO user_role_assignments (user_id, role_id) VALUES ((SELECT id FROM users WHERE username='$username'),( SELECT id FROM roles WHERE title='Root'))"
+  role_q="INSERT INTO user_role_assignments (\`user_id\`, \`role_id\`) VALUES ((SELECT \`id\` FROM \`users\` WHERE \`username\`='$username'),( SELECT \`id\` FROM \`roles\` WHERE \`title\`='Root'))"
   if mysql -u "$db_user" -p"$db_pass" -h "$db_host" "$db_name" -e "$role_q"; then
-    echo Your username is $username, we will not display your password
+    echo -e '\e[1A\e[KImported base.sql.User created.'
+    echo "Your username is $username, we will not display your password."
+  else
+    exit 3
   fi
+else
+  exit 4
+fi
+
+read -p 'Application name:' app_name
+app_name_q="INSERT INTO \`config\` (\`type\`, \`key\`, \`value\`, \`created_by\`, \`modified_by\`) VALUES ('application', 'name', '$app_name', (SELECT \`id\` FROM \`users\` WHERE \`username\`='$username'), (SELECT \`id\` FROM \`users\` WHERE \`username\`='$username'));"
+if mysql -u "$db_user" -p"$db_pass" -h "$db_host" "$db_name" -e "$app_name_q"; then
+    echo "Application configuration complete. Go log in."
+else
+  exit 5
 fi
