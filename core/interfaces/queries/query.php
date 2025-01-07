@@ -158,33 +158,24 @@ class Query
     return $this;
   }
 
-  public function and()
+  public function and($column, $comp, $value = null)
   {
-
     $last = end($this->whereConditions);
-    if (!$last) {
-      // Skip the and, since there are no preceeding conditions
-      return $this;
+    if ($last) {
+      $this->whereConditions[] = 'AND';
     }
-    if ($last && ($last == 'AND' || $last == 'OR')) {
-      die($this . PHP_EOL . ' AND must follow another condition');
-    }
-    $this->whereConditions[] = 'AND';
+    $this->where($column, $comp, $value);
     return $this;
   }
 
-  public function or()
+  public function or($column, $comp, $value = null)
   {
     $last = end($this->whereConditions);
-    if (!$last) {
-      // Skip the or, since there are no preceeding conditions
-      return $this;
+    $last = end($this->whereConditions);
+    if ($last) {
+      $this->whereConditions[] = 'OR';
     }
-    if ($last && ($last == 'AND' || $last == 'OR')) {
-      die($this . PHP_EOL . ' OR must follow another condition');
-    }
-    $this->whereConditions[] = 'OR';
-    return $this;
+    $this->where($column, $comp, $value);
   }
 
   public function andGroup()

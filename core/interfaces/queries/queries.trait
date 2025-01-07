@@ -6,11 +6,13 @@ require_once(__DIR__ . '/select.php');
 require_once(__DIR__ . '/insert.php');
 require_once(__DIR__ . '/update.php');
 require_once(__DIR__ . '/delete.php');
+require_once(__DIR__ . '/raw.php');
 
 use \Tetra\Database\selectQuery;
 use \Tetra\Database\insertQuery;
 use \Tetra\Database\updateQuery;
 use \Tetra\Database\deleteQuery;
+use \Tetra\Database\rawQuery;
 
 trait Queries {
 
@@ -62,6 +64,61 @@ trait Queries {
       $query->where('id', '=', $id);
     }
     return $query;
+  }
+
+  protected function raw($query)
+  {
+    return new rawQuery($query);
+  }
+
+  public function describeTable($table = null) {
+    if (!$table && isset($this->table)){
+      $table = $this->table;
+    }
+
+    if (!isset($_SESSION['schemas'])) {
+      $_SESSION['schemas'] = Array();
+    }
+
+    if (isset($_SESSION['schemas'][$table])) {
+      return $_SESSION['schemas'][$table];
+    } else {
+      $schema = new \stdClass();
+      $schema->name = $table;
+      $schema->columns = Array();
+      $response = $this->raw("DESCRIBE $table")->execute();
+      while($column = $response->fetch_object()) {
+
+        $column->name = $column->Field;
+        unset($column->Field);
+
+        $type = $column->Type;
+        unset($column->Type);
+        preg_match_all('/^([a-z\_]+)\(*([0-9]*)\)* *(.*)/m', $type, $type_matches, PREG_SET_ORDER, 0);
+        if (isset($type_matches[0])){
+          $column->type = $type_matches[0][1] ?? null;
+          $column->length = $type_matches[0][2] ?? null;
+          $column->unsigned = ($type_matches[0][3] ?? null) == 'unsigned';
+        }
+
+        $column->allowNull = $column->Null !== 'NO';
+        unset($column->Null);
+
+        $column->isKey = !!$column->Key;
+        unset($column->Key);
+
+        $column->default = $column->Default;
+        unset($column->Default);
+
+        $column->extra = $column->Extra;
+        unset($column->Extra);
+
+        $schema->columns[$column->name] = $column;
+      }
+
+      $_SESSION['schemas'][$table] = $schema;
+      return $schema;
+    }
   }
 }
 ?> 

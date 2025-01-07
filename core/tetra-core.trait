@@ -1,0 +1,87 @@
+<?php
+namespace Tetra;
+
+require_once(CORE_ROOT . '/interfaces/queries/select.php');
+require_once(CORE_ROOT . '/interfaces/queries/insert.php');
+require_once(CORE_ROOT . '/interfaces/queries/update.php');
+require_once(CORE_ROOT . '/interfaces/queries/delete.php');
+
+use \Tetra\Database\selectQuery;
+use \Tetra\Database\insertQuery;
+use \Tetra\Database\updateQuery;
+use \Tetra\Database\deleteQuery;
+
+trait Core {
+  protected function configValue($key, $type = 'application')
+  {
+    $config = new selectQuery('value')
+      ->from('config')
+      ->where('type', '=', $type)
+      ->and('key', '=', $key)
+      ->execute(true);
+    if (!$config) {
+      $this->error("Config {$key} not found", 404);
+    }
+    return $config->value;
+  }
+
+  /**
+   * Kill the current script, and return as much useful JSON data as possible
+   *
+   * @param String $message Error text.
+   * @param Integer $code Error code, header to be returned.
+   * @param String $type Category of error for reporting.
+   * @param Object $data Additional data to be included in the response.
+   *
+   * @return Void Print error response.
+   */
+  public function error($message, $code = 500, $type = null, $data = null)
+  {
+    $error = new \stdClass();
+    $error->message = $message;
+    $error->code = $code;
+    $error->type = $type;
+    if ($data) {
+      $error->data = $data;
+    }
+    if ($error->type == null) {
+      switch($code) {
+        case 401:
+          $error->type = 'Not Authorized';
+          break;
+        case 404:
+          $error->type = 'Not Found';
+          break;
+        default:
+          $error->type = \get_class($this);
+          break;
+      }
+    }
+    $e = new \Exception();
+    $error->stack = explode("\n", $e->getTraceAsString());
+    array_shift($error->stack);
+
+    if (php_sapi_name() === 'cli') { // Command line response
+      echo PHP_EOL . "{$error->code} ERROR {$error->type}" . PHP_EOL . $error->message . PHP_EOL;
+    } else { // HTTP response
+      http_response_code($error->code);
+      header('Content-Type: application/json');
+      die(json_encode($error));
+    }
+  }
+
+  /**
+  * convert kebab case URL to prettier camelCase for functions
+  * eg. course-enrollments => courseEnrollments
+  */
+  public function toCamelCase($string, $capitalizeFirstCharacter = false) {
+    $str = str_replace('-', ' ', $string);
+    $str = ucwords($str);
+    $str = str_replace(' ', '', $str);
+    if (!$capitalizeFirstCharacter) {
+        $str = lcfirst($str);
+    }
+    return $str;
+  }
+}
+?> 

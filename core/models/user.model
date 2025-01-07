@@ -14,9 +14,33 @@ class User extends Base {
 
   /**
   * @var String
-  * Name
+  * Name prefix eg. "Ms.", "Dr.", "Mr."
   */
-  public $name;
+  public $name_prefix;
+
+  /**
+  * @var String
+  * First Name
+  */
+  public $first_name;
+
+  /**
+  * @var String
+  * Middle Name
+  */
+  public $middle_name;
+
+  /**
+  * @var String
+  * Last Name
+  */
+  public $last_name;
+
+  /**
+  * @var String
+  * Name Suffix eg. "jr.", "OBE"
+  */
+  public $name_suffix;
 
   /**
   * @var String
@@ -28,7 +52,7 @@ class User extends Base {
   * @var String
   * assword
   */
-  private $password;
+  protected $password;
 
   /**
   * @var Date
@@ -40,7 +64,7 @@ class User extends Base {
   * @var String
   * Authorization Token
   */
-  private $auth_token;
+  protected $auth_token;
 
   /**
   * @var Date
@@ -105,25 +129,42 @@ class User extends Base {
    * @param String $key Column name
    * @param String $value Column value
    */
-  protected function mapData(&$data)
+  // protected function mapData(&$data)
+  // {
+  //   parent::mapData($data);
+  //   foreach($data as $key => $value) {
+  //     switch($key) {
+  //       case 'date_last_accessed':
+  //         $this->$key = $this->dateValue($value);
+  //         break;
+  //         case 'password':
+  //         case 'username':
+  //         case 'name':
+  //         case 'email':
+  //           $this->$key = $this->stringValue($value);
+  //           break;
+  //       default:
+  //         break;
+  //     }
+  //   }
+  //   return true;
+  // }
+
+  public function name()
   {
-    parent::mapData($data);
-    foreach($data as $key => $value) {
-      switch($key) {
-        case 'date_last_accessed':
-          $this->$key = $this->dateValue($value);
-          break;
-          case 'password':
-          case 'username':
-          case 'name':
-          case 'email':
-            $this->$key = $this->stringValue($value);
-            break;
-        default:
-          break;
-      }
+    $names = array();
+    $names[] = $this->name_prefix;
+    $names[] = $this->first_name;
+    $names[] = $this->middle_name;
+    $names[] = $this->last_name;
+    // var_dump(($names));die('names');
+    $names = array_filter($names);
+    $name = join(' ', $names);
+    if ($this->name_suffix) {
+      $name .= ', ' . $this->name_suffix;
     }
-    return true;
+    // die($name);
+    return $name;
   }
 
   /**
@@ -208,11 +249,11 @@ class User extends Base {
 
   public function byUsername($username)
   {
-    $data = $this->select()
-    ->where('username', '=', $username)
-    ->execute(true);
+    $q = $this->select()
+      ->where('username', '=', $username);
+    $data = $q->execute(true);
     if($data) {
-      $this->mapData($data);
+      $this->parseData($data);
       return $this;
     } else {
       return false;
