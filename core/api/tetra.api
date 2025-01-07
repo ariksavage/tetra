@@ -28,7 +28,7 @@ class tetra extends base {
    */
   public function dbTestGET()
   {
-    $result = $this->select(['1'], 'users')->exec();
+    $result = $this->select(['1'], 'users')->execute();
     var_dump($result);
     die();
   }
