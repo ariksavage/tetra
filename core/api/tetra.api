@@ -1,0 +1,48 @@
+<?php
+
+namespace Tetra\API;
+
+require_once(__DIR__ . '/base.api');
+
+require_once(CORE_ROOT . '/models/user.model');
+
+use \Tetra\Models\User;
+
+class tetra extends base {
+
+  public function __construct()
+  {
+    $this->data = new \stdClass();
+  }
+
+  public function coreGET()
+  {
+    $this->successMsg('Tetra core found');
+  }
+
+  public function dbTestGET()
+  {
+    $result = $this->select(['1'], 'users')->exec();
+    var_dump($result);
+    die();
+  }
+
+  public function ddevConfigGET()
+  {
+    $data = new \stdClass();
+    if(!getenv('IS_DDEV_PROJECT')){
+      \Tetra\error("This is not a DDEV project", "DDEV");
+    }
+    $data->host = getenv('PGHOST');
+    $data->user = getenv('PGUSER');
+    $data->password = getenv('PGPASSWORD');
+    $data->db = getenv('PGDATABASE');
+    $this->success('database', $data);
+  }
+
+  public function baseTablesGET()
+  {
+
+  }
+}
+?>
