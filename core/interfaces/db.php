@@ -9,13 +9,27 @@ class DB extends \mysqli
 
   public function __construct()
   {
-    $tetraConfig = CONFIG_PATH . '/db.config';
-    if (file_exists($tetraConfig)){
-      $config = (object) \yaml_parse_file($tetraConfig, 0);
-    } else {
-      \Tetra\error("Tetra config not found.", "Tetra", 500, ["config_file" => $tetraConfig]);
-    }
+    $config = $this->getConfig();
     parent::__construct($config->host, $config->user, $config->password, $config->name);
+  }
+
+  protected function getConfig()
+  {
+    $config = new \stdClass();
+    if(getenv('IS_DDEV_PROJECT')) {
+      $config->host = getenv('PGHOST');
+      $config->user = getenv('PGUSER');
+      $config->password = getenv('PGPASSWORD');
+      $config->name = getenv('PGDATABASE');
+    } else {
+      $tetraConfig = CONFIG_PATH . '/db.config';
+      if (file_exists($tetraConfig)){
+        $config = (object) \yaml_parse_file($tetraConfig, 0);
+      } else {
+        \Tetra\error("Tetra config not found.", "Tetra", 500, ["config_file" => $tetraConfig]);
+      }
+    }
+    return $config;
   }
 
   public function test() {
