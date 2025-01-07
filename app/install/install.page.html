@@ -8,7 +8,16 @@
   <p>And run Angular with proxy.conf.json:</p>
   <pre>"serve": "cd kd-app && ng serve --proxy-config proxy.conf.json --open"</pre>
 </div>
-<p *ngIf="coreTested && coreFound">Core configured</p>
+<p *ngIf="coreTested && coreFound">Core found</p>
+<p *ngIf="!dbTested">Testing database connection...</p>
+<div *ngIf="dbTested && !dbFound">
+  <p>configure database:</p>
+  <div class="field text" label="Database host" [(model)]="databaseConfig.host"></div>
+  <div class="field text" label="Database user" [(model)]="databaseConfig.user"></div>
+  <div class="field password" label="Database password" [(model)]="databaseConfig.password"></div>
+  <div class="field text" label="Database name" [(model)]="databaseConfig.db"></div>
+</div>
+<!--
 <p *ngIf="coreFound && !tablesTested">Checking if required tables are configured...</p>
 <div *ngIf="tablesTested && !tablesFound">
   <p>Adding required tables...</p>
@@ -23,3 +32,4 @@
 <div *ngIf="installComplete">
   <p>All checks completed. Redirecting to the homepage</p>
 </div>
+-->

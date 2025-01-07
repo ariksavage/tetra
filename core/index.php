@@ -48,10 +48,13 @@ unset($_GET['id2']);
 
 $currentUser = new User();
 
-$reqLogin = ($type == 'users' && $action == 'login');
-if (!$reqLogin && !$currentUser->byToken()) {
-  \Tetra\error("Not authorized", "Core", 401);
-}
+// $skipLogin = ($type == 'users' && $action == 'login') || ($action == 'tetra');
+// var_dump($skipLogin) {
+
+// }
+// if (!$skipLogin && !$currentUser->byToken()) {
+//   \Tetra\error("Not authorized", "Core", 401);
+// }
 
 // Load override classes first, then look to core
 $moduleClassFile = "/core/modules/$type.api";

@@ -29,7 +29,7 @@ function error($message = null, $type = null, $code = 500, $data = null) {
     $response = new \stdClass();
     $response->error = new \stdClass();
     if ($data){
-      $response->error = (object) array_merge((array) $response->error, (array) $data);
+      $response->error->data  = $data;
     }
     $response->error->message = $message;
     $response->error->type = $type;

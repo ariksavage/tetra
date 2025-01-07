@@ -22,8 +22,9 @@ export class CoreService {
    * @var Object result Response from Core
    */
   handleResult(result: any, key: string = '') {
-    console.log('handle result', result);
     if (result && result.message) {
+      console.log(result.message);
+      return true;
       // this.messages.message(result.message, key);
     }
     if (result && result.data) {
