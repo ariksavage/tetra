@@ -1,18 +1,23 @@
 <?php
 namespace Tetra\API;
 
-require_once(CORE_ROOT . '/config.trait');
+require_once(CORE_ROOT . '/tetra-core.trait');
 require_once(CORE_ROOT . '/interfaces/queries/queries.trait');
 
 class Base {
-
-  use \Tetra\Config;
+  use \Tetra\Core;
   use \Tetra\Queries;
 
   /**
    * @var String
    */
   protected $table;
+
+  /**
+   *
+   * @var Object
+   */
+  protected $_postdata;
 
   /**
    * @var String
@@ -47,7 +52,7 @@ class Base {
    * Will always be null, unless an error is thrown elsewhere in code.
    */
 
-  public function __construct($table, $model, $plural, $singular) {
+  public function __construct($table = null, $model = null, $plural = null, $singular = null) {
     $this->data = new \stdClass();
     $this->table = $table;
     $this->model = $model;
@@ -139,6 +144,24 @@ class Base {
   }
 
   /**
+   * Get data from Angular POST request, or from plain $_POST;
+   *
+   * @return Object
+   */
+  protected function getPostData()
+  {
+    if (!$this->_postdata) {
+        if ($_POST) {
+        $this->_postdata = (object) $_POST;
+      } else {
+        $rawdata = file_get_contents("php://input");
+        $this->_postdata = json_decode($rawdata);
+      }
+    }
+    return $this->_postdata;
+  }
+
+  /**
    * Get a value from $postdata
    * 
    * @param String $key Object key to be retrieved
@@ -147,11 +170,14 @@ class Base {
    */
   protected function postValue($key, $default = '', $type = 'string')
   {
-    global $postdata;
+    // Get postdata either from Angular or from $_POST;
+
+    $postdata = $this->getPostData();
     $value = $default;
     if (isset($postdata->$key)) {
       $value = $postdata->$key;
     }
+
     switch($type) {
       case 'integer':
         $value = intval($value);
@@ -159,10 +185,14 @@ class Base {
       case 'float':
         $value = floatval($value);
         break;
+      case 'boolean':
+        $value = !!$value;
+        break;
       case 'string':
       default:
         break;
     }
+
     return $value;
   }
 
@@ -204,7 +234,7 @@ class Base {
     }
     $this->message = $message;
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode($this);
+    die(json_encode($this));
   }
 
   /**

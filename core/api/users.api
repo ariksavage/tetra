@@ -26,7 +26,6 @@ class users extends base {
     return $query;
   }
 
-
   public function loginPOST()
   {
     $username = $this->postValue('username');
@@ -35,9 +34,9 @@ class users extends base {
     $user = new User();
     if ($token = $user->login($username, $password, $sessionExpiresDays)) {
       $this->addData('token', $token);
-      $this->success('user', $user, "Welcome, {$user->name}");
+      $this->success('user', $user, "Welcome, {$user->name()}");
     } else {
-      \Tetra\error('Login failed', 'Login', 401);
+      $this->error('Login failed', 401, 'Login');
     }
   }
 

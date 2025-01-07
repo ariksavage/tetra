@@ -14,30 +14,21 @@ define('CORE_ROOT', __dir__);
 define('SERVER_ROOT', realpath(CORE_ROOT . '/../'));
 define('CONFIG_PATH', __dir__ . '/../../config');
 
-require_once(CORE_ROOT . '/functions.php');
+require_once(CORE_ROOT . '/api/base.api');
 require_once(CORE_ROOT . '/models/user.model');
 
 use \Tetra\Models\User;
 
+$core = new \Tetra\API\Base();
 
 // Globals
-
-// Get postdata from either Angular or plain $_POST
-$postdata = null;
-
-if ($_POST) {
-  $postdata = (object) $_POST;
-} else {
-  $rawdata = file_get_contents("php://input");
-  $postdata = json_decode($rawdata);
-}
 
 $method = $_SERVER['REQUEST_METHOD'];
 $type = $_GET['apitype'] ?? 'error';
 unset($_GET['apitype']);
 $action = $_GET['action'] ?? 'index';
 unset($_GET['action']);
-$action = dashesToCamelCase($action);
+$action = $core->toCamelCase($action);
 
 $id  = $_GET['id']  ?? null;
 unset($_GET['id']);
@@ -63,15 +54,14 @@ if (file_exists($moduleClassFile)) {
 } else if (file_exists(CORE_ROOT . "/api/$type.api")) {
   require_once CORE_ROOT . "/api/$type.api";
 } else {
-  http_response_code(404);
-  die("$type is not a valid type");
+  $core->error("$type is not a valid type", 404);
 }
 
-$class = __NAMESPACE__ . '\\API\\' . dashesToCamelCase($type);
+$class = __NAMESPACE__ . '\\API\\' . $core->toCamelCase($type);
 if (class_exists($class)) {
   $core = new $class();
 } else {
-  die("$class does not exist.");
+  $core->error("$class does not found.", 404);
 }
 
 $fn = "$action$method";
@@ -84,6 +74,5 @@ if (method_exists($core, $fn)) {
     $core->$fn();
   }
 } else {
-  http_response_code(404);
-  die("$type/$action is not a valid $method action");
+  $core->error("$type/$action is not a valid $method action", 404);
 }
