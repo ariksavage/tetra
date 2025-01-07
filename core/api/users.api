@@ -1,0 +1,52 @@
+<?php
+
+namespace Tetra\API;
+
+require_once(__DIR__ . '/base.api');
+
+require_once(CORE_ROOT . '/models/user.model');
+
+use \Tetra\Models\User;
+
+class users extends base {
+
+  public function __construct()
+  {
+    parent::__construct('users', '\Tetra\Models\User', 'Users', 'User');
+  }
+
+  protected function searchColumns()
+  {
+    return ['username', 'name', 'email'];
+  }
+
+  protected function listQuery()
+  {
+    $query = parent::listQuery();
+    return $query;
+  }
+
+
+  public function loginPOST()
+  {
+    $username = $this->postValue('username');
+    $password = $this->postValue('password');
+    $sessionExpiresDays = $this->configValue('session_expires_days');
+    $user = new User();
+    if ($token = $user->login($username, $password, $sessionExpiresDays)) {
+      $this->addData('token', $token);
+      $this->success('user', $user, "Welcome, {$user->name}");
+    } else {
+      \Tetra\error('Login failed', 'Login', 401);
+    }
+  }
+
+  public function logoutGET()
+  {
+    global $currentUser;
+    if($currentUser->logout()) {
+      $this->successMsg("Successfully logged out.");
+    }
+  }
+}
+?>

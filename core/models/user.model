@@ -1,0 +1,343 @@
+<?php
+
+namespace Tetra\Models;
+
+require_once(__dir__ . '/base.model');
+
+class User extends Base {
+
+  /**
+  * @var String
+  * Username
+  */
+  public $username;
+
+  /**
+  * @var String
+  * Name
+  */
+  public $name;
+
+  /**
+  * @var String
+  * Email address
+  */
+  public $email;
+
+  /**
+  * @var String
+  * assword
+  */
+  private $password;
+
+  /**
+  * @var Date
+  * Date Last Accessed
+  */
+  public $date_last_accessed;
+
+  /**
+  * @var String
+  * Authorization Token
+  */
+  private $auth_token;
+
+  /**
+  * @var Date
+  * Authorization expiration date
+  */
+  protected $auth_expires;
+
+  public function __construct($data = null, $flags = [])
+  {
+    parent::__construct('users', $data, $flags = []);
+    return $this;
+  }
+
+  /**
+   * Prepare to save.
+   * Remove properties that are not reflected in the database
+   * 
+   * @return Array<Mixed> Array of column => value to be saved.
+   */
+  public function beforeSave()
+  {
+
+    $data = parent::beforeSave();
+
+
+
+    if ($this->password && strlen($this->password) !== 60) {
+      $data['password'] = $this->passwordHash($this->password);
+    }
+
+    if (!$data['username']) {
+      unset($data['username']);
+    }
+    if (!$data['date_last_accessed']) {
+      unset($data['date_last_accessed']);
+    }
+    if (!$data['email']) {
+      unset($data['email']);
+    }
+    
+    return $data;
+  }
+
+  /**
+   * Validate this model before saving as a new item.
+   * @return Boolean Object is valid.
+   */
+  // protected function validateNew(&$data)
+  // {
+  //   if (!$data['password']){
+  //     $this->setError("No password provided.", "User");
+  //     return false;
+  //   } else {
+  //     $data['password'] = $this->passwordHash($data['password']);
+  //     // hash password
+  //   }
+  //   return $data;
+  // }
+
+  /**
+   * Map database column into the appropriate value types.
+   * @param String $key Column name
+   * @param String $value Column value
+   */
+  protected function mapData(&$data)
+  {
+    parent::mapData($data);
+    foreach($data as $key => $value) {
+      switch($key) {
+        case 'date_last_accessed':
+          $this->$key = $this->dateValue($value);
+          break;
+          case 'password':
+          case 'username':
+          case 'name':
+          case 'email':
+            $this->$key = $this->stringValue($value);
+            break;
+        default:
+          break;
+      }
+    }
+    return true;
+  }
+
+  /**
+   * Clear the authorization token and
+   */
+  public function logout()
+  {
+    $_SESSION['authorization_token'] = NULL;
+    $_SESSION['user'] = null;
+    return $this->update()
+      ->set(['auth_token' => null, 'auth_expires' => null])
+      ->where('id', '=', $this->id)
+      ->execute();
+  }
+
+  public function login($username, $password, $expiresDays = 1)
+  {
+    $this->byUsername($username);
+    if ($this->testPassword($password)) {
+      return $this->access(true);
+    } else {
+      return false;
+    }
+  }
+
+  public function passwordResetLink($host, $expDays = 30)
+  {
+    if ($this->isLoggedIn()) {
+      return false;
+    }
+    $url = $host . '/reset-password';
+    $token = $this->updateAuthToken(null, $expDays);
+    return $url . '/' . $this->auth_token;
+  }
+
+  /**
+   * Find the user's authorization token
+   * 
+   * First check session.
+   * Then look in request headers (ie from API calls)
+   * 
+   * @return String $authToken The Authorization Token.
+   */
+  private function getAuthToken()
+  {
+    $authToken = '';
+    if(isset($_SESSION['authorization_token'])) {
+      return $_SESSION['authorization_token'];
+    } else if (isset($_COOKIE['auth'])) {
+      $_SESSION['authorization_token'] = $_COOKIE['auth'];
+      return $_COOKIE['auth'];
+    }
+    if (function_exists('apache_request_headers')){
+      $headers = \apache_request_headers();
+      $authToken = $headers['Authorization'] ?? null;
+    }
+    if ($authToken){
+      $authToken = str_replace('Bearer ', '', $authToken);
+      $authToken = trim($authToken);
+      $_SESSION['authorization_token'] = $authToken;
+      return $authToken;
+    }
+    return false;
+  }
+
+  public function byToken()
+  {
+    $token = $this->getAuthToken();
+    $q = $this->select()
+      ->where('auth_token', '=', $token)
+      ->and()
+      ->where('auth_expires', '>=', 'NOW()');
+      if ($data = $q->execute(true)) {
+      $this->mapData($data);
+
+      return true;
+    } else {
+      return false;
+    }
+
+  }
+
+  public function byUsername($username)
+  {
+    $data = $this->select()
+    ->where('username', '=', $username)
+    ->execute(true);
+    if($data) {
+      $this->mapData($data);
+      return $this;
+    } else {
+      return false;
+    }
+  }
+
+  public function loadCurrentUser()
+  {
+    if(isset($_SESSION['user'])) {
+      return $_SESSION['user'];
+    }
+    if($token = $this->getAuthToken()) {
+      $q = $this->select()
+        ->where('auth_token', '=', $token)
+        ->and()
+        ->where('auth_expires',  '>=', date('Y-m-d h:i:s', time()));
+      $data = $q->execute(true);
+      if($data) {
+        $this->__construct($data);
+        $this->getCategory();
+        $this->getRoles();
+        $this->getGroups();
+        $this->access();
+        $_SESSION['user'] = $this;
+        return $this;
+      } else {
+        return false;
+      }
+    }
+  }
+
+  /**
+   * Create a hash of the user's password.
+   * In this case, we want to increase the default cost for BCRYPT to 12.
+   * Note BCRYPT will always be 60 characters.
+   */
+  private function passwordHash($password)
+  {
+    $options = [
+        'cost' => 12,
+    ];
+    return password_hash($password, PASSWORD_BCRYPT, $options);
+  }
+
+  /**
+   * Test password hash against the password that is provided.
+   * 
+   * Note that password_hash() returns the algorithm,
+   * cost and salt as part of the returned hash. 
+   * 
+   * Therefore, all information that's needed to verify the hash is included in it. 
+   * This allows the verify function to verify the hash without needing separate 
+   * storage for the salt or algorithm information. 
+   */
+  public function testPassword($password)
+  {
+    $passwordHash = $this->password;
+    if (!$passwordHash) {
+      return false;
+    }
+    return password_verify($password, $passwordHash);
+  }
+
+  public function updatePassword($username, $password)
+  {
+    if ($username !== $this->username) {
+      return false;
+    }
+    $data = [];
+    $passwordHash = $this->passwordHash($password);
+    $data['password'] = $passwordHash;
+    $data['auth_token'] = '';
+    $data['change_password'] = false;
+    return $this->update($data)->execute();
+  }
+
+  /**
+   * Create a random auth token from the username and current timestamp
+   */
+  private function generateAuthToken()
+  {
+    $token = md5($this->username . date('Y-m-d-h-i-s'));
+    return $token;
+  }
+
+  /**
+   * Update date_last_accessed to the current date
+   * Update auth_expires to the next day.
+   */
+  private function access($updateToken = false)
+  {
+    $expiresDays = 1;
+    $expires = strtotime("+{$expiresDays} days");
+    $data = [
+      'date_last_accessed' => $this->timestamp(),
+      'auth_expires' => $this->timestamp($expires),
+    ];
+    if ($updateToken) {
+      $this->auth_token = $this->generateAuthToken();
+      $data['auth_token'] = $this->auth_token;
+    }
+    $q = $this->update()->set($data)->where('id', '=', $this->id);
+    if ($q->execute()) {
+      $this->refresh();
+    }
+    $_SESSION['authorization_token'] = $this->auth_token;
+    $_SESSION['user'] = $this;
+    return $this->auth_token;
+  }
+
+  public function fullName()
+  {
+      $name = [];
+      if ($this->first_name) {
+        $name[] = trim($this->first_name);
+      }
+      if ($this->middle_name) {
+        $name[] = trim($this->middle_name);
+      }
+      if ($this->last_name) {
+        $name[] = trim($this->last_name);
+      }
+      if ($this->name_suffix) {
+        $name[] = trim($this->name_suffix);
+      }
+      return implode(' ', $name);
+  }
+}

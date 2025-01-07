@@ -1,0 +1,57 @@
+.label {
+  display: inline-block;
+  font-size: 1em;
+  margin-right: 1em;
+}
+.input {
+  display: none;
+}
+.toggle {
+  width: 3em;
+  box-shadow: 2px 2px 1px #000 inset;
+  height: 1.5em;
+  background: var(--error);
+  border-radius: 1em;
+  transition: background .2s linear;
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  padding: 1px;
+  &::before {
+    content: '';
+    height: 100%;
+    width: 100%;
+    top: 0;
+    left: 0;
+    background: rgba(0, 0, 0, .2);
+    z-index: 1;
+    position: absolute;
+  }
+
+  .toggle-inner {
+    position: absolute;
+    top: 1px;
+    height: 1.5em;
+    width: 1.5em;
+    left: 0;
+    z-index: 2;
+    border-radius: 1em;
+    transition: left .2s linear;
+    background: #fff;
+    display: inline-block;
+    box-shadow: 1px 1px 2px #000;
+  }
+
+  &.on {
+    background: var(--success);
+    .toggle-inner {
+      left: 1.5em;
+    }
+  }
+}
+
+.description {
+  font-size: .7em;
+  display: inline-block;
+  margin: 0 0 0 1rem;
+}

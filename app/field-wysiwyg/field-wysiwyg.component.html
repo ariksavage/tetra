@@ -1,0 +1,11 @@
+<label class="label" *ngIf="label" [attr.for]="id()">{{label}}</label>
+<!--<textarea #area [attr.id]="id()" class="input"  (change)="change()" (keydown)="change()"></textarea>-->
+
+<editor
+    #area
+    [init]="init"
+    [(ngModel)]="model"
+    (ngModelChange)="change()"
+    (keydown)="change()"
+>
+</editor>

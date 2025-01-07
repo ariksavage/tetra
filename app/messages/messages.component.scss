@@ -1,0 +1,29 @@
+:host {
+  &:empty {
+    display: none;
+  }
+}
+.messages {
+  display: block;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.message {
+  display: flex;
+  align-items: center;
+  border: 1px solid transparent;
+  background: var(--body, #fff);
+
+
+  &.error {
+    border-color: red;
+    color: red;
+  }
+}
+
+.message-text {
+  flex: 1 0 auto;
+  padding: 0 1ex;
+}

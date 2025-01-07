@@ -1,0 +1,25 @@
+<h1 class="page-title">{{title}}</h1>
+<p *ngIf="!coreTested">Testing connection to backend...</p>
+<div *ngIf="coreTested && !coreFound">
+  <p>No connection to the core has been found.</p>
+  <p><a href="/core/tetra/install" target="_blank">Test Core</a></p>
+  <p>Check that the proxy.conf.json file exists in your project root. It should look like this:</p>
+  <pre [innerHTML]="proxyConf()"></pre>
+  <p>And run Angular with proxy.conf.json:</p>
+  <pre>"serve": "cd kd-app && ng serve --proxy-config proxy.conf.json --open"</pre>
+</div>
+<p *ngIf="coreTested && coreFound">Core configured</p>
+<p *ngIf="coreFound && !tablesTested">Checking if required tables are configured...</p>
+<div *ngIf="tablesTested && !tablesFound">
+  <p>Adding required tables...</p>
+</div>
+<p *ngIf="tablesTested && tablesFound">Required tables found</p>
+
+<p *ngIf="tablesFound && !usersTested">Checking for active users...</p>
+<div *ngIf="usersTested && !usersFound">
+  <p>Create a user...</p>
+</div>
+<p *ngIf="usersTested && usersFound">Active users found.</p>
+<div *ngIf="installComplete">
+  <p>All checks completed. Redirecting to the homepage</p>
+</div>

@@ -1,0 +1,67 @@
+<?php
+
+namespace Tetra;
+
+require_once(__DIR__ . '/select.php');
+require_once(__DIR__ . '/insert.php');
+require_once(__DIR__ . '/update.php');
+require_once(__DIR__ . '/delete.php');
+
+use \Tetra\Database\selectQuery;
+use \Tetra\Database\insertQuery;
+use \Tetra\Database\updateQuery;
+use \Tetra\Database\deleteQuery;
+
+trait Queries {
+
+  protected function select($fields = ['*'], $table = null)
+  {
+    if (!$table && $this->table) {
+      $table = $this->table;
+    }
+    $q = new selectQuery($fields, $table);
+
+    return $q;
+  }
+
+  protected function update($table = null)
+  {
+    if (!$table && $this->table) {
+      $table = $this->table;
+    }
+    $q =  new updateQuery($table);
+    return $q;
+  }
+
+  /**
+   * Create an INSERT query. See interfaces\queries
+   * 
+   * @param String $table Table into which data will be inserted.
+   * 
+   * @return kdCore\database\insert $query The Query Object.
+   */
+  protected function insert($data, $table = null)
+  {
+    if (!$table && isset($this->table)){
+      $table = $this->table;
+    }
+    $query = new insertQuery($data);
+    if ($table) {
+      $query->into($table);
+    }
+    return $query;
+  }
+
+  protected function delete($id = null, $table = null)
+  {
+    if (!$table && isset($this->table)){
+      $table = $this->table;
+    }
+    $query = new deleteQuery($table);
+    if ($id) {
+      $query->where('id', '=', $id);
+    }
+    return $query;
+  }
+}
+?> 

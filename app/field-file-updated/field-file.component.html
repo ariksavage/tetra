@@ -1,0 +1,22 @@
+<label class="label field-label" [attr.for]="id()" *ngIf="label">{{label}}</label>
+<div class="field-body">
+<label class="preview" [attr.for]="id()" *ngIf="type =='image' && src()"><img [src]="src()" [alt]="alt"/></label>
+<div class="file-input-wrap">
+  <input type="file" [attr.id]="id()" class="file-input" (change)="onFileSelected($event)" #fileUpload>
+</div>
+<div class="inputs" *ngIf="file">
+  <div class="input file-name">
+    <label for="name">{{type == 'any' ? 'File' : type}} name</label>
+    <input id="name" [(ngModel)]="name" (change)="isReady($event)"/>
+  </div>
+  <div class="input alt-text" *ngIf="type == 'image'">
+    <label for="alt">Alt Text</label>
+    <textarea id="alt" [(ngModel)]="alt" (change)="isReady($event)" maxlength="200"></textarea>
+  </div>
+  <p class="error" *ngIf="error" [innerHTML]="getError()"></p>
+  <button class="btn btn-primary" *ngIf="ready" (click)="upload()">Create Asset</button>
+</div>
+
+
+
+
