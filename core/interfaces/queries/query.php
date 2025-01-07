@@ -23,20 +23,8 @@ class Query
   }
 
   protected function connect() {
-    $tetraConfig = CONFIG_PATH . '/db.config';
-    if (file_exists($tetraConfig)){
-      $config = (object) \yaml_parse_file($tetraConfig, 0);
-    } else {
-      \Tetra\error("Tetra config not found.", "Tetra", 500, ["config_file" => $tetraConfig]);
-    }
-
     // add db
-    $this->conn = new db(
-      $config->host,
-      $config->user,
-      $config->password,
-      $config->name
-    );
+    $this->conn = new DB();
   }
 
   public function setMethod($method = null)
