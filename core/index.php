@@ -15,11 +15,12 @@ define('SERVER_ROOT', realpath(CORE_ROOT . '/../'));
 define('CONFIG_PATH', __dir__ . '/../../config');
 
 require_once(CORE_ROOT . '/api/base.api');
+require_once(CORE_ROOT . '/api/tetra.api');
 require_once(CORE_ROOT . '/models/user.model');
 
 use \Tetra\Models\User;
 
-$core = new \Tetra\API\Base();
+$core = new \Tetra\API\Tetra();
 
 // Globals
 

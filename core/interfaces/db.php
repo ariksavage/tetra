@@ -1,11 +1,13 @@
 <?php
 
 namespace Tetra\Database;
+require_once(CORE_ROOT . '/tetra-core.trait');
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 class DB extends \mysqli
 {
+  use \Tetra\Core;
 
   public function __construct()
   {
@@ -90,7 +92,7 @@ class DB extends \mysqli
       $result = parent::query($query, $result_mode);
       return $result;
     } catch (\mysqli_sql_exception $ex) {
-      \Tetra\error($ex->getMessage(), "MySQL", 500, array('query' => $query));
+      $this->error($ex->getMessage(), "MySQL", 500, array('query' => $query));
       return false;
     }
   }

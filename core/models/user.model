@@ -89,8 +89,6 @@ class User extends Base {
 
     $data = parent::beforeSave();
 
-
-
     if ($this->password && strlen($this->password) !== 60) {
       $data['password'] = $this->passwordHash($this->password);
     }
@@ -107,48 +105,6 @@ class User extends Base {
     
     return $data;
   }
-
-  /**
-   * Validate this model before saving as a new item.
-   * @return Boolean Object is valid.
-   */
-  // protected function validateNew(&$data)
-  // {
-  //   if (!$data['password']){
-  //     $this->setError("No password provided.", "User");
-  //     return false;
-  //   } else {
-  //     $data['password'] = $this->passwordHash($data['password']);
-  //     // hash password
-  //   }
-  //   return $data;
-  // }
-
-  /**
-   * Map database column into the appropriate value types.
-   * @param String $key Column name
-   * @param String $value Column value
-   */
-  // protected function mapData(&$data)
-  // {
-  //   parent::mapData($data);
-  //   foreach($data as $key => $value) {
-  //     switch($key) {
-  //       case 'date_last_accessed':
-  //         $this->$key = $this->dateValue($value);
-  //         break;
-  //         case 'password':
-  //         case 'username':
-  //         case 'name':
-  //         case 'email':
-  //           $this->$key = $this->stringValue($value);
-  //           break;
-  //       default:
-  //         break;
-  //     }
-  //   }
-  //   return true;
-  // }
 
   public function name()
   {
@@ -167,27 +123,104 @@ class User extends Base {
     return $name;
   }
 
+  public function login($username, $password, $expiresDays = 1)
+  {
+    $this->byUsername($username);
+    if ($this->testPassword($password)) {
+      return $this->startSession();
+    } else {
+      return false;
+    }
+  }
+    /**
+   * Test password hash against the password that is provided.
+   *
+   * Note that password_hash() returns the algorithm,
+   * cost and salt as part of the returned hash.
+   *
+   * Therefore, all information that's needed to verify the hash is included in it.
+   * This allows the verify function to verify the hash without needing separate
+   * storage for the salt or algorithm information.
+   */
+  public function testPassword($password)
+  {
+    $passwordHash = $this->password;
+    if (!$passwordHash) {
+      return false;
+    }
+    return password_verify($password, $passwordHash);
+  }
+
+  protected function startSession() {
+    $token = $this->generateAuthToken();
+    $data = Array();
+    $data['user_id'] = $this->id;
+    $data['token'] = $token;
+    if ($this->insert($data, 'user_sessions')->execute()) {
+      $_SESSION['authorization_token'] = $token;
+      $_SESSION['user'] = $this;
+      $this->updateSession($token);
+      return $token;
+    } else {
+      return false;
+    }
+  }
+
   /**
+   * Create a random auth token from the username and current timestamp
+   */
+  private function generateAuthToken()
+  {
+    $token = md5($this->username . date('Y-m-d-h-i-s'));
+    $_SESSION['token'] = $token;
+    return $token;
+  }
+
+  protected function updateSession($token) {
+    $token = $this->getAuthToken();
+    $data = Array();
+    $data['date_last_access'] = null; // updated by the table itself
+    if ($this->update('user_sessions')->set($data)->where('token', '=', $token)->and('user_id', '=', $this->id)) {
+      $data['date_ended'] = date('Y-m-d h:i:s');
+      $expired = $this->sessionExpires();
+      $this->update('user_sessions')
+      ->set($data)
+      ->where('user_id', '=', $this->id)
+      ->and('date_last_access', '<', $expired)
+      ->execute();
+      return true;
+    }
+  }
+
+  private function sessionExpires()
+  {
+    $sessionExpiresDays = $this->configValue('session_expires_days');
+    $expired = date('Y-m-d h:i:s', strtotime("-{$sessionExpiresDays} day"));
+    return $expired;
+  }
+
+    /**
    * Clear the authorization token and
    */
   public function logout()
   {
     $_SESSION['authorization_token'] = NULL;
     $_SESSION['user'] = null;
-    return $this->update()
-      ->set(['auth_token' => null, 'auth_expires' => null])
-      ->where('id', '=', $this->id)
-      ->execute();
+    return $this->endSession();
   }
 
-  public function login($username, $password, $expiresDays = 1)
+
+  protected function endSession()
   {
-    $this->byUsername($username);
-    if ($this->testPassword($password)) {
-      return $this->access(true);
-    } else {
-      return false;
-    }
+    $token = $this->getAuthToken();
+    $data = Array();
+    $data['date_ended'] = date('Y-m-d h:i:s');
+    return $this->update('user_sessions')
+          ->set($data)
+          ->where('token', '=', $token)
+          ->and('user_id', '=', $this->id)
+          ->and('date_ended', 'IS NULL')
+          ->execute();
   }
 
   public function passwordResetLink($host, $expDays = 30)
@@ -233,18 +266,20 @@ class User extends Base {
   public function byToken()
   {
     $token = $this->getAuthToken();
-    $q = $this->select()
-      ->where('auth_token', '=', $token)
-      ->and()
-      ->where('auth_expires', '>=', 'NOW()');
-      if ($data = $q->execute(true)) {
-      $this->mapData($data);
-
-      return true;
+    $expired = $this->sessionExpires();
+    $session_q = $this->select(['user_id'], 'user_sessions')->where('token', '=', $token)->and('date_last_access', '>', $expired);
+    if ($session = $session_q->execute(true)) {
+      $q = $this->select()
+        ->where('id', '=', $session->user_id);
+        if ($data = $q->execute(true)) {
+        $this->mapData($data);
+        return true;
+      } else {
+        return false;
+      }
     } else {
       return false;
     }
-
   }
 
   public function byUsername($username)
@@ -298,25 +333,6 @@ class User extends Base {
     return password_hash($password, PASSWORD_BCRYPT, $options);
   }
 
-  /**
-   * Test password hash against the password that is provided.
-   * 
-   * Note that password_hash() returns the algorithm,
-   * cost and salt as part of the returned hash. 
-   * 
-   * Therefore, all information that's needed to verify the hash is included in it. 
-   * This allows the verify function to verify the hash without needing separate 
-   * storage for the salt or algorithm information. 
-   */
-  public function testPassword($password)
-  {
-    $passwordHash = $this->password;
-    if (!$passwordHash) {
-      return false;
-    }
-    return password_verify($password, $passwordHash);
-  }
-
   public function updatePassword($username, $password)
   {
     if ($username !== $this->username) {
@@ -331,38 +347,29 @@ class User extends Base {
   }
 
   /**
-   * Create a random auth token from the username and current timestamp
-   */
-  private function generateAuthToken()
-  {
-    $token = md5($this->username . date('Y-m-d-h-i-s'));
-    return $token;
-  }
-
-  /**
    * Update date_last_accessed to the current date
    * Update auth_expires to the next day.
    */
-  private function access($updateToken = false)
-  {
-    $expiresDays = 1;
-    $expires = strtotime("+{$expiresDays} days");
-    $data = [
-      'date_last_accessed' => $this->timestamp(),
-      'auth_expires' => $this->timestamp($expires),
-    ];
-    if ($updateToken) {
-      $this->auth_token = $this->generateAuthToken();
-      $data['auth_token'] = $this->auth_token;
-    }
-    $q = $this->update()->set($data)->where('id', '=', $this->id);
-    if ($q->execute()) {
-      $this->refresh();
-    }
-    $_SESSION['authorization_token'] = $this->auth_token;
-    $_SESSION['user'] = $this;
-    return $this->auth_token;
-  }
+  // private function access($updateToken = false)
+  // {
+  //   $expiresDays = 1;
+  //   $expires = strtotime("+{$expiresDays} days");
+  //   $data = [
+  //     'date_last_accessed' => $this->timestamp(),
+  //     'auth_expires' => $this->timestamp($expires),
+  //   ];
+  //   if ($updateToken) {
+  //     $this->auth_token = $this->generateAuthToken();
+  //     $data['auth_token'] = $this->auth_token;
+  //   }
+  //   $q = $this->update('user_session')->set($data)->where('id', '=', $this->id);
+  //   if ($q->execute()) {
+  //     $this->refresh();
+  //   }
+  //   $_SESSION['authorization_token'] = $this->auth_token;
+  //   $_SESSION['user'] = $this;
+  //   return $this->auth_token;
+  // }
 
   public function fullName()
   {

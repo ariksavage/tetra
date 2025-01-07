@@ -8,11 +8,17 @@ require_once(CORE_ROOT . '/models/user.model');
 
 use \Tetra\Models\User;
 
-class tetra extends base {
+class Tetra extends Base {
 
   public function __construct()
   {
     $this->data = new \stdClass();
+  }
+
+  public function requiresAuth() {
+    echo 'skip auth';
+    return false;
+
   }
 
   /**
@@ -23,30 +29,19 @@ class tetra extends base {
     $this->successMsg('Tetra core found');
   }
 
-  /**
-   * Test database connection is available
-   */
-  public function dbTestGET()
+  public function loginPOST()
   {
-    $result = $this->select(['1'], 'users')->execute();
-    var_dump($result);
-    die();
+    $username = $this->postValue('username');
+    $password = $this->postValue('password');
+    $sessionExpiresDays = $this->configValue('session_expires_days');
+    $user = new User();
+    if ($token = $user->login($username, $password, $sessionExpiresDays)) {
+      $this->addData('token', $token);
+      $this->success('user', $user, "Welcome, {$user->name()}");
+    } else {
+      $this->error('Login failed', 401, 'Login');
+    }
   }
 
-  /**
-   * Get default DDEV configuration from the environment
-   */
-  public function ddevConfigGET()
-  {
-    $data = new \stdClass();
-    if(!getenv('IS_DDEV_PROJECT')) {
-      \Tetra\error("This is not a DDEV project", "DDEV");
-    }
-    $data->host = getenv('PGHOST');
-    $data->user = getenv('PGUSER');
-    $data->password = getenv('PGPASSWORD');
-    $data->db = getenv('PGDATABASE');
-    $this->success('database', $data);
-  }
 }
 ?>

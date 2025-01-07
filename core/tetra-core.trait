@@ -5,11 +5,13 @@ require_once(CORE_ROOT . '/interfaces/queries/select.php');
 require_once(CORE_ROOT . '/interfaces/queries/insert.php');
 require_once(CORE_ROOT . '/interfaces/queries/update.php');
 require_once(CORE_ROOT . '/interfaces/queries/delete.php');
+require_once(CORE_ROOT . '/models/user.model');
 
 use \Tetra\Database\selectQuery;
 use \Tetra\Database\insertQuery;
 use \Tetra\Database\updateQuery;
 use \Tetra\Database\deleteQuery;
+use \Tetra\Models\User;
 
 trait Core {
   protected function configValue($key, $type = 'application')
@@ -23,6 +25,20 @@ trait Core {
       $this->error("Config {$key} not found", 404);
     }
     return $config->value;
+  }
+
+  protected function getCurrentUser() {
+    if (isset($_SESSION['user'])) {
+      $user = $_SESSION['user'];
+    } else {
+      $user = new User();
+      if ($user->byToken()) {
+        $_SESSION['user'] = $user;
+      } else {
+        return false;
+      }
+    }
+    return $user;
   }
 
   /**
@@ -64,7 +80,7 @@ trait Core {
     if (php_sapi_name() === 'cli') { // Command line response
       echo PHP_EOL . "{$error->code} ERROR {$error->type}" . PHP_EOL . $error->message . PHP_EOL;
     } else { // HTTP response
-      http_response_code($error->code);
+      http_response_code(intval($error->code));
       header('Content-Type: application/json');
       die(json_encode($error));
     }
@@ -74,7 +90,8 @@ trait Core {
   * convert kebab case URL to prettier camelCase for functions
   * eg. course-enrollments => courseEnrollments
   */
-  public function toCamelCase($string, $capitalizeFirstCharacter = false) {
+  public function toCamelCase($string, $capitalizeFirstCharacter = false)
+  {
     $str = str_replace('-', ' ', $string);
     $str = ucwords($str);
     $str = str_replace(' ', '', $str);
