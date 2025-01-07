@@ -15,11 +15,17 @@ class tetra extends base {
     $this->data = new \stdClass();
   }
 
+  /**
+   * Basic check to see if the core is reachable
+   */
   public function coreGET()
   {
     $this->successMsg('Tetra core found');
   }
 
+  /**
+   * Test database connection is available
+   */
   public function dbTestGET()
   {
     $result = $this->select(['1'], 'users')->exec();
@@ -27,10 +33,13 @@ class tetra extends base {
     die();
   }
 
+  /**
+   * Get default DDEV configuration from the environment
+   */
   public function ddevConfigGET()
   {
     $data = new \stdClass();
-    if(!getenv('IS_DDEV_PROJECT')){
+    if(!getenv('IS_DDEV_PROJECT')) {
       \Tetra\error("This is not a DDEV project", "DDEV");
     }
     $data->host = getenv('PGHOST');
@@ -38,11 +47,6 @@ class tetra extends base {
     $data->password = getenv('PGPASSWORD');
     $data->db = getenv('PGDATABASE');
     $this->success('database', $data);
-  }
-
-  public function baseTablesGET()
-  {
-
   }
 }
 ?>
