@@ -1,17 +1,17 @@
 <?php
 
-namespace Tetra\API;
+namespace Core\API;
 
 require_once(__DIR__ . '/base.api');
 require_once(CORE_ROOT . '/models/user.model');
 
-use \Tetra\Models\User;
+use Models\User;
 
 class Users extends Base {
 
   public function __construct()
   {
-    parent::__construct('users', '\Tetra\Models\User', 'Users', 'User');
+    parent::__construct('users', '\Core\Models\User', 'Users', 'User');
   }
 
   protected function searchColumns()

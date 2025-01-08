@@ -1,6 +1,6 @@
 <?php
 
-namespace Tetra;
+namespace Core;
 /**
 * Get current user,
 * Define constants
@@ -18,9 +18,9 @@ require_once(CORE_ROOT . '/api/base.api');
 require_once(CORE_ROOT . '/api/tetra.api');
 require_once(CORE_ROOT . '/models/user.model');
 
-use \Tetra\Models\User;
+use \Core\Models\User;
 
-$core = new \Tetra\API\Tetra();
+$core = new \Core\API\Tetra();
 
 // Globals
 

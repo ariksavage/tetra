@@ -1,6 +1,6 @@
 <?php
 
-namespace Tetra;
+namespace Core\Database;
 
 require_once(__DIR__ . '/select.php');
 require_once(__DIR__ . '/insert.php');
@@ -8,14 +8,21 @@ require_once(__DIR__ . '/update.php');
 require_once(__DIR__ . '/delete.php');
 require_once(__DIR__ . '/raw.php');
 
-use \Tetra\Database\selectQuery;
-use \Tetra\Database\insertQuery;
-use \Tetra\Database\updateQuery;
-use \Tetra\Database\deleteQuery;
-use \Tetra\Database\rawQuery;
+// use \Core\Database\selectQuery;
+// use \Core\Database\insertQuery;
+// use \Core\Database\updateQuery;
+// use \Core\Database\deleteQuery;
+// use \Core\Database\rawQuery;
 
 trait Queries {
 
+  /**
+   * Create a SELECT query.
+   * @param  array  $fields Fields to select from the DB. Default: All ('*').
+   * @param  String $table  Table name to select from.
+   *
+   * @return selectQuery    Query object
+   */
   protected function select($fields = ['*'], $table = null)
   {
     if (!$table && $this->table) {
@@ -26,6 +33,14 @@ trait Queries {
     return $q;
   }
 
+  /**
+   * Create an UPDATE query. See interfaces\queries
+   *
+   * @param  array  $data [$key => $value] array of data to update.
+   * @param  String $table  Table name to update.
+   *
+   * @return selectQuery    Query object
+   */
   protected function update(array $data, $table = null)
   {
     if (!$table && $this->table) {
@@ -38,13 +53,14 @@ trait Queries {
   /**
    * Create an INSERT query. See interfaces\queries
    * 
+   * @param  array  $data [$key => $value] array of data to insert.
    * @param String $table Table into which data will be inserted.
    * 
-   * @return kdCore\database\insert $query The Query Object.
+   * @return insertQuery $query Query Object.
    */
   protected function insert($data, $table = null)
   {
-    if (!$table && isset($this->table)){
+    if (!$table && isset($this->table)) {
       $table = $this->table;
     }
     $query = new insertQuery($data);
@@ -54,9 +70,17 @@ trait Queries {
     return $query;
   }
 
-  protected function deleteQuery($id = null, $table = null)
+  /**
+   * Create a DELETE query. See interfaces\queries
+   *
+   * @param String $table Table into which data will be inserted.
+   * @param  integer $id ID of the item to be deleted (if provided)
+   *
+   * @return insertQuery $query Query Object.
+   */
+  protected function deleteQuery($table = null, $id = null)
   {
-    if (!$table && isset($this->table)){
+    if (!$table && isset($this->table)) {
       $table = $this->table;
     }
     $query = new deleteQuery($table);
@@ -66,12 +90,23 @@ trait Queries {
     return $query;
   }
 
+  /**
+   * Create a raw Query object.
+   * @param  String $query A MySQL Query string
+   * @return rawQuery      Query object
+   */
   protected function raw($query)
   {
     return new rawQuery($query);
   }
 
-  public function describeTable($table = null) {
+  /**
+   * Get descriptions of all columns in a given table.
+   * @param  String $table Table name
+   * @return Object        Object including `name` and `columns`
+   */
+  public function describeTable($table = null)
+  {
     if (!$table && isset($this->table)){
       $table = $this->table;
     }
@@ -121,4 +156,3 @@ trait Queries {
     }
   }
 }
-?> 

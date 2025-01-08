@@ -1,6 +1,6 @@
 <?php
 
-namespace Tetra\Database;
+namespace Core\Database;
 
 require_once('query.php');
 
