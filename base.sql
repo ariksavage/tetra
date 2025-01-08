@@ -53,9 +53,6 @@ CREATE TABLE `users` (
   `middle_name` varchar(255) DEFAULT NULL,
   `last_name` varchar(255) DEFAULT NULL,
   `name_suffix` varchar(255) DEFAULT NULL,
-  `auth_token` varchar(255) DEFAULT NULL,
-  `date_last_accessed` timestamp NULL DEFAULT NULL,
-  `auth_expires` timestamp NULL DEFAULT NULL,
   `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
   `created_by` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID, 0 for System',
   `date_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -97,6 +94,16 @@ CREATE TABLE `user_role_assignments` (
   PRIMARY KEY (`user_id`,`role_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+DROP TABLE IF EXISTS `user_sessions`;
+
+CREATE TABLE `user_sessions` (
+  `user_id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `date_started` timestamp NULL DEFAULT current_timestamp(),
+  `date_last_access` timestamp NULL DEFAULT current_timestamp(),
+  `date_ended` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
