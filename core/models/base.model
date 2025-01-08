@@ -15,6 +15,12 @@ class Base {
   protected $table;
 
   /**
+   * @var String
+   * Item label, for use in messages / errors
+   */
+  protected $label;
+
+  /**
    * @var Integer
    * Item ID
    */
@@ -44,165 +50,230 @@ class Base {
    */
   public $modified_by;
 
-  public function __construct($table, $data = null, $flags = [])
+  /**
+   * Model constructor
+   */
+  public function __construct($label, $table, $data = null, $flags = [])
   {
     $this->table = $table;
+    $this->label = $label;
     $schema = $this->describeTable();
+    if ($data) {
+      if (isset($data->id)){
+        $this->byId($data->id);
+      }
+      $this->mapData($data);
+      // $this->debug($this);
+    }
     return $this;
   }
 
-  protected function parseData($data) {
-    $schema = $this->describeTable();
-    foreach($data as $key => $value) {
-      $type = $schema->columns[$key]->type;
-      switch($type) {
-        case 'int':
-          $this->$key = intval($value);
-          break;
-        case 'timestamp':
-          $this->$key = \strtotime($value);
-          break;
-        case 'blob':
-        case 'varchar':
-        default:
-          $this->$key = strval($value);
-          break;
-      }
-    }
-  }
-
-  public function byId($id)
+  protected function getDataById(int $id)
   {
     $data = $this->select()
       ->where('id', '=', $id)
       ->execute(true);
-    if($data) {
-      $this->mapData($data);
-      return $this;
-    } else {
-      return false;
+    if (!$data) {
+      $this->error("{$this->label} {$id} Not Found", 404, "{$this->label} Not Found");
     }
-  }
-
-  public function refresh()
-  {
-    $this->byId($this->id);
-  }
-
-  public function save()
-  {
-    if ($data = $this->beforeSave()) {
-      if ($this->id) {
-        // update query
-        $q = $this->update()
-          ->set($data)
-          ->where('id', '=', $this->id)
-          ->execute();
-      } else {
-        // insert query
-        $this->id = $this->insert($data)
-          ->execute();
-      }
-      $this->refresh();
-      return true;
-    }
-    return false;
-  }
-
-  public function remove()
-  {
-    if ($this->beforeDelete()) {
-      if ($this->delete($this->id)->execute()) {
-        return $this->afterDelete();
-      }
-    }
-    return false;
-  }
-
-  protected function mapData(&$data)
-  { 
-    foreach($data as $key => $value) {
-      switch($key) {
-        // Number fields
-        case 'id':
-          $this->$key = $this->numberValue($value);
-          unset($data->$key);
-          break;
-        // Date fields
-        case 'date_created':
-        case 'date_modified':
-          $this->$key = $this->dateValue($value);
-          unset($data->$key);
-          break;
-        default:
-          break;
-      }
-    }
-    return true;
-  }
-
-  protected function numberValue($value)
-  {
-    $value = trim($value);
-    $float = floatval($value);
-    $int = intval($value);
-    if (!$value) {
-      return 0;
-    } else if (strval($int) == strval($value)) {
-      return $int;
-    } else if (strval($float) == strval($value)) {
-      return $float;
-    }
-  }
-
-  protected function dateValue($value)
-  {
-    if ($value) {
-      return strtotime($value);
-    } else {
-      return null;
-    }
-  }
-
-  protected function booleanValue($value)
-  {
-    return !!$value;
-  }
-
-  protected function stringValue($value)
-  {
-    if (!$value) {
-      return '';
-    }
-    return trim(strval($value));
-  }
-
-  protected function afterLoad()
-  {
-    return true;
-  }
-
-  protected function beforeSave()
-  {
-    $data = $this->toArray();
-    unset($data['id']);
-    unset($data['date_modified']);
-    unset($data['date_created']);
     return $data;
   }
 
-  protected function beforeDelete()
+    /**
+   * Populate this object by using its ID to fetch data
+   *
+   * @param Integer $id Item's database ID.
+   *
+   * @return $this
+   */
+  public function byId(int $id)
   {
-    return true;
+    if ($data = $this->getDataById($id)) {
+      $this->mapData($data);
+      return $this;
+    }
   }
 
-  protected function afterDelete()
-  {
-    return true;
+  protected function mapData(object $data) {
+    $schema = $this->describeTable();
+    foreach($data as $prop => $value) {
+      // echo "$prop => $value" . PHP_EOL;
+      if (property_exists($this, $prop)) {
+        $column = $schema->columns[$prop];
+        switch($column->type) {
+          case 'tinyint':
+            $this->$prop = !!$value;
+            break;
+          case 'int':
+            $this->$prop = intval($value);
+            break;
+          case 'timestamp':
+            $this->$prop = strtotime($value);
+            break;
+          case 'varchar':
+            $this->$prop = strval($value);
+            break;
+          case 'blob':
+            if (json_decode($value)) {
+              $this->$prop = json_decode($value);
+            } else {
+              $this->prop = strval($value);
+            }
+            break;
+          default:
+            $this->prop = $value;
+        }
+      }
+    }
+    return $this;
   }
 
-  protected function timeStamp($value = null) {
-    return date('Y-m-d h:i:s', $value);
+  /**
+   * Map data from the database to the model
+   *
+   * Convert Y-m-d h:i:s timestamps to a time integer
+   * Convert numberical strings to integer
+   * Convert tinyint 1/0 to TRUE/FALSE
+   *
+   * @param Array $data Database row or postdata
+   *
+   * @return $this
+   */
+  // protected function parseData($data)
+  // {
+  //   // if (isset($data->id)) {
+  //   //   $this->byId($data->id);
+  //   // }
+  //   $schema = $this->describeTable();
+  //   foreach($data as $key => $value) {
+  //     $column = $schema->columns[$key];
+  //     if ($value === NULL) {
+  //       if (!$column->allowNull && $column->default) {
+  //         $this->$key = $column->default;
+  //       }
+  //     } else {
+  //       $type = $column->type;
+  //       switch($type) {
+  //         case 'int':
+  //           $this->$key = intval($value);
+  //           break;
+  //         case 'timestamp':
+  //           $this->$key = \strtotime($value);
+  //           break;
+  //         case 'blob':
+  //         case 'varchar':
+  //         default:
+  //           $this->$key = strval($value);
+  //           break;
+  //       }
+  //     }
+  //   }
+  //   return $this;
+  // }
+
+  /**
+   * Format data to be used in update / insert queries
+   *
+   * Convert time integers to Y-m-d h:i:s
+   * Convert TRUE / FALSE to 1 / 0 for tinyint
+   *
+   * @param Array $data Database row or postdata
+   *
+   * @return Array Formatted Data
+   */
+  // protected function formatData($data)
+  // {
+  //   $schema = $this->describeTable();
+
+  //   foreach($data as $key => $value) {
+  //     $column = $schema->columns[$key];
+  //     if ($value === NULL) {
+  //       if (!$column->allowNull && $column->default) {
+  //         $this->$key = $column->default;
+  //       }
+  //         // $this->$key = NULL;
+  //     } else {
+  //       $type = $column->type;
+  //       switch($type) {
+  //         case 'tinyint':
+  //           $data[$key] = $value ? 1 : 0;
+  //         case 'int':
+  //           $data[$key] = intval($value);
+  //           break;
+  //         case 'timestamp':
+  //           $data[$key] = date('Y-m-d h:i:s', $value);
+  //           break;
+  //         case 'blob':
+  //         case 'varchar':
+  //         default:
+  //           $data[$key] = strval($value);
+  //           break;
+  //       }
+  //     }
+  //   }
+
+  //   // var_dump($data);
+  //   // die('format data');
+  //   return $data;
+  // }
+
+  /**
+   * Reload this object by getting data from the database
+   */
+  public function refresh()
+  {
+    $this->byId($this->id);
+    return $this;
+  }
+
+  public function prepareSave() {
+    $currentUser = $this->getCurrentUser();
+    $this->modified_by = intval($currentUser->id);
+    $data = $this->toArray();
+    unset($data['date_created']);
+    unset($data['date_modified']);
+    unset($data['id']);
+    return $data;
+  }
+
+  /**
+   * Save the current model to the database.
+   */
+  public function save()
+  {
+    $currentUser = $this->getCurrentUser();
+    $this->modified_by = intval($currentUser->id);
+    if (!isset($this->id) || !$this->id) {
+      $this->created_by = intval($currentUser->id);
+      $data = $this->prepareSave();
+      $this->id = $this->insert($data)->execute();
+    } else {
+      $data = $this->prepareSave();
+      $original = (array) $this->getDataById($this->id);
+      $diff = array_diff($data, $original);
+      $this->update($diff)->where('id', '=', $this->id)->execute();
+    }
+    $this->refresh();
+    return $this;
+  }
+
+  /**
+   * Delete this item from the database
+   *
+   * @return Boolean
+   */
+  public function delete()
+  {
+    return $this->deleteQuery($this->id)->execute();
+  }
+  /**
+   * Return JSON to debug
+   */
+  protected function debug($label, $data)
+  {
+    echo $label . PHP_EOL;
+    header('Content-Type: application/json; charset=utf-8');
+    die(json_encode($data));
   }
 
   /**

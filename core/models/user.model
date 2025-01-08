@@ -54,28 +54,32 @@ class User extends Base {
   */
   protected $password;
 
-  /**
-  * @var Date
-  * Date Last Accessed
-  */
-  public $date_last_accessed;
-
-  /**
-  * @var String
-  * Authorization Token
-  */
-  protected $auth_token;
-
-  /**
-  * @var Date
-  * Authorization expiration date
-  */
-  protected $auth_expires;
-
   public function __construct($data = null, $flags = [])
   {
-    parent::__construct('users', $data, $flags = []);
+    parent::__construct('User', 'users', $data, $flags = []);
     return $this;
+  }
+
+  public function mapData(object $data)
+  {
+    // if ($data->password && strlen($data->password) !== 60) {
+    //   $this->password = $this->passwordHash($data->password);
+    //   unset($data->password);
+    // }
+    return parent::mapData($data);
+  }
+
+  public function prepareSave() {
+    $data = parent::prepareSave();
+    // $this->debug('Prepare Save', $data);
+    if ($this->password) {
+      if (strlen($this->password) == 60) { // password is hashed
+        $data['password'] = $this->password;
+      } else {
+        $data['password'] = $this->passwordHash($this->password);
+      }
+    }
+    return $data;
   }
 
   /**
@@ -84,27 +88,24 @@ class User extends Base {
    * 
    * @return Array<Mixed> Array of column => value to be saved.
    */
-  public function beforeSave()
-  {
+  // public function beforeSave()
+  // {
 
-    $data = parent::beforeSave();
+  //   $data = parent::beforeSave();
 
-    if ($this->password && strlen($this->password) !== 60) {
-      $data['password'] = $this->passwordHash($this->password);
-    }
+  //   if ($this->password && strlen($this->password) !== 60) {
+  //     $data['password'] = $this->passwordHash($this->password);
+  //   }
 
-    if (!$data['username']) {
-      unset($data['username']);
-    }
-    if (!$data['date_last_accessed']) {
-      unset($data['date_last_accessed']);
-    }
-    if (!$data['email']) {
-      unset($data['email']);
-    }
+  //   if (!$data['username']) {
+  //     unset($data['username']);
+  //   }
+  //   if (!$data['email']) {
+  //     unset($data['email']);
+  //   }
     
-    return $data;
-  }
+  //   return $data;
+  // }
 
   public function name()
   {
@@ -113,17 +114,15 @@ class User extends Base {
     $names[] = $this->first_name;
     $names[] = $this->middle_name;
     $names[] = $this->last_name;
-    // var_dump(($names));die('names');
     $names = array_filter($names);
     $name = join(' ', $names);
     if ($this->name_suffix) {
       $name .= ', ' . $this->name_suffix;
     }
-    // die($name);
     return $name;
   }
 
-  public function login($username, $password, $expiresDays = 1)
+  public function login($username, $password)
   {
     $this->byUsername($username);
     if ($this->testPassword($password)) {
@@ -151,7 +150,8 @@ class User extends Base {
     return password_verify($password, $passwordHash);
   }
 
-  protected function startSession() {
+  protected function startSession()
+  {
     $token = $this->generateAuthToken();
     $data = Array();
     $data['user_id'] = $this->id;
@@ -176,7 +176,8 @@ class User extends Base {
     return $token;
   }
 
-  protected function updateSession($token) {
+  protected function updateSession($token)
+  {
     $token = $this->getAuthToken();
     $data = Array();
     $data['date_last_access'] = null; // updated by the table itself
@@ -295,37 +296,37 @@ class User extends Base {
     }
   }
 
-  public function loadCurrentUser()
-  {
-    if(isset($_SESSION['user'])) {
-      return $_SESSION['user'];
-    }
-    if($token = $this->getAuthToken()) {
-      $q = $this->select()
-        ->where('auth_token', '=', $token)
-        ->and()
-        ->where('auth_expires',  '>=', date('Y-m-d h:i:s', time()));
-      $data = $q->execute(true);
-      if($data) {
-        $this->__construct($data);
-        $this->getCategory();
-        $this->getRoles();
-        $this->getGroups();
-        $this->access();
-        $_SESSION['user'] = $this;
-        return $this;
-      } else {
-        return false;
-      }
-    }
-  }
+  // public function loadCurrentUser()
+  // {
+  //   if(isset($_SESSION['user'])) {
+  //     return $_SESSION['user'];
+  //   }
+  //   if($token = $this->getAuthToken()) {
+  //     $q = $this->select()
+  //       ->where('auth_token', '=', $token)
+  //       ->and()
+  //       ->where('auth_expires',  '>=', date('Y-m-d h:i:s', time()));
+  //     $data = $q->execute(true);
+  //     if($data) {
+  //       $this->__construct($data);
+  //       $this->getCategory();
+  //       $this->getRoles();
+  //       $this->getGroups();
+  //       $this->access();
+  //       $_SESSION['user'] = $this;
+  //       return $this;
+  //     } else {
+  //       return false;
+  //     }
+  //   }
+  // }
 
   /**
    * Create a hash of the user's password.
    * In this case, we want to increase the default cost for BCRYPT to 12.
    * Note BCRYPT will always be 60 characters.
    */
-  private function passwordHash($password)
+  protected function passwordHash($password)
   {
     $options = [
         'cost' => 12,
@@ -370,22 +371,4 @@ class User extends Base {
   //   $_SESSION['user'] = $this;
   //   return $this->auth_token;
   // }
-
-  public function fullName()
-  {
-      $name = [];
-      if ($this->first_name) {
-        $name[] = trim($this->first_name);
-      }
-      if ($this->middle_name) {
-        $name[] = trim($this->middle_name);
-      }
-      if ($this->last_name) {
-        $name[] = trim($this->last_name);
-      }
-      if ($this->name_suffix) {
-        $name[] = trim($this->name_suffix);
-      }
-      return implode(' ', $name);
-  }
 }
