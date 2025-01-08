@@ -1,12 +1,12 @@
 <?php
-namespace Tetra\Models;
+namespace Core\Models;
 
 require_once(CORE_ROOT . '/interfaces/queries/queries.trait');
 require_once(CORE_ROOT . '/tetra-core.trait');
 
 class Base {
-  use \Tetra\Core;
-  use \Tetra\Queries;
+  use \Core\Common;
+  use \Core\Database\Queries;
 
   /**
   * @var String
@@ -94,26 +94,51 @@ class Base {
     }
   }
 
-  protected function mapData(object $data) {
+  /**
+   * Take data from the database, or post
+   * and map it to the model.
+   *
+   * @param object $data Data to map.
+   *
+   * @return $this.
+   */
+  protected function mapData(object $data)
+  {
     $schema = $this->describeTable();
     foreach($data as $prop => $value) {
-      // echo "$prop => $value" . PHP_EOL;
       if (property_exists($this, $prop)) {
         $column = $schema->columns[$prop];
         switch($column->type) {
           case 'tinyint':
+          case 'boolean':
+          case 'bool':
             $this->$prop = !!$value;
             break;
           case 'int':
+          case 'bigint':
             $this->$prop = intval($value);
+            break;
+          case 'float':
+          case 'double':
+          case 'doubleprecision':
+          case 'real':
+          case 'decimal':
+            $this->$prop = float($value);
             break;
           case 'timestamp':
             $this->$prop = strtotime($value);
             break;
           case 'varchar':
+          case 'char':
+          case 'text':
+          case 'tinytext':
+          case 'mediumtext':
+          case 'longtext':
+          case 'enum':
             $this->$prop = strval($value);
             break;
           case 'blob':
+          case 'longblob':
             if (json_decode($value)) {
               $this->$prop = json_decode($value);
             } else {
@@ -129,95 +154,6 @@ class Base {
   }
 
   /**
-   * Map data from the database to the model
-   *
-   * Convert Y-m-d h:i:s timestamps to a time integer
-   * Convert numberical strings to integer
-   * Convert tinyint 1/0 to TRUE/FALSE
-   *
-   * @param Array $data Database row or postdata
-   *
-   * @return $this
-   */
-  // protected function parseData($data)
-  // {
-  //   // if (isset($data->id)) {
-  //   //   $this->byId($data->id);
-  //   // }
-  //   $schema = $this->describeTable();
-  //   foreach($data as $key => $value) {
-  //     $column = $schema->columns[$key];
-  //     if ($value === NULL) {
-  //       if (!$column->allowNull && $column->default) {
-  //         $this->$key = $column->default;
-  //       }
-  //     } else {
-  //       $type = $column->type;
-  //       switch($type) {
-  //         case 'int':
-  //           $this->$key = intval($value);
-  //           break;
-  //         case 'timestamp':
-  //           $this->$key = \strtotime($value);
-  //           break;
-  //         case 'blob':
-  //         case 'varchar':
-  //         default:
-  //           $this->$key = strval($value);
-  //           break;
-  //       }
-  //     }
-  //   }
-  //   return $this;
-  // }
-
-  /**
-   * Format data to be used in update / insert queries
-   *
-   * Convert time integers to Y-m-d h:i:s
-   * Convert TRUE / FALSE to 1 / 0 for tinyint
-   *
-   * @param Array $data Database row or postdata
-   *
-   * @return Array Formatted Data
-   */
-  // protected function formatData($data)
-  // {
-  //   $schema = $this->describeTable();
-
-  //   foreach($data as $key => $value) {
-  //     $column = $schema->columns[$key];
-  //     if ($value === NULL) {
-  //       if (!$column->allowNull && $column->default) {
-  //         $this->$key = $column->default;
-  //       }
-  //         // $this->$key = NULL;
-  //     } else {
-  //       $type = $column->type;
-  //       switch($type) {
-  //         case 'tinyint':
-  //           $data[$key] = $value ? 1 : 0;
-  //         case 'int':
-  //           $data[$key] = intval($value);
-  //           break;
-  //         case 'timestamp':
-  //           $data[$key] = date('Y-m-d h:i:s', $value);
-  //           break;
-  //         case 'blob':
-  //         case 'varchar':
-  //         default:
-  //           $data[$key] = strval($value);
-  //           break;
-  //       }
-  //     }
-  //   }
-
-  //   // var_dump($data);
-  //   // die('format data');
-  //   return $data;
-  // }
-
-  /**
    * Reload this object by getting data from the database
    */
   public function refresh()
@@ -226,6 +162,11 @@ class Base {
     return $this;
   }
 
+  /**
+   * Convert the model to an array for use in a query.
+   *
+   * @return Array
+   */
   public function prepareSave() {
     $currentUser = $this->getCurrentUser();
     $this->modified_by = intval($currentUser->id);
@@ -243,16 +184,18 @@ class Base {
   {
     $currentUser = $this->getCurrentUser();
     $this->modified_by = intval($currentUser->id);
-    if (!isset($this->id) || !$this->id) {
+
+    if (!isset($this->id) || !$this->id) { // This has an ID, update it.
       $this->created_by = intval($currentUser->id);
       $data = $this->prepareSave();
       $this->id = $this->insert($data)->execute();
-    } else {
+    } else { // NO ID, create new.
       $data = $this->prepareSave();
       $original = (array) $this->getDataById($this->id);
       $diff = array_diff($data, $original);
       $this->update($diff)->where('id', '=', $this->id)->execute();
     }
+
     $this->refresh();
     return $this;
   }
@@ -264,10 +207,13 @@ class Base {
    */
   public function delete()
   {
-    return $this->deleteQuery($this->id)->execute();
+    return $this->deleteQuery($this->table, $this->id)->execute();
   }
+
   /**
    * Return JSON to debug
+   *
+   * @param $label
    */
   protected function debug($label, $data)
   {

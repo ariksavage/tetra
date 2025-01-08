@@ -1,13 +1,13 @@
 <?php
 
-namespace Tetra\Database;
+namespace Core\Database;
 require_once(CORE_ROOT . '/tetra-core.trait');
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 class DB extends \mysqli
 {
-  use \Tetra\Core;
+  use \Core\Common;
 
   public function __construct()
   {

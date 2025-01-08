@@ -1,46 +1,53 @@
 <?php
-namespace Tetra\API;
+namespace Core\API;
 
 require_once(CORE_ROOT . '/tetra-core.trait');
 require_once(CORE_ROOT . '/interfaces/queries/queries.trait');
 
 class Base {
-  use \Tetra\Core;
-  use \Tetra\Queries;
+  use \Core\Common;
+  use \Core\Database\Queries;
 
   /**
+   * Default table name.
    * @var String
    */
   protected $table;
 
   /**
-   *
+   * Cached data sent via POST request.
    * @var Object
    */
+
   protected $_postdata;
 
   /**
+   * Classname of the default model
    * @var String
    */
   protected $model;
 
   /**
+   * Label for multiple items
    * @var String
    */
   protected $plural;
 
   /**
+   * Label for a single item
    * @var String
    */
   protected $singular;
 
   /**
+   * Data object to be returned
    * @var Object
    * Data
    */
   public $data;
 
   /**
+   * Text message to be returned
    * @var String
    * Message
    */
@@ -48,22 +55,33 @@ class Base {
 
 
   public function __construct($table = null, $model = null, $plural = null, $singular = null) {
-    $this->data = new \stdClass();
-    $this->table = $table;
-    $this->model = $model;
-    $this->plural = $plural;
-    $this->singular = $singular;
-    $this->checkAuth();
+    if ($this->checkAuth()) {
+      $this->data = new \stdClass();
+      $this->message = '';
+      $this->table = $table;
+      $this->model = $model;
+      $this->plural = $plural;
+      $this->singular = $singular;
+    }
   }
 
+  /**
+   * Check if authorization is required
+   * @return Boolean True if login is required
+   */
   public function requiresAuth() {
-    return false;
+    return true;
   }
 
+  /**
+   * If authorization is required, check for an active user
+   * @return [type] [description]
+   */
   protected function checkAuth() {
     if ($this->requiresAuth() && !$this->getCurrentUser()) {
       $this->error('Login required', 401);
     }
+    return true;
   }
 
   public function savePOST()
@@ -90,7 +108,7 @@ class Base {
     if (count($list)){
       $this->success($this->plural, $list);
     } else {
-      \Tetra\error("No results found", $this->plural, 404);
+      $this->error("No results found", $this->plural, 404);
     }
   }
 
@@ -225,7 +243,7 @@ class Base {
    * 
    * @return JSON.
    */
-  public function success($key = '', $data = null, $message = null)
+  public function success($key = '', $data = null, $message = '')
   {
     if ($data) {
       if ($key) {

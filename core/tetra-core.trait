@@ -1,5 +1,5 @@
 <?php
-namespace Tetra;
+namespace Core;
 
 require_once(CORE_ROOT . '/interfaces/queries/select.php');
 require_once(CORE_ROOT . '/interfaces/queries/insert.php');
@@ -7,13 +7,19 @@ require_once(CORE_ROOT . '/interfaces/queries/update.php');
 require_once(CORE_ROOT . '/interfaces/queries/delete.php');
 require_once(CORE_ROOT . '/models/user.model');
 
-use \Tetra\Database\selectQuery;
-use \Tetra\Database\insertQuery;
-use \Tetra\Database\updateQuery;
-use \Tetra\Database\deleteQuery;
-use \Tetra\Models\User;
+use \Core\Database\selectQuery;
+use \Core\Database\insertQuery;
+use \Core\Database\updateQuery;
+use \Core\Database\deleteQuery;
+use \Core\Models\User;
 
-trait Core {
+trait Common {
+  /**
+   * Shorthand function to get a config value
+   * @param  string $key  Config key
+   * @param  string $type Config type
+   * @return Mixed        Config value
+   */
   protected function configValue($key, $type = 'application')
   {
     $config = new selectQuery('value')
@@ -27,7 +33,43 @@ trait Core {
     return $config->value;
   }
 
-  protected function getCurrentUser() {
+    /**
+   * Find the user's authorization token.
+   *
+   * First check session.
+   * Then look in request headers (ie from API calls)
+   *
+   * @return String $authToken The Authorization Token.
+   */
+  protected function getAuthToken()
+  {
+    $authToken = '';
+    if(isset($_SESSION['authorization_token'])) {
+      return $_SESSION['authorization_token'];
+    } else if (isset($_COOKIE['auth'])) {
+      $_SESSION['authorization_token'] = $_COOKIE['auth'];
+      return $_COOKIE['auth'];
+    }
+    if (function_exists('apache_request_headers')){
+      $headers = \apache_request_headers();
+      $authToken = $headers['Authorization'] ?? null;
+    }
+    if ($authToken){
+      $authToken = str_replace('Bearer ', '', $authToken);
+      $authToken = trim($authToken);
+      $_SESSION['authorization_token'] = $authToken;
+      return $authToken;
+    }
+    return false;
+  }
+
+  /**
+   * Get the session's current user
+   *
+   * @return  User
+   */
+  protected function getCurrentUser()
+  {
     if (isset($_SESSION['user'])) {
       $user = $_SESSION['user'];
     } else {
@@ -87,7 +129,7 @@ trait Core {
   }
 
   /**
-  * convert kebab case URL to prettier camelCase for functions
+  * Convert kebab case URL to prettier camelCase for functions
   * eg. course-enrollments => courseEnrollments
   */
   public function toCamelCase($string, $capitalizeFirstCharacter = false)

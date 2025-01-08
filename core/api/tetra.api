@@ -1,12 +1,12 @@
 <?php
 
-namespace Tetra\API;
+namespace Core\API;
 
 require_once(__DIR__ . '/base.api');
 
 require_once(CORE_ROOT . '/models/user.model');
 
-use \Tetra\Models\User;
+use \Core\Models\User;
 
 class Tetra extends Base {
 
