@@ -57,7 +57,7 @@ class Base {
   }
 
   public function requiresAuth() {
-    return true;
+    return false;
   }
 
   protected function checkAuth() {
@@ -75,7 +75,7 @@ class Base {
     if ($success) {
       $this->success($this->singular, $model, "Successfully saved {$this->singular}.");
     } else {
-      \Tetra\error("Could not save {$this->singular}.", $this->plural, $code = 500, $data);
+      $this->error("Could not save {$this->singular}.", $this->plural, $code = 500, $data);
     }
   }
 
@@ -98,10 +98,7 @@ class Base {
   {
     $model = new $this->model();
     $model->byId($id);
-    if (!$model->id){
-      \Tetra\error("{$this->singular} $id does not exist", $this->plural);
-    }
-    if ($model->remove()) {
+    if ($model->delete()) {
       $this->successMsg("Deleted {$this->singular} $id");
     }
   }

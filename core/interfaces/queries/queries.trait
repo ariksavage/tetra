@@ -26,12 +26,12 @@ trait Queries {
     return $q;
   }
 
-  protected function update($table = null)
+  protected function update(array $data, $table = null)
   {
     if (!$table && $this->table) {
       $table = $this->table;
     }
-    $q =  new updateQuery($table);
+    $q =  new updateQuery($table)->set($data);
     return $q;
   }
 
@@ -54,7 +54,7 @@ trait Queries {
     return $query;
   }
 
-  protected function delete($id = null, $table = null)
+  protected function deleteQuery($id = null, $table = null)
   {
     if (!$table && isset($this->table)){
       $table = $this->table;
