@@ -3,12 +3,11 @@
 namespace Core\API;
 
 require_once(__DIR__ . '/base.api');
-
 require_once(CORE_ROOT . '/models/user.model');
 
 use \Core\Models\User;
 
-class Tetra extends Base {
+class Core extends Base {
 
   public function __construct()
   {
@@ -16,9 +15,7 @@ class Tetra extends Base {
   }
 
   public function requiresAuth() {
-    echo 'skip auth';
     return false;
-
   }
 
   /**
@@ -26,7 +23,7 @@ class Tetra extends Base {
    */
   public function coreGET()
   {
-    $this->successMsg('Tetra core found');
+    $this->successMsg('Core found');
   }
 
   public function loginPOST()

@@ -21,14 +21,16 @@ export class CoreService {
    * Set messages, return data.
    * @var Object result Response from Core
    */
-  handleResult(result: any, key: string = '') {
-    if (result && result.message) {
-      console.log(result.message);
-      return true;
-      // this.messages.message(result.message, key);
-    }
-    if (result && result.data) {
-      return result.data;
+  handleResult(result: any = null, key: string = '') {
+    if (result) {
+      if (result.message) {
+        console.log(result.message);
+      }
+      if (result.data) {
+        return result.data;
+      } else {
+        return true;
+      }
     } else {
       return false;
     }
@@ -38,8 +40,8 @@ export class CoreService {
    * Set error message
    * @param Object error Error object
    */
-  handleError(data: any, key: string = '') {
-    console.error('error', data);
+  handleError(error: any) {
+    console.error('ERROR ' + error.code, error.message);
     return false;
   }
 
@@ -55,7 +57,11 @@ export class CoreService {
    * Set headers for http requests
    */
   getConfig() {
-    const headers = new HttpHeaders().set('Authorization', `Bearer ${this.authToken}`);
+    const headers = new HttpHeaders();
+    if (this.authToken) {
+      headers.set('Authorization', `Bearer ${this.authToken}`);
+    }
+    // headers.set('responseType',  'application/json');
     return { headers };
   }
 
@@ -99,8 +105,8 @@ export class CoreService {
     let url = this.url(type, action, id, id2);
     return this.http.get(url, this.getConfig()).toPromise().then((result: any) => {
       return this.handleResult(result, type);
-    }).catch((response: any) => {
-      return this.handleError(response.error, type)
+    }, (response: any) => {
+      return this.handleError(response.error)
     });
   }
 
@@ -115,10 +121,12 @@ export class CoreService {
    */
   post(type: string, action: string = '', payload: any = {}) {
     let url = this.url(type, action);
+    console.log('post url', url);
     return this.http.post(url, payload, this.getConfig()).toPromise().then((result: any) => {
+      console.log('post', result);
       return this.handleResult(result, type);
     }, (response: any) => {
-      return this.handleError(response.error, type)
+      return this.handleError(response.error)
     });
   }
 
@@ -137,7 +145,7 @@ export class CoreService {
     return this.http.put(url, null, this.getConfig()).toPromise().then((result: any) => {
       return this.handleResult(result, type);
     }, (response: any) => {
-      return this.handleError(response.error, type)
+      return this.handleError(response.error)
     });
   }
 
@@ -156,7 +164,7 @@ export class CoreService {
     return this.http.delete(url, this.getConfig()).toPromise().then((result: any) => {
       return this.handleResult(result, type);
     }, (response: any) => {
-      return this.handleError(response.error, type)
+      return this.handleError(response.error)
     });
   }
 
@@ -199,7 +207,7 @@ export class CoreService {
   //       }
   //     },
   //     (response: any) => {
-  //       return this.handleError(response.error, type);
+  //       return this.handleError(response.error);
   //     }
   //   );
   // }

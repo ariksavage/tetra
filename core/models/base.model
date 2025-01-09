@@ -1,59 +1,85 @@
 <?php
+/**
+ * Base model class
+ *
+ * Represents an object that can be READ, UPDATED, DELETED
+ *
+ * PHP version 8.4
+ *
+ *
+ * @category   Model
+ * @package    Core
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @version    1.0
+ * @since      2025-01-05
+ */
+
 namespace Core\Models;
 
 require_once(CORE_ROOT . '/interfaces/queries/queries.trait');
 require_once(CORE_ROOT . '/tetra-core.trait');
 
+/**
+ * Base model class.
+ */
 class Base {
   use \Core\Common;
   use \Core\Database\Queries;
 
   /**
-  * @var String
-  * Database table
-  */
-  protected $table;
-
-  /**
+   * Database table
    * @var String
-   * Item label, for use in messages / errors
    */
-  protected $label;
+  protected string $table;
 
   /**
-   * @var Integer
+   * Singular item label
+   * for use in messages / errors
+   * @var String
+   */
+  protected string $label;
+
+  /**
    * Item ID
+   * @var Integer
    */
-  public $id;
+  public int $id;
 
   /**
-   * @var Date
    * Date Created
-   */
-  public $date_created;
-
-  /**
-   * @var Integer
-   * User ID of creator
-   */
-  public $created_by;
-
-  /**
    * @var Date
-   * Date Modified
    */
-  public $date_modified;
+  public int $date_created;
 
   /**
+   * User ID of creator
    * @var Integer
-   * User ID of last to modify
    */
-  public $modified_by;
+  public int $created_by;
 
   /**
-   * Model constructor
+   * Date Modified
+   * @var Date
    */
-  public function __construct($label, $table, $data = null, $flags = [])
+  public int $date_modified;
+
+  /**
+   * ID of last user to modify this item
+   * @var Integer
+   */
+  public int $modified_by;
+
+  /**
+   * Construct the model
+   *
+   * @param string      $label Singular name for this item, eg "User"
+   * @param string      $table Database table where this item is stored, eg "users"
+   * @param object|null $data  Data to be mapped onto this item
+   * @param array       $flags Additional parameters.
+   *
+   * @return            $this
+   */
+  public function __construct(string $label, string $table, object|null $data = null, array $flags = [])
   {
     $this->table = $table;
     $this->label = $label;
@@ -63,11 +89,15 @@ class Base {
         $this->byId($data->id);
       }
       $this->mapData($data);
-      // $this->debug($this);
     }
     return $this;
   }
 
+  /**
+   * Query the database for an item by its ID
+   * @param  int    $id Item ID
+   * @return object     Database row as an object
+   */
   protected function getDataById(int $id)
   {
     $data = $this->select()
@@ -79,7 +109,7 @@ class Base {
     return $data;
   }
 
-    /**
+  /**
    * Populate this object by using its ID to fetch data
    *
    * @param Integer $id Item's database ID.
@@ -95,7 +125,7 @@ class Base {
   }
 
   /**
-   * Take data from the database, or post
+   * Take data from the database, or POST
    * and map it to the model.
    *
    * @param object $data Data to map.
@@ -142,7 +172,7 @@ class Base {
             if (json_decode($value)) {
               $this->$prop = json_decode($value);
             } else {
-              $this->prop = strval($value);
+              $this->$prop = strval($value);
             }
             break;
           default:
@@ -164,6 +194,8 @@ class Base {
 
   /**
    * Convert the model to an array for use in a query.
+   *
+   * Apply any other necessary business logic before saving
    *
    * @return Array
    */

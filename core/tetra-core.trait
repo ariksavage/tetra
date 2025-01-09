@@ -22,7 +22,7 @@ trait Common {
    */
   protected function configValue($key, $type = 'application')
   {
-    $config = new selectQuery('value')
+    $config = new selectQuery()
       ->from('config')
       ->where('type', '=', $type)
       ->and('key', '=', $key)
@@ -30,7 +30,17 @@ trait Common {
     if (!$config) {
       $this->error("Config {$key} not found", 404);
     }
-    return $config->value;
+    switch($config->value_type) {
+      case 'int':
+        return intval($config->value);
+        break;
+      case 'string':
+        return strval($config->value);
+        break;
+      default:
+        return $config->value;
+        break;
+    }
   }
 
     /**

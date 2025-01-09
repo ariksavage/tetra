@@ -1,0 +1,91 @@
+<?php
+/**
+ * User Rolemodel
+ *
+ * Represents a role with permissions.
+ *
+ * PHP version 8.4
+ *
+ *
+ * @category   Model
+ * @package    Core
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @version    1.0
+ * @since      2025-01-05
+ */
+
+namespace Core\Models;
+
+require_once(__dir__ . '/base.model');
+require_once(__dir__ . '/user_permission.model');
+
+use \Core\Models\UserPermission;
+
+class UserRole extends Base {
+
+  /**
+   * Shorthand string for this role
+   * @var String
+   */
+  public $key;
+
+  /**
+   * Shorthand string for this role
+   * @var String
+   */
+  public $title;
+
+  /**
+   * Shorthand string for this role
+   * @var String
+   */
+  public $description;
+
+  public $permissions;
+
+  /**
+   * Construct the model
+   *
+   * @param string      $label Singular name for this item, eg "User"
+   * @param string      $table Database table where this item is stored, eg "users"
+   * @param object|null $data  Data to be mapped onto this item
+   * @param array       $flags Additional parameters.
+   *
+   * @return            $this
+   */
+  public function __construct(object|null $data = null, array $flags = [])
+  {
+    parent::__construct('Role', 'user_roles', $data, $flags = []);
+    $this->getPermissions();
+    return $this;
+  }
+
+
+  /**
+   * Convert the model to an array for use in a query.
+   *
+   * And apply any other necessary business logic
+   * before saving
+   *
+   * - Ensure the user's password is hashed, if provided.
+   *
+   * @return Array
+   */
+  public function prepareSave() {
+    $data = parent::prepareSave();
+    return $data;
+  }
+
+  public function getPermissions() {
+
+      if ($this->key == 'root') {
+        $query = $this->select()->from('user_permissions');
+      } else {
+        $query = $this->select(['user_permissions.*'])
+        ->from('user_role_permissions_assignments')
+        ->leftJoin('user_permissions', 'permission_id', 'id')
+        ->where('user_role_permissions_assignments.role_id', '=', $this->id);
+      }
+      $this->permissions = $query->execute(false, '\Core\Models\UserPermission');
+  }
+}
