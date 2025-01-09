@@ -1,8 +1,25 @@
 <?php
+/**
+ * User model
+ *
+ * Includes user login, password reset, and permissions logic
+ *
+ * PHP version 8.4
+ *
+ *
+ * @category   Model
+ * @package    Core
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @version    1.0
+ * @since      2025-01-05
+ */
 
 namespace Core\Models;
 
 require_once(__dir__ . '/base.model');
+require_once(__dir__ . '/user_role.model');
+
+use \Core\Models\UserRole;
 
 class User extends Base {
 
@@ -54,13 +71,39 @@ class User extends Base {
    */
   protected $password;
 
-  public function __construct($data = null, $flags = [])
+  /**
+   * Roles
+   */
+  public $roles;
+
+
+  /**
+   * Construct the model
+   *
+   * @param string      $label Singular name for this item, eg "User"
+   * @param string      $table Database table where this item is stored, eg "users"
+   * @param object|null $data  Data to be mapped onto this item
+   * @param array       $flags Additional parameters.
+   *
+   * @return            $this
+   */
+  public function __construct(object|null $data = null, array $flags = [])
   {
     parent::__construct('User', 'users', $data, $flags = []);
     return $this;
   }
 
 
+  /**
+   * Convert the model to an array for use in a query.
+   *
+   * And apply any other necessary business logic
+   * before saving
+   *
+   * - Ensure the user's password is hashed, if provided.
+   *
+   * @return Array
+   */
   public function prepareSave() {
     $data = parent::prepareSave();
     if ($this->password) {
@@ -73,6 +116,15 @@ class User extends Base {
     return $data;
   }
 
+  /**
+   * Get the user's full name as a single string:
+   *
+   * {prefix} {First} {Middle} {Last} {suffix}
+   *
+   * ignoring any missing segments
+   *
+   * @return String Full name
+   */
   public function name()
   {
     $names = array();
@@ -98,11 +150,12 @@ class User extends Base {
    *
    * @return Boolean Login success
    */
-  public function login($username, $password)
+  public function login(string $username, string $password)
   {
     $this->byUsername($username);
     if ($this->testPassword($password)) {
-      return $this->startSession();
+      $expiresDays = $this->configValue('session_expires_days');
+      return $this->startSession($expiresDays);
     } else {
       $this->error("Access Denied.", 401, "Login");
     }
@@ -120,29 +173,28 @@ class User extends Base {
     return $this->endSession();
   }
 
-  /*
-  public function updatePassword($username, $password)
+  /**
+   * Start a new session and generate a link to
+   * allow a user to reset their password.
+   *
+   * @var String $host  Base URL of the request.
+   *
+   * @return String     Reset Link
+   */
+  public function passwordResetLink(string $host)
   {
-    if ($username !== $this->username) {
-      return false;
-    }
-    $data = [];
-    $passwordHash = $this->passwordHash($password);
-    $data['password'] = $passwordHash;
-    $data['change_password'] = false;
-    return $this->update($data)->execute();
+    // end any open sessions
+    $now = date('Y-m-d h:i:s');
+    $this->update(['date_ended' => $now], 'user_sessions')
+    ->where('user_id', '=', $this->id)
+    ->and('date_ended', 'IS NULL')
+    ->execute();
+    // start a new reset session
+    $expiresDays = $this->configValue('password_reset_expires_days');
+    $token = $this->startSession($expiresDays);
+    $link = "{$host}/password-reset/{$token}";
+    return $link;
   }
-
-  public function passwordResetLink($host, $expDays = 30)
-  {
-    if ($this->isLoggedIn()) {
-      return false;
-    }
-    $url = $host . '/reset-password';
-    $token = $this->updateAuthToken(null, $expDays);
-    return $url . '/' . $this->auth_token;
-  }
-  */
 
   /**
    * Get user by the current authorization token
@@ -152,8 +204,8 @@ class User extends Base {
   public function byToken()
   {
     $token = $this->getAuthToken();
-    $expired = $this->sessionExpires();
-    $session_q = $this->select(['user_id'], 'user_sessions')->where('token', '=', $token)->and('date_last_access', '>', $expired);
+    $now = date('Y-m-d h:i:s');
+    $session_q = $this->select(['user_id'], 'user_sessions')->where('token', '=', $token)->and('date_expires', '>', $now)->and('date_ended', 'IS NULL');
     if ($session = $session_q->execute(true)) {
       $q = $this->select()
         ->where('id', '=', $session->user_id);
@@ -174,7 +226,7 @@ class User extends Base {
    *
    * @return User.
    */
-  public function byUsername($username)
+  public function byUsername(string $username)
   {
     $q = $this->select()
       ->where('username', '=', $username);
@@ -201,7 +253,7 @@ class User extends Base {
    *
    * @return Boolean           Password verified
    */
-  public function testPassword($password)
+  public function testPassword(string $password)
   {
     $passwordHash = $this->password;
     if (!$passwordHash) {
@@ -219,7 +271,7 @@ class User extends Base {
    *
    * @return String            Encrypted password
    */
-  protected function passwordHash($password)
+  protected function passwordHash(string $password)
   {
     $options = [
         'cost' => 12,
@@ -238,37 +290,23 @@ class User extends Base {
   }
 
   /**
-   * Get a timestamp of the date that any active sessions have expired.
-   *
-   * and session_expires = 3 days
-   * and today is    2025-01-08 3:00:00
-   * Session expires 2025-01-05 3:00:00
-   *
-   * @return String  Timestamp
-   */
-  private function sessionExpires()
-  {
-    $sessionExpiresDays = $this->configValue('session_expires_days');
-    $expired = date('Y-m-d h:i:s', strtotime("-{$sessionExpiresDays} day"));
-    return $expired;
-  }
-
-  /**
    * Start a new session in the user_sessions table
    * with a new auth token.
    *
    * @return String  Authorization token
    */
-  protected function startSession()
+  protected function startSession($expiresDays)
   {
     $token = $this->generateAuthToken();
     $data = Array();
     $data['user_id'] = $this->id;
     $data['token'] = $token;
+    $data['date_started'] = date('Y-m-d h:i:s');
+    $data['date_last_access'] = $data['date_started'];
+    $data['date_expires'] = date('Y-m-d h:i:s', strtotime("+{$expiresDays} days"));
     if ($this->insert($data, 'user_sessions')->execute()) {
       $_SESSION['authorization_token'] = $token;
       $_SESSION['user'] = $this;
-      $this->updateSession($token);
       return $token;
     } else {
       return false;
@@ -283,12 +321,15 @@ class User extends Base {
    *
    * @return Boolean       Success.
    */
-  protected function updateSession($token)
+  public function updateSession(string $token = '')
   {
     $token = $this->getAuthToken();
     $data = Array();
-    $data['date_last_access'] = null; // updated by the table itself
-    if ($this->update($data, 'user_sessions')->where('token', '=', $token)->and('user_id', '=', $this->id)) {
+    $now = date('Y-m-d h:i:s');
+    $data['date_last_access'] = $now; // updated by the table itself
+    $expiresDays = $this->configValue('session_expires_days');
+    $data['date_expires'] = date('Y-m-d h:i:s', strtotime("+{$expiresDays} days"));
+    if ($this->update($data, 'user_sessions')->where('token', '=', $token)->and('user_id', '=', $this->id)->execute()) {
       $this->cleanupSessions();
       return true;
     }
@@ -319,12 +360,20 @@ class User extends Base {
    */
   protected function cleanupSessions()
   {
-    $data['date_ended'] = date('Y-m-d h:i:s');
-      $expired = $this->sessionExpires();
+    $now = date('Y-m-d h:i:s');
+    $data = Array('date_ended' => $now);
       return $this->update($data, 'user_sessions')
       ->where('user_id', '=', $this->id)
-      ->and('date_last_access', '<', $expired)
+      ->and('date_expires', '<', $now)
       ->and('date_ended','IS NULL')
       ->execute();
+  }
+
+  public function getRoles() {
+    $this->roles = $this->select(['user_roles.*'])
+      ->from('user_role_assignments')
+      ->leftJoin('user_roles', 'role_id', 'id')
+      ->where('user_role_assignments.user_id', '=', $this->id)
+      ->execute(false, '\Core\Models\UserRole');
   }
 }

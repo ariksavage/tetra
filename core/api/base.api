@@ -78,8 +78,11 @@ class Base {
    * @return [type] [description]
    */
   protected function checkAuth() {
-    if ($this->requiresAuth() && !$this->getCurrentUser()) {
+    $user = $this->getCurrentUser();
+    if ($this->requiresAuth() && !$user) {
       $this->error('Login required', 401);
+    } else {
+      $user->updateSession();
     }
     return true;
   }
@@ -121,10 +124,16 @@ class Base {
     }
   }
 
-  public function idGET($id)
+  protected function getById(int $id)
   {
     $model = new $this->model();
     $model->byId($id);
+    return $model;
+  }
+
+  public function idGET($id)
+  {
+    $model = $this->getById($id);
     $this->success($this->singular, $model);
   }
 

@@ -3,14 +3,14 @@ import { CookiesService } from './cookies.service';
 import { CoreService } from './core.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Observable, Subject, BehaviorSubject} from 'rxjs';
-import { User } from './user';
+import { User } from '@tetra/user';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  current = new Subject<User>();
-  user: User = new User({});
+  user = new Subject<User|null>();
+  _user: User|null = null;
   isAdmin: boolean = false;
   token: string = '';
 
@@ -21,22 +21,17 @@ export class UserService {
     protected activeRoute: ActivatedRoute
   ) {}
 
-  getUser(): Observable<User> {
-    return this.current.asObservable();
+  getUser(): Observable<User|null> {
+    return this.user.asObservable();
   }
 
-  requireLogin() {
-    const self = this;
-
-    return this.loginByToken();
-  }
-
-  setUser(user: User) {
-    this.current.next(user);
-    this.user = user;
+  setUser(user: User|null) {
+    this._user = user;
+    this.user.next(user);
   }
 
   loginByToken(token: string|null = null) {
+
     const self = this;
     if (token){
       this.token = token;
@@ -45,43 +40,42 @@ export class UserService {
     }
 
     if (!this.token) {
-      if (window.location.pathname != '/login') {
-        self.loginRedirect()
-      }
-      return new Promise((resolve, reject) => {});
+        self.loginRedirect();
+      return new Promise((resolve, reject) => {reject('no token found')});
     }
     this.core.setAuth(this.token);
 
-    return this.core.get('user', 'current').then((data) => {
+    return this.core.get('users', 'current').then((data) => {
       if (data && data.user){
         const user = new User(data.user);
-        this.setUser(user);
+        self.setUser(user);
         return user;
       } else {
         self.token = '';
         const user = new User({});
-        this.setUser(user);
+        self.setUser(user);
         self.cookies.delete('auth');
         self.loginRedirect();
         return false;
       }
     });
   }
-  loginRedirect(){
+
+  loginRedirect() {
     const self = this;
-    self.route.navigateByUrl('/login?redirect=' + window.location.pathname);
+    if (window.location.pathname != '/login') {
+      self.route.navigateByUrl('/login?redirect=' + window.location.pathname);
+    }
   }
 
   login(username: string, password: string) {
     const self = this;
-    return this.core.post('user', 'login', {username, password}).then((data)=> {
-      if (data.authorization_token){
-        self.cookies.set('auth', data.authorization_token, 1);
+    const data = {username, password};
+    return this.core.post('core', 'login', data).then((data)=> {
+      if (data.token){
+        self.cookies.set('auth', data.token, 1);
         const user = new User(data.user);
         self.setUser(user);
-        if (this.user.hasRole('administrator')) {
-          this.isAdmin = true;
-        }
         return data.user;
       } else {
         return false;
@@ -95,7 +89,7 @@ export class UserService {
       self.cookies.delete('auth');
       const user = new User({});
       this.setUser(user);
-      return true;
+      self.route.navigateByUrl('/login');
     })
   }
 }

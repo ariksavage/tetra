@@ -15,12 +15,12 @@ define('SERVER_ROOT', realpath(CORE_ROOT . '/../'));
 define('CONFIG_PATH', __dir__ . '/../../config');
 
 require_once(CORE_ROOT . '/api/base.api');
-require_once(CORE_ROOT . '/api/tetra.api');
-require_once(CORE_ROOT . '/models/user.model');
+require_once(CORE_ROOT . '/api/core.api');
+// require_once(CORE_ROOT . '/models/user.model');
 
-use \Core\Models\User;
+// use \Core\Models\User;
 
-$core = new \Core\API\Tetra();
+$core = new \Core\API\Core();
 
 // Globals
 
@@ -38,7 +38,7 @@ unset($_GET['id2']);
 
 // Check authorization
 
-$currentUser = new User();
+// $currentUser = new User();
 
 // $skipLogin = ($type == 'users' && $action == 'login') || ($action == 'tetra');
 // var_dump($skipLogin) {

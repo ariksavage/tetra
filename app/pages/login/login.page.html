@@ -1,1 +1,8 @@
 <h1 class="page-title">{{title}}</h1>
+<div class="login-form" *ngIf="!user">
+  <div class="field text" label="username" [(model)]="username"></div>
+  <div class="field password" label="password" [(model)]="password"></div>
+  <button *ngIf="username && password" (click)="login()">Log In</button>
+</div>
+
+<p *ngIf="user">Logged in as {{user.name()}}</p>
