@@ -1,3 +1,13 @@
 <label class="label" [attr.for]="id()" *ngIf="label">{{label}}</label>
-<input class="input" [attr.id]="id()" (blur)="onBlur($event)" (focus)="onFocus($event)" [attr.placeholder]="placeholder" [attr.type]="type" [(ngModel)]="model" (change)="onChange($event)" (keydown)="onKeyDown($event)"/>
+<input
+  class="input"
+  [(ngModel)]="model"
+  [attr.id]="id()"
+  [attr.placeholder]="placeholder"
+  [attr.type]="type"
+  (blur)="onBlur($event)"
+  (focus)="onFocus($event)"
+  (change)="onChange($event)"
+  (keydown)="onKeyDown($event)"
+/>
 <p class="error" *ngIf="error">{{error}}</p>

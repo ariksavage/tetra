@@ -4,7 +4,8 @@ import { Routes } from '@angular/router';
 import { LoginPage } from '@tetra/pages/login/login.page';
 
 const r : Routes = [
-  { path: 'login', component:  LoginPage }
+  { path: 'login', component:  LoginPage },
+  { path: 'logout', redirectTo: '/', pathMatch: 'full' }
 ];
 
 export const tetraRoutes: Routes = r;

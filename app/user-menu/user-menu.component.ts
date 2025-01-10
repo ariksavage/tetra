@@ -3,23 +3,35 @@ import { CommonModule } from '@angular/common';
 import { UserService } from '@tetra/user.service';
 import { User } from '@tetra/user';
 @Component({
-  selector: 'nav.user-menu',
+  selector: '.user-menu',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './user-menu.component.html',
   styleUrl: './user-menu.component.scss'
 })
 export class TetraUserMenuComponent {
-  user: User|null = null;
+  user: User = new User();
+  open: boolean = false;
 
   constructor(
     private userService: UserService
   ){
-   userService.getUser().subscribe((user: User|null) => this.user = user);
+   userService.getUser().subscribe((user: User) => this.user = user);
+  }
+
+  loggedIn() {
+    if (this.user && this.user.id) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   logout() {
-    this.user = null;
+    const self = this;
     this.userService.logout();
+  }
+  toggle() {
+    this.open = !this.open;
   }
 }

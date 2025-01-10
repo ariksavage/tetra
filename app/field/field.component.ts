@@ -19,8 +19,7 @@ export class FieldComponent implements OnInit {
   hasFocus: boolean = false;
   touched: boolean = false;
   updateDebounce: any = null;
-
-
+  @Output() onEnter = new EventEmitter<any>();
 
   ngOnInit() {
   }
@@ -52,6 +51,9 @@ export class FieldComponent implements OnInit {
 
   onKeyDown(e: any) {
     this.update();
+    if (e.key == 'Enter') {
+      this.onEnter.emit();
+    }
   }
 
   onFocus(e: any) {

@@ -24,7 +24,7 @@ export class CoreService {
   handleResult(result: any = null, key: string = '') {
     if (result) {
       if (result.message) {
-        console.log(result.message);
+        // console.log(result.message);
       }
       if (result.data) {
         return result.data;
@@ -121,9 +121,7 @@ export class CoreService {
    */
   post(type: string, action: string = '', payload: any = {}) {
     let url = this.url(type, action);
-    console.log('post url', url);
     return this.http.post(url, payload, this.getConfig()).toPromise().then((result: any) => {
-      console.log('post', result);
       return this.handleResult(result, type);
     }, (response: any) => {
       return this.handleError(response.error)
