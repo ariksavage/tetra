@@ -1,2 +1,8 @@
 <label class="label" *ngIf="label">{{label}}</label>
-<input class="input" [(ngModel)]="model" (change)="update()"/>
+<input class="input"
+  [(ngModel)]="model"
+  (change)="onChange($event)"
+  (keydown)="onKeyDown($event)"
+  (blur)="onBlur($event)"
+  (focus)="onFocus($event)"
+/>

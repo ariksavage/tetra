@@ -1,0 +1,46 @@
+:host {
+  position: relative;
+}
+.toggle {
+  position: relative;
+  z-index: 8;
+  &.open {
+    &::before {
+      content: '';
+      background: rgba(0, 0, 0, .1);
+      backdrop-filter: blur(3px);
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      width: 100vw;
+    }
+  }
+
+}
+
+.dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 300px;
+  z-index: 9;
+  background: #fff;
+  max-height: 0;
+  overflow: hidden;
+  padding: 0;
+  transition: max-height .2s;
+
+  &.open {
+    max-height: 50vh;
+  }
+}
+.dropdown-list {
+  margin: 1em 0 0;
+  padding: 0;
+  list-style-type: none;
+}
+.dropdown-item {
+  margin-bottom: 1em;
+  padding: 0 1em;
+}

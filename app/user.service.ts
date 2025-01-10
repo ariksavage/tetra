@@ -9,8 +9,8 @@ import { User } from '@tetra/user';
   providedIn: 'root'
 })
 export class UserService {
-  user = new Subject<User|null>();
-  _user: User|null = null;
+  user = new Subject<User>();
+  _user: User = new User();
   isAdmin: boolean = false;
   token: string = '';
 
@@ -21,11 +21,11 @@ export class UserService {
     protected activeRoute: ActivatedRoute
   ) {}
 
-  getUser(): Observable<User|null> {
+  getUser(): Observable<User> {
     return this.user.asObservable();
   }
 
-  setUser(user: User|null) {
+  setUser(user: User) {
     this._user = user;
     this.user.next(user);
   }
@@ -40,7 +40,6 @@ export class UserService {
     }
 
     if (!this.token) {
-        self.loginRedirect();
       return new Promise((resolve, reject) => {reject('no token found')});
     }
     this.core.setAuth(this.token);
@@ -55,7 +54,6 @@ export class UserService {
         const user = new User({});
         self.setUser(user);
         self.cookies.delete('auth');
-        self.loginRedirect();
         return false;
       }
     });
@@ -63,7 +61,7 @@ export class UserService {
 
   loginRedirect() {
     const self = this;
-    if (window.location.pathname != '/login') {
+    if (window.location.pathname.indexOf('/login') == -1) {
       self.route.navigateByUrl('/login?redirect=' + window.location.pathname);
     }
   }
@@ -85,11 +83,11 @@ export class UserService {
 
   logout() {
     const self = this;
-    return this.core.get('user', 'logout').then((data)=> {
+    return this.core.get('users', 'logout').then((data)=> {
       self.cookies.delete('auth');
       const user = new User({});
       this.setUser(user);
-      self.route.navigateByUrl('/login');
+      self.route.navigateByUrl('/logout');
     })
   }
 }

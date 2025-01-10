@@ -11,12 +11,17 @@
 
 header {
   grid-area: header;
+  padding: 10px;
+
 }
 
 main {
+  background: blue;
   grid-area: main;
+  padding: 10px;
 }
 
 footer {
   grid-area: footer;
+  padding: 10px;
 }
