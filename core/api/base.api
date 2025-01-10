@@ -106,7 +106,6 @@ class Base {
   public function listPOST()
   {
     $query = $this->listQuery();
-
     $list  = $query->execute(false, $this->model);
     if (count($list)){
       $this->success($this->plural, $list);
