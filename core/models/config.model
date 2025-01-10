@@ -1,0 +1,76 @@
+<?php
+/**
+ * Config model
+ *
+ * Configuration options / values
+ *
+ * PHP version 8.4
+ *
+ * @category   Model
+ * @package    Core
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @version    1.0
+ * @since      2025-01-10
+ */
+
+namespace Core\Models;
+
+require_once(__dir__ . '/base.model');
+require_once(__dir__ . '/user_role.model');
+
+use \Core\Models\UserRole;
+
+class Config extends Base {
+
+  /**
+   * User facing label
+   * @var String
+   */
+  public $label;
+
+  /**
+   * User facing description
+   * @var String
+   */
+  public $description;
+
+  /**
+   * General type of the configuration, essentially a category
+   * @var String
+   */
+  public $type;
+
+  /**
+   * Config key
+   * @var String
+   */
+  public $key;
+
+  /**
+   * Config value
+   * @var String
+   */
+  public $value;
+
+  /**
+   * Type of the value: string, number, boolean, etc
+   * @var String
+   */
+  public $value_type;
+
+  /**
+   * Construct the model
+   *
+   * @param string      $label Singular name for this item, eg "User"
+   * @param string      $table Database table where this item is stored, eg "users"
+   * @param object|null $data  Data to be mapped onto this item
+   * @param array       $flags Additional parameters.
+   *
+   * @return            $this
+   */
+  public function __construct(object|null $data = null, array $flags = [])
+  {
+    parent::__construct('Config', 'config', $data, $flags = []);
+    return $this;
+  }
+}

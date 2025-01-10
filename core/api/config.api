@@ -1,0 +1,51 @@
+<?php
+
+namespace Core\API;
+
+require_once(__DIR__ . '/base.api');
+require_once(CORE_ROOT . '/models/config.model');
+
+
+class Config extends Base {
+
+  public function __construct()
+  {
+    parent::__construct('config', '\Core\Models\Config', 'Config', 'Config');
+  }
+
+  protected function searchColumns()
+  {
+    return ['username', 'name', 'email'];
+  }
+
+  protected function listQuery()
+  {
+    $query = parent::listQuery();
+    return $query;
+  }
+
+  public function currentGET()
+  {
+    if ($currentUser = $this->getCurrentUser()) {
+      $currentUser->getRoles();
+      $this->success('user', $currentUser);
+    }
+  }
+
+  public function logoutGET()
+  {
+    $currentUser = $this->getCurrentUser();
+    if($currentUser->logout()) {
+      $this->successMsg("Successfully logged out.");
+    }
+  }
+
+  public function passwordResetLinkPOST(int $id)
+  {
+    $user = $this->getById($id);
+    $host = $this->postValue('host');
+    $link = $user->passwordResetLink($host);
+    $this->success('password-reset', $link);
+  }
+}
+?>

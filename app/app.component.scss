@@ -1,3 +1,6 @@
+/**
+ * Basic layout styling, will be overridden by specific apps
+ */
 :host {
   height: 100vh;
   width: 100vw;
@@ -11,17 +14,15 @@
 
 header {
   grid-area: header;
-  padding: 10px;
-
+  padding: 10px 10px 0;
 }
 
 main {
-  background: blue;
   grid-area: main;
   padding: 10px;
 }
 
 footer {
   grid-area: footer;
-  padding: 10px;
+  padding: 0 10px 10px;
 }

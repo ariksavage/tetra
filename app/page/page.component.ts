@@ -45,9 +45,13 @@ export class TetraPage {
     });
   }
 
+  checkPermissions() {
+
+  }
+
   load() {
     this.titleService.setTitle(this.title);
-    if (this.requiresLogin && !this.user) {
+    if (this.requiresLogin && !(this.user && this.user.id)) {
       this.userService.loginRedirect();
     }
     return this.onLoad();

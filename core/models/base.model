@@ -37,7 +37,7 @@ class Base {
    * for use in messages / errors
    * @var String
    */
-  protected string $label;
+  protected string $itemLabel;
 
   /**
    * Item ID
@@ -72,17 +72,17 @@ class Base {
   /**
    * Construct the model
    *
-   * @param string      $label Singular name for this item, eg "User"
-   * @param string      $table Database table where this item is stored, eg "users"
-   * @param object|null $data  Data to be mapped onto this item
-   * @param array       $flags Additional parameters.
+   * @param string      itemLabel Singular name for this item, eg "User"
+   * @param string      $table    Database table where this item is stored, eg "users"
+   * @param object|null $data     Data to be mapped onto this item
+   * @param array       $flags    Additional parameters.
    *
    * @return            $this
    */
-  public function __construct(string $label, string $table, object|null $data = null, array $flags = [])
+  public function __construct(string $itemLabel, string $table, object|null $data = null, array $flags = [])
   {
     $this->table = $table;
-    $this->label = $label;
+    $this->itemLabel = $itemLabel;
     $schema = $this->describeTable();
     if ($data) {
       if (isset($data->id)){
@@ -104,7 +104,7 @@ class Base {
       ->where('id', '=', $id)
       ->execute(true);
     if (!$data) {
-      $this->error("{$this->label} {$id} Not Found", 404, "{$this->label} Not Found");
+      $this->error("{$this->itemLabel} {$id} Not Found", 404, "{$this->label} Not Found");
     }
     return $data;
   }
@@ -169,7 +169,7 @@ class Base {
             break;
           case 'blob':
           case 'longblob':
-            if (json_decode($value)) {
+            if ($value && json_decode($value)) {
               $this->$prop = json_decode($value);
             } else {
               $this->$prop = strval($value);
