@@ -33,7 +33,6 @@ class Config extends Base {
     $config->byId($id);
     $config->setValue($value);
     $this->success('config', $config);
-
   }
 }
 ?>

@@ -8,7 +8,7 @@
       <div class="field number"  *ngIf="item.value_type == 'number'" [(model)]="item.value"></div>
 
       <div class="field text" *ngIf="item.value_type == 'text'" [(model)]="item.value"></div>
-      <button *ngIf="item.touched()" (click)="update(item)" [attr.aria-label]="'Update ' + item.label" [attr.title]="'Update ' + item.label"><i class="fa-solid fa-floppy-disk"></i></button>
+      <button *ngIf="item.touched()" icon="floppy-disk" (click)="update(item)" [attr.aria-label]="'Update ' + item.label" [attr.title]="'Update ' + item.label"></button>
       <div class="description">{{item.description}}</div>
     </li>
   </ul>
