@@ -32,7 +32,7 @@ export class TetraAppComponent {
   ) {
     const self = this;
     appService.getConfig().then((data: any) => {
-      self.title = data.config.title;
+      self.title = data.config.name;
       self.copyright = data.config.copyright;
       self.titleService.setTitle(self.title);
       appService.getPageTitle().subscribe((title: string) => {
