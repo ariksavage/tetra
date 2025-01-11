@@ -32,7 +32,10 @@ export class AppService {
   replacements: Array<any> = [];
 
   constructor(private router: Router, protected activeRoute: ActivatedRoute, protected title:Title, protected core: CoreService) {
+  }
 
+  getConfig() {
+    return this.core.get('core', 'app');
   }
 
   setPageTitle(title: string) {

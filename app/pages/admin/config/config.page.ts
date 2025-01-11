@@ -20,14 +20,24 @@ import { TetraButtonComponent } from '@tetra/button/button.component';
 export class AdminConfigPage extends TetraPage {
   override title = 'Config';
   config: Array<Config> = [];
+  categories: Array<string> = [];
 
   override onLoad() {
     const self = this;
     this.core.post('config', 'list').then((data: any) => {
-
-      self.config = data.config.map((item: any) => {
+      this.config = data.config.map((item: Config) => {
+        if (!(this.categories.indexOf(item.type) > -1)) {
+          this.categories.push(item.type);
+        }
         return new Config(item);
-      });
+      })
+      this.categories = this.categories.sort();
+    });
+  }
+
+  byCategory(category: string) {
+    return this.config.filter((item: Config) => {
+      return item.type == category;
     });
   }
 

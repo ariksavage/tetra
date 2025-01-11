@@ -1,15 +1,15 @@
-<h1 class="page-title">{{title}}</h1>
-<ul class="items-list">
-  <li *ngFor="let item of config" class="config-item">
-    <h3>{{item.label}}</h3>
-    <button class="icon-only icon-rotate-hover" *ngIf="item.touched()" icon="rotate" (click)="item.reset()"  [attr.aria-label]="'Reset ' + item.label" [attr.title]="'Update ' + item.label"></button>
+<section *ngFor="let category of categories">
+  <h2>{{category.toUpperCase()}}</h2>
+  <ul class="items-list">
+    <li *ngFor="let item of byCategory(category)" class="config-item">
+      <h3>{{item.label}}</h3>
+      <button class="icon-only icon-rotate-hover" *ngIf="item.touched()" icon="rotate" (click)="item.reset()"  [attr.aria-label]="'Reset ' + item.label" [attr.title]="'Update ' + item.label"></button>
 
-    <div class="field number"  *ngIf="item.value_type == 'number'" [(model)]="item.value"></div>
+      <div class="field number"  *ngIf="item.value_type == 'number'" [(model)]="item.value"></div>
 
-    <div class="field text" *ngIf="item.value_type == 'text'" [(model)]="item.value"></div>
-    <button *ngIf="item.touched()" (click)="update(item)" [attr.aria-label]="'Update ' + item.label" [attr.title]="'Update ' + item.label"><i class="fa-solid fa-floppy-disk"></i></button>
-    <div class="description">{{item.description}}</div>
-  </li>
-</ul>
-
-<button class="icon-only" iconStyle="regular" icon="floppy-disk"></button>
+      <div class="field text" *ngIf="item.value_type == 'text'" [(model)]="item.value"></div>
+      <button *ngIf="item.touched()" (click)="update(item)" [attr.aria-label]="'Update ' + item.label" [attr.title]="'Update ' + item.label"><i class="fa-solid fa-floppy-disk"></i></button>
+      <div class="description">{{item.description}}</div>
+    </li>
+  </ul>
+</section>
