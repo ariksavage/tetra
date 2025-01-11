@@ -73,4 +73,30 @@ class Config extends Base {
     parent::__construct('Config', 'config', $data, $flags = []);
     return $this;
   }
+
+  protected function mapData(object $data)
+  {
+    parent::mapData($data);
+    switch($this->value_type) {
+      case 'text':
+      case 'longtext':
+        break;
+      case 'number':
+        $this->value = floatval($this->value);
+        break;
+      case 'boolean':
+        $this->value = !!$this->value;
+        break;
+      case 'object':
+        $this->value = json_decode($this->value);
+      default:
+        break;
+    }
+    return $this;
+  }
+
+  public function setValue($value) {
+    $this->value = $value;
+    $this->save();
+  }
 }

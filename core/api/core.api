@@ -26,6 +26,12 @@ class Core extends Base {
     $this->successMsg('Core found');
   }
 
+  public function titleGET()
+  {
+    $title = $this->configValue('name');
+    $this->success('title', $title);
+  }
+
   public function loginPOST()
   {
     $username = $this->postValue('username');

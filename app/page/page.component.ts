@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { Title } from "@angular/platform-browser";
 import { Observable, Subject, BehaviorSubject} from 'rxjs';
 
 import { CoreService } from '@tetra/core.service';
@@ -19,21 +18,26 @@ export class TetraPage {
   public title: string = 'Page';
   protected user: User|null = null;
   protected requiresLogin: boolean = true;
+  protected pageConfig: any = {
+    showHeader: true,
+    showTitle: true
+  };
 
   constructor(
     protected core: CoreService,
     protected app: AppService,
     protected route: Router,
     protected activeRoute: ActivatedRoute,
-    protected titleService:Title,
     protected userService: UserService
   ) {
+
     userService.getUser().subscribe((user: User | null) => {
       if (user) {
         this.user = user;
       }
     });
   }
+
 
   ngOnInit() {
     const self = this;
@@ -50,7 +54,8 @@ export class TetraPage {
   }
 
   load() {
-    this.titleService.setTitle(this.title);
+    this.app.setPageConfig(this.pageConfig);
+    this.app.setPageTitle(this.title);
     if (this.requiresLogin && !(this.user && this.user.id)) {
       this.userService.loginRedirect();
     }

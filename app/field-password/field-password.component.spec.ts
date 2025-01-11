@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FieldPasswordComponent } from './field-password.component';
+import { TetraFieldPasswordComponent } from './field-password.component';
 
-describe('FieldPasswordComponent', () => {
-  let component: FieldPasswordComponent;
-  let fixture: ComponentFixture<FieldPasswordComponent>;
+describe('TetraFieldPasswordComponent', () => {
+  let component: TetraFieldPasswordComponent;
+  let fixture: ComponentFixture<TetraFieldPasswordComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FieldPasswordComponent]
+      imports: [TetraFieldPasswordComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FieldPasswordComponent);
+    fixture = TestBed.createComponent(TetraFieldPasswordComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

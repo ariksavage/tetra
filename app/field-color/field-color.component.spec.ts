@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FieldColorComponent } from './field-color.component';
+import { TetraFieldColorComponent } from './field-color.component';
 
-describe('FieldColorComponent', () => {
-  let component: FieldColorComponent;
-  let fixture: ComponentFixture<FieldColorComponent>;
+describe('TetraFieldColorComponent', () => {
+  let component: TetraFieldColorComponent;
+  let fixture: ComponentFixture<TetraFieldColorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FieldColorComponent]
+      imports: [TetraFieldColorComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FieldColorComponent);
+    fixture = TestBed.createComponent(TetraFieldColorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

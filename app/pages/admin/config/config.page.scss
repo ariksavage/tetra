@@ -1,0 +1,26 @@
+.items-list {
+  margin: 0;
+  padding: 0;
+}
+.config-item {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 0 1em;
+}
+
+buttom {
+  margin-right: 1em;
+}
+.field {
+  flex: 1 0 auto;
+  margin: 0 1ex;
+
+  + button {
+    margin: 0 0 0 1em;
+  }
+}
+h3,
+.description{
+  flex: 0 0 100%;
+  margin: 0;
+}

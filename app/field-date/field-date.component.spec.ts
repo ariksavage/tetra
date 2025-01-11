@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FieldDateComponent } from './field-date.component';
+import { TetraFieldDateComponent } from './field-date.component';
 
-describe('FieldDateComponent', () => {
-  let component: FieldDateComponent;
-  let fixture: ComponentFixture<FieldDateComponent>;
+describe('TetraFieldDateComponent', () => {
+  let component: TetraFieldDateComponent;
+  let fixture: ComponentFixture<TetraFieldDateComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FieldDateComponent]
+      imports: [TetraFieldDateComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FieldDateComponent);
+    fixture = TestBed.createComponent(TetraFieldDateComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

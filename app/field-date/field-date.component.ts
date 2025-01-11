@@ -10,7 +10,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './field-date.component.html',
   styleUrl: './field-date.component.scss'
 })
-export class FieldDateComponent {
+export class TetraFieldDateComponent {
   @Input() label: string = '';
   @Input() model: any = null;
   month: number|null = null;

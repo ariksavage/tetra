@@ -109,6 +109,24 @@ export class CoreService {
       return this.handleError(response.error)
     });
   }
+  /**
+   * http PATCH request
+   *
+   * @param String type API call type, eg. users, courses
+   * @param String action API call action, eg get, list
+   * @param Number id ID of the {type} resource
+   * @param Object payload data to be sent
+   *
+   * @return Promise After handling messages, returns a promise that will resolve data sent back by the API
+   */
+  patch(type: string, action: string, id: number|null = null, payload: any = {}) {
+    let url = this.url(type, action, id);
+    return this.http.patch(url, payload, this.getConfig()).toPromise().then((result: any) => {
+      return this.handleResult(result, type);
+    }, (response: any) => {
+      return this.handleError(response.error)
+    });
+  }
 
   /**
    * http POST request
