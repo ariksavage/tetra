@@ -61,7 +61,6 @@ export class UserService {
 
   loginRedirect() {
     const self = this;
-    console.log('redirect', window.location.pathname.indexOf('/login'));
     if (!(window.location.pathname.indexOf('/login') > -1)) {
       self.route.navigateByUrl('/login?redirect=' + window.location.pathname);
     }

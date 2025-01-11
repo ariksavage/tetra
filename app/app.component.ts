@@ -21,6 +21,7 @@ export class TetraAppComponent {
   showTitle: boolean = true;
   year = new Date().getFullYear();
   user: User|null = null;
+  copyright: string = '';
   @HostBinding('class') bodyClass = '';
 
   constructor(
@@ -30,8 +31,9 @@ export class TetraAppComponent {
     protected titleService:Title,
   ) {
     const self = this;
-    core.get('core', 'title').then((data: any) => {
-      self.title = data.title;
+    appService.getConfig().then((data: any) => {
+      self.title = data.config.title;
+      self.copyright = data.config.copyright;
       self.titleService.setTitle(self.title);
       appService.getPageTitle().subscribe((title: string) => {
         self.pageTitle = title;
