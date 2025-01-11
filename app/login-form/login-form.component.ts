@@ -1,14 +1,14 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FieldTextComponent } from '@tetra/field-text/field-text.component';
-import { FieldPasswordComponent } from '@tetra/field-password/field-password.component';
+import { TetraFieldTextComponent } from '@tetra/field-text/field-text.component';
+import { TetraFieldPasswordComponent } from '@tetra/field-password/field-password.component';
 import { UserService } from '@tetra/user.service';
 
 import { User } from '@tetra/user';
 @Component({
   selector: '.login-form',
   standalone: true,
-  imports: [ CommonModule, FieldTextComponent, FieldPasswordComponent ],
+  imports: [ CommonModule, TetraFieldTextComponent, TetraFieldPasswordComponent ],
   templateUrl: './login-form.component.html',
   styleUrl: './login-form.component.scss'
 })

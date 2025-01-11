@@ -15,37 +15,25 @@ class Config extends Base {
 
   protected function searchColumns()
   {
-    return ['username', 'name', 'email'];
+    return ['label', 'description', 'type', 'value'];
   }
 
-  protected function listQuery()
-  {
-    $query = parent::listQuery();
-    return $query;
+  public function typeGET($type) {
+    $config = $this->select()
+      ->where('type', '=', $type)
+      ->execute(false, '\Core\Models\Config');
+    $this->success('config', $config);
   }
 
-  public function currentGET()
+  public function valuePATCH($id)
   {
-    if ($currentUser = $this->getCurrentUser()) {
-      $currentUser->getRoles();
-      $this->success('user', $currentUser);
-    }
-  }
+    $value = $this->postValue('value');
 
-  public function logoutGET()
-  {
-    $currentUser = $this->getCurrentUser();
-    if($currentUser->logout()) {
-      $this->successMsg("Successfully logged out.");
-    }
-  }
+    $config = new \Core\Models\Config();
+    $config->byId($id);
+    $config->setValue($value);
+    $this->success('config', $config);
 
-  public function passwordResetLinkPOST(int $id)
-  {
-    $user = $this->getById($id);
-    $host = $this->postValue('host');
-    $link = $user->passwordResetLink($host);
-    $this->success('password-reset', $link);
   }
 }
 ?>

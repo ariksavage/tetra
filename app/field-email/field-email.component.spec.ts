@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FieldEmailComponent } from './field-email.component';
+import { TetraFieldEmailComponent } from './field-email.component';
 
-describe('FieldEmailComponent', () => {
-  let component: FieldEmailComponent;
-  let fixture: ComponentFixture<FieldEmailComponent>;
+describe('TetraFieldEmailComponent', () => {
+  let component: TetraFieldEmailComponent;
+  let fixture: ComponentFixture<TetraFieldEmailComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FieldEmailComponent]
+      imports: [TetraFieldEmailComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FieldEmailComponent);
+    fixture = TestBed.createComponent(TetraFieldEmailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

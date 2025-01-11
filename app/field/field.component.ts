@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   templateUrl: './field.component.html',
   styleUrl: './field.component.scss'
 })
-export class FieldComponent implements OnInit {
+export class TetraFieldComponent implements OnInit {
   @Input() label: string = '';
   @Input() model: any = null;
   @Input() placeholder: string = '';

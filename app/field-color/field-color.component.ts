@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { FieldComponent } from '../field/field.component';
+import { TetraFieldComponent } from '../field/field.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ColorPickerModule } from 'ngx-color-picker'; // https://www.npmjs.com/package/ngx-color-picker
@@ -11,6 +11,6 @@ import { ColorPickerModule } from 'ngx-color-picker'; // https://www.npmjs.com/p
   templateUrl: './field-color.component.html',
   styleUrl: './field-color.component.scss'
 })
-export class FieldColorComponent extends FieldComponent {
+export class TetraFieldColorComponent extends TetraFieldComponent {
   override type = 'color';
 }

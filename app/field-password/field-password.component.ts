@@ -1,7 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { FieldComponent } from '../field/field.component';
+import { TetraFieldComponent } from '../field/field.component';
 
 @Component({
   selector: '.field.password',
@@ -10,7 +10,7 @@ import { FieldComponent } from '../field/field.component';
   templateUrl: './field-password.component.html',
   styleUrl: './field-password.component.scss'
 })
-export class FieldPasswordComponent extends FieldComponent {
+export class TetraFieldPasswordComponent extends TetraFieldComponent {
   show: boolean = false;
 
   toggleShow() {

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FieldFileComponent } from './field-file.component';
+import { TetraFieldFileComponent } from './field-file.component';
 
-describe('FieldFileComponent', () => {
-  let component: FieldFileComponent;
-  let fixture: ComponentFixture<FieldFileComponent>;
+describe('TetraFieldFileComponent', () => {
+  let component: TetraFieldFileComponent;
+  let fixture: ComponentFixture<TetraFieldFileComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FieldFileComponent]
+      imports: [TetraFieldFileComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FieldFileComponent);
+    fixture = TestBed.createComponent(TetraFieldFileComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

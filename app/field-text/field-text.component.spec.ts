@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { FieldTextComponent } from './field-text.component';
+import { TetraFieldTextComponent } from './field-text.component';
 
-describe('FieldTextComponent', () => {
-  let component: FieldTextComponent;
-  let fixture: ComponentFixture<FieldTextComponent>;
+describe('TetraFieldTextComponent', () => {
+  let component: TetraFieldTextComponent;
+  let fixture: ComponentFixture<TetraFieldTextComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [FieldTextComponent]
+      imports: [TetraFieldTextComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FieldTextComponent);
+    fixture = TestBed.createComponent(TetraFieldTextComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

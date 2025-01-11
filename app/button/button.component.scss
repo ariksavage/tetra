@@ -1,0 +1,42 @@
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+:host {
+  font-size: 1em;
+  cursor: pointer;
+
+  &.icon-only {
+    font-size: 1em;
+    background: transparent;
+    border: none;
+    height: 2em;
+    width: 2em;
+    position: relative;
+
+    &:hover,
+    &:focus-visible {
+      border: 1px solid #000;
+    }
+
+    .icon {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+}
+
+.icon {
+  font-size: 1em;
+  margin-right: 1em;
+
+  &:last-child {
+    margin: 0;
+  }
+}

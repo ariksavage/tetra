@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, ChangeDetectorRef } from '@angular/core';
-import { FieldComponent } from '../field/field.component';
+import { TetraFieldComponent } from '../field/field.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders, HttpEventType } from '@angular/common/http';
@@ -13,7 +13,7 @@ import { Observable, Subject, EMPTY, throwError, finalize } from "rxjs";
   styleUrl: './field-file.component.scss'
 })
 
-export class FieldFileComponent extends FieldComponent {
+export class TetraFieldFileComponent extends TetraFieldComponent {
   fileName = '';
   uploadProgress:number = 0;
   uploadSub: any = null;
