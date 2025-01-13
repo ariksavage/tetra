@@ -1,0 +1,20 @@
+<div class="order" *ngIf="!root">
+  <button class="order-up" *ngIf="item.weight > 0" (click)="move(item, -1)"><i class="fa-solid fa-angle-up" ></i></button>
+  <button class="order-up" *ngIf="item.weight < maxWeight" (click)="move(item, 1)"><i class="fa-solid fa-angle-down" ></i></button>
+</div>
+<div class="icon popup" title="Edit {{item.title}} icon" *ngIf="!root">
+  <i button class="fa-solid" [ngClass]="item.icon"></i>
+  <p content ><i button class="fa-solid" [ngClass]="item.icon"></i></p>
+  <div content class="field text icon" label="Icon" [(model)]="item.icon"></div>
+  <p footer> Use any "fa-icon" from <a href="https://fontawesome.com/icons" target="_blank">Font Awesome</a></p>
+</div>
+<div class="field text path" label="Path" [(model)]="item.path" *ngIf="!root"></div>
+<div class="field text title" label="Title" [(model)]="item.title" *ngIf="!root"></div>
+
+<button class="remove-btn" (click)="removeItem()" *ngIf="!root"><i class="fa-solid fa-trash" ></i></button>
+
+<ul class="children" *ngIf="item && item.children && item.children.length">
+  <li class="edit-menu-item" *ngFor="let child of item.children" [item]="child" (remove)="removeChild($event)" [maxWeight]="item.children.length + 1" (reorder)="orderWeight()"></li>
+  <li class="add-child-item"><button class="add-child-btn" button (click)="addChild()">Add Item</button></li>
+</ul>
+

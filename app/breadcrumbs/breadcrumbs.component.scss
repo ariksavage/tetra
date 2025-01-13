@@ -1,0 +1,14 @@
+.breadcrumbs-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.breadcrumb {
+  display: inline-block;
+  margin: 0 0 1em;
+  &::after {
+    content: '>';
+    margin: 0 1ex;
+  }
+}

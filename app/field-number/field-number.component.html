@@ -1,0 +1,16 @@
+<label class="label" [attr.for]="id()" *ngIf="label">{{label}}</label>
+<input
+  class="input"
+  [(ngModel)]="model"
+  [attr.id]="id()"
+  [attr.placeholder]="placeholder"
+  [attr.type]="type"
+  (blur)="onBlur($event)"
+  (focus)="onFocus($event)"
+  (change)="onChange($event)"
+  (keydown)="onKeyDown($event)"
+  [attr.min]="min"
+  [attr.max]="max"
+  [attr.step]="step"
+/>
+<p class="error" *ngIf="error">{{error}}</p>
