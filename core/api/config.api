@@ -18,6 +18,46 @@ class Config extends Base {
     return ['label', 'description', 'type', 'value'];
   }
 
+  protected function updateMenuItems($item) {
+    $ids = [];
+    $data = (array) $item;
+    unset($data['children']);
+    unset($data['id']);
+    if (isset($item->id)){
+      $q = $this->update($data, 'menu')->where('id', '=', $item->id);
+      $q->execute();
+    } else {
+      $q = $this->insert($data, 'menu');
+      $item->id = $q->execute();
+      foreach($item->children as &$child){
+        $child->parent = $item->id;
+      }
+    }
+    $ids[] = $item->id;
+
+    if($item->children) {
+      foreach($item->children as $child) {
+        $child_ids = $this->updateMenuItems($child);
+        $ids = array_merge($ids, $child_ids);
+      }
+    }
+    return $ids;
+  }
+
+  public function menuPATCH() {
+    $menu = $this->postValue('menu');
+    $ids = [];
+    foreach($menu->children as $item) {
+      $child_ids = $this->updateMenuItems($item);
+        $ids = array_merge($ids, $child_ids);
+    }
+    asort($ids);
+    // Delete items that were left out
+    $deleteQ = $this->deleteQuery('menu')->where('id', 'NOT IN', $ids);
+    $deleteQ->execute();
+    $this->success('menu', $menu);
+  }
+
   public function typeGET($type) {
     $config = $this->select()
       ->where('type', '=', $type)

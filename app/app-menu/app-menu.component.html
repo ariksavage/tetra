@@ -1,0 +1,8 @@
+<ul class="items">
+  <li class="item" *ngFor="let item of navItems" [ngClass]="{'current': isCurrent(item), 'in-path': inPath(item)}">
+    <a class="item-link" [href]="item.path">
+      <i *ngIf="item.icon" class="icon fa-solid" [ngClass]="item.icon"></i>
+      <span class="item-title">{{item.title}}</span>
+    </a>
+  </li>
+</ul>

@@ -4,13 +4,13 @@ import { CommonModule } from '@angular/common';
 import { CoreService } from '@tetra/core.service';
 
 @Component({
-  selector: 'nav.route-nav',
+  selector: 'nav.app-menu',
   standalone: true,
   imports: [CommonModule],
-  templateUrl: './route-nav.component.html',
-  styleUrl: './route-nav.component.scss'
+  templateUrl: './app-menu.component.html',
+  styleUrl: './app-menu.component.scss'
 })
-export class RouteNavComponent {
+export class TetraAppMenuComponent {
   routeConfig : Array<any> = [];
   navItems: Array<any> =[];
   private matchedRoutes: Array<string> = [];
@@ -32,8 +32,14 @@ export class RouteNavComponent {
       rootPath = 'admin';
     }
     return this.core.get('core', 'menu-tree', rootPath).then((data) => {
-      console.log('menu', data.menu);
       self.navItems = data.menu.children;
     })
+  }
+
+  isCurrent(route: any) {
+    return route.path == window.location.pathname;
+  }
+  inPath(route: any) {
+    return route.path !== '/' && !this.isCurrent(route) && window.location.pathname.indexOf(route.path) > -1;
   }
 }

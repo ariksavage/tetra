@@ -15,12 +15,24 @@
 header {
   grid-area: header;
   padding: 10px 10px 0;
+  border-bottom: 1px solid var(--border);
 }
 
 main {
   grid-area: main;
+  display: grid;
+  grid-template-columns: auto 1fr;
+}
+
+.main-content {
   padding: 10px;
 }
+
+.page-title {
+  margin: 0 0 .5em;
+}
+
+
 
 footer {
   grid-area: footer;

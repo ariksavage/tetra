@@ -17,21 +17,58 @@ export class AppService {
     showTitle: true
   };
   private pageConfig = new BehaviorSubject<any>({});
-  // private _pageIcon: string = '';
-  // private pageIcon = new BehaviorSubject<string>('');
-  // private _siteTitle: string = '';
-  // private siteTitle = new BehaviorSubject<string>('');
-  // private _navLinks: Array<any> = [];
-  // private navLinks = new BehaviorSubject<Array<any>>([]);
-  // private _subNavLinks: Array<any> = [];
-  // private subNavLinks = new BehaviorSubject<Array<any>>([]);
-  // private _breadcrumbs: Array<any> = [];
-  // private breadcrumbs = new BehaviorSubject<Array<any>>([]);
-  // private _config: any = {};
-  // private config = new BehaviorSubject<any>({});
+
+  private _breadcrumbs: Array<any> = [];
+  private breadcrumbs = new BehaviorSubject<any>([]);
   replacements: Array<any> = [];
 
   constructor(private router: Router, protected activeRoute: ActivatedRoute, protected title:Title, protected core: CoreService) {
+    router.events.subscribe((val: any) => {
+      if (val instanceof NavigationEnd) {
+        this.mapBreadcrumbs();
+      }
+    })
+  }
+
+  mapBreadcrumbs() {
+    const routerConfig: any = {};
+    for (let a=0;a<this.router.config.length; a++) {
+      const route: any = this.router.config[a];
+      if (typeof route.path == 'string' && route.path){
+        const key: string = route.path.toString();
+        if (typeof routerConfig[key] == 'undefined'){
+          routerConfig[key] = route;
+        } else {
+          if (typeof routerConfig[key].children !== 'undefined'){
+            routerConfig[key].children = routerConfig[key].children.concat(route.children);
+          } else {
+            routerConfig[key].children = route.children;
+          }
+        }
+      }
+    }
+    let routes = Object.values(routerConfig);
+    let lastPath = '';
+    const crumbs: Array<any> = [];
+    const urlSegments = window.location.pathname.split('/');
+    urlSegments.pop();
+    for (let i=0;i<urlSegments.length; i++) {
+      let crumb = urlSegments[i];
+      const crumbRoutes = routes.filter((item: any) => {
+        return item.path == crumb
+      });
+      if (crumbRoutes.length){
+        const crumbRoute: any = crumbRoutes[0];
+        lastPath += '/' + crumbRoute.path;
+        crumbs.push({
+          title: crumbRoute.title,
+          path: lastPath
+        });
+        routes = crumbRoute.children;
+        console.log('routes', routes);
+      }
+    }
+    this.setBreadcrumbs(crumbs);
   }
 
   getConfig() {
@@ -54,5 +91,14 @@ export class AppService {
 
   getPageConfig() {
     return this.pageConfig.asObservable();
+  }
+
+  setBreadcrumbs(crumbs: Array<any>){
+    this._breadcrumbs = crumbs;
+    this.breadcrumbs.next(this._breadcrumbs);
+  }
+
+  getBreadcrumbs() {
+    return this.breadcrumbs.asObservable();
   }
 }

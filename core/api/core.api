@@ -33,6 +33,9 @@ class Core extends Base {
     ->orderBy('weight')
     ->execute();
     foreach($items as &$item) {
+      $item->id = intval($item->id);
+      $item->parent = intval($item->parent);
+      $item->weight = intval($item->weight);
       $item->children = $this->getMenuChildren($item->id);
     }
     return $items;

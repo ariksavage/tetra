@@ -1,0 +1,5 @@
+<ul class="breadcrumbs-list" *ngIf="breadcrumbs.length">
+  <li class="breadcrumb" *ngFor="let crumb of breadcrumbs">
+    <a [href]="crumb.path">{{crumb.title}}</a>
+  </li>
+</ul>

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { RouteNavComponent } from './route-nav.component';
+import { TetraBreadcrumbsComponent } from './breadcrumbs.component';
 
-describe('RouteNavComponent', () => {
-  let component: RouteNavComponent;
-  let fixture: ComponentFixture<RouteNavComponent>;
+describe('TetraBreadcrumbsComponent', () => {
+  let component: TetraBreadcrumbsComponent;
+  let fixture: ComponentFixture<TetraBreadcrumbsComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [RouteNavComponent]
+      imports: [TetraBreadcrumbsComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(RouteNavComponent);
+    fixture = TestBed.createComponent(TetraBreadcrumbsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
