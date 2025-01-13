@@ -1,0 +1,3 @@
+<ul>
+  <li *ngFor="let item of navItems"><a [href]="item.path"><i *ngIf="item.icon" class="fa-solid" [ngClass]="item.icon"></i>{{item.title}} ({{item.path}})</a></li>
+</ul>

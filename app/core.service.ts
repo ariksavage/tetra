@@ -77,7 +77,7 @@ export class CoreService {
    *  this.url('certifictes', 'course', courseId = 60, userId = 3)
    *  /core/certificates/course/60/3
    */
-  url(type: string, action: string = '', id: number|null = null, id2: number|null = null) {
+  url(type: string, action: string = '', id: any = null, id2: any = null) {
     let url = `/core/${type}`;
     if (action) {
       url += `/${action}`;
@@ -101,7 +101,7 @@ export class CoreService {
    *
    * @return Promise After handling messages, returns a promise that will resolve data sent back by the API
    */
-  get(type: string, action: string = '', id: number|null = null, id2: number|null = null) {
+  get(type: string, action: string = '', id: any = null, id2: any = null) {
     let url = this.url(type, action, id, id2);
     return this.http.get(url, this.getConfig()).toPromise().then((result: any) => {
       return this.handleResult(result, type);
@@ -119,7 +119,7 @@ export class CoreService {
    *
    * @return Promise After handling messages, returns a promise that will resolve data sent back by the API
    */
-  patch(type: string, action: string, id: number|null = null, payload: any = {}) {
+  patch(type: string, action: string, id: any = null, payload: any = {}) {
     let url = this.url(type, action, id);
     return this.http.patch(url, payload, this.getConfig()).toPromise().then((result: any) => {
       return this.handleResult(result, type);
@@ -156,7 +156,7 @@ export class CoreService {
    *
    * @return Promise After handling messages, returns a promise that will resolve data sent back by the API
    */
-  put(type: string, action: string, id: number|null = null, id2: number|null = null) {
+  put(type: string, action: string, id: any = null, id2: any = null) {
     let url = this.url(type, action, id, id2);
     return this.http.put(url, null, this.getConfig()).toPromise().then((result: any) => {
       return this.handleResult(result, type);
@@ -175,7 +175,7 @@ export class CoreService {
    *
    * @return Promise After handling messages, returns a promise that will resolve data sent back by the API
    */
-  delete(type: string, action: string, id: number|null = null) {
+  delete(type: string, action: string, id: any = null) {
     let url = this.url(type, action, id);
     return this.http.delete(url, this.getConfig()).toPromise().then((result: any) => {
       return this.handleResult(result, type);
@@ -194,7 +194,7 @@ export class CoreService {
    *
    * @return Promise Downloads the file and resolves the filename
    */
-  // download(type: string, action: string, id: number|null = null, id2: number|null = null) {
+  // download(type: string, action: string, id: any = null, id2: any = null) {
   //   let url = this.url(type, action, id, id2);
   //   const headers = new HttpHeaders().set('Authorization', 'Bearer ' + this.authToken);
   //   const config = this.getConfig();

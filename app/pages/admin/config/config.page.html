@@ -4,9 +4,7 @@
     <li *ngFor="let item of byCategory(category)" class="config-item">
       <h3>{{item.label}}</h3>
       <button class="icon-only icon-rotate-hover" *ngIf="item.touched()" icon="rotate" (click)="item.reset()"  [attr.aria-label]="'Reset ' + item.label" [attr.title]="'Update ' + item.label"></button>
-
       <div class="field number"  *ngIf="item.value_type == 'number'" [(model)]="item.value"></div>
-
       <div class="field text" *ngIf="item.value_type == 'text'" [(model)]="item.value"></div>
       <button *ngIf="item.touched()" icon="floppy-disk" (click)="update(item)" [attr.aria-label]="'Update ' + item.label" [attr.title]="'Update ' + item.label"></button>
       <div class="description">{{item.description}}</div>
