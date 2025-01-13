@@ -26,6 +26,37 @@ class Core extends Base {
     $this->successMsg('Core found');
   }
 
+  protected function getMenuChildren($parent = 0)
+  {
+    $items = $this->select()->from('menu')
+    ->where('parent', '=', $parent)
+    ->orderBy('weight')
+    ->execute();
+    foreach($items as &$item) {
+      $item->children = $this->getMenuChildren($item->id);
+    }
+    return $items;
+  }
+
+  public function menuTreeGET($root = '') {
+    $root = '/' . $root;
+    $parent = new \stdClass();
+    $parent->path = $root;
+    $parent->icon = null;
+    $parent->title = null;
+    if ($root == '/'){
+      $parent->id = 0;
+
+    } else {
+      $parent = $this->select()
+      ->from('menu')
+      ->where('path', '=', $root)
+      ->execute(true);
+    }
+    $parent->children = $this->getMenuChildren($parent->id);
+    $this->success('menu', $parent);
+  }
+
   public function appGET()
   {
     $config = new \stdClass();

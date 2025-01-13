@@ -13,11 +13,9 @@ import { Observable, Subject, EMPTY, throwError, finalize } from "rxjs";
   styleUrl: './field-file.component.scss'
 })
 export class TetraFieldFileComponent extends TetraFieldComponent {
-  // fileName = '';
   @Input() dir: string = '';
   uploadProgress:number = 0;
   uploadSub: any = null;
-  // file: File|null = null;
 
 
   @Input() requiredFileType:string = '';
