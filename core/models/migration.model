@@ -1,0 +1,146 @@
+<?php
+/**
+ * Migration model
+ *
+ * Database and filesystem operations to be conducted automatically.
+ *
+ * PHP version 8.4
+ *
+ * @category   Model
+ * @package    Core
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @version    1.0
+ * @since      2025-01-14
+ */
+
+namespace Core\Models;
+
+require_once(__dir__ . '/base.model');
+require_once(__dir__ . '/user_role.model');
+
+use \Core\Models\UserRole;
+
+class Migration extends Base {
+  public $name;
+  protected $start;
+  protected $end;
+  public function __construct() {
+    $this->start();
+    if ($this->isComplete()) {
+      $this->end(true);
+    } else {
+      if ($this->execute()) {
+        $this->end();
+      }
+    }
+  }
+
+  protected function start() {
+    $this->start = time();
+    echo $this->name . PHP_EOL;
+    $blink = " \033[5m";
+    $end = "\033[0m";
+    echo $blink . "Executing..." . $end . PHP_EOL;
+  }
+
+  protected function end($skipped = false) {
+    $this->end = time();
+    echo chr(27) . "[1A";
+    if ($skipped) {
+      echo "    SKIPPED" . PHP_EOL;
+      return true;
+    } else {
+      $green = "\033[0;32m";
+      $nocolor = "\033[0m";
+      echo $green . "    COMPLETE (" . $this->elapsed() . 's)' . $nocolor . PHP_EOL;
+    }
+  }
+
+  protected function isComplete() {
+    return false;
+  }
+
+  protected function execute() {
+    sleep(4);
+    return true;
+  }
+  protected function elapsed(){
+    $t = (float) $this->end - $this->start;
+    return number_format($t, 2, '.', '');
+  }
+
+  protected function tableExists(string $tableName): bool
+  {
+    //show tables where tables_in_db = 'config'
+    $q = $this->raw("SHOW TABLES WHERE tables_in_db = '$tableName'");
+    $results = $q->execute();
+    return $results->num_rows > 0;
+  }
+
+  protected function createTable(string $tableName, array $columns, string|array $key): bool
+  {
+    $q = "CREATE TABLE `{$tableName}` (";
+    $q .= implode(", ", $columns);
+    if (is_string($key)){
+      $q .= ", PRIMARY KEY (`{$key}`) )";
+    }
+    if (is_array($key)) {
+      $q .= ', ' . implode(", ", $key);
+    }
+    $q .= " ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+    $result = $this->raw($q)->execute();
+    return $result;
+  }
+
+  /**
+   * Check if a column exists on a given table
+   * @param  String $tableName  Table where the column should exist
+   * @param  String $columnName Column name
+   * @return Boolean            True if column exists on table.
+   */
+  protected function columnExists(string $tableName, string $columnName): bool
+  {
+    $q = $this->raw("SHOW COLUMNS FROM `{$tableName}` WHERE Field = '{$columnName}'");
+    $result = $q->execute();
+    return $result->num_rows > 0;
+  }
+
+  /**
+   * Rename an existing database table
+   * @var String $from Old table name
+   * @var String $new New table name
+   */
+  protected function renameTable($from, $to)
+  {
+    $q = $this->raw("RENAME TABLE `$from` TO `$to`");
+    return $q->execute();
+  }
+
+  protected function configExists($key, $type = 'application') {
+    $value = $this->select(['*'], 'config')
+      ->where('type', '=', $type)
+      ->and('key', '=', $key)
+      ->execute(true);
+    return !!$value;
+  }
+
+  protected function createConfig($key, $label, $type = 'application', $description = '', $value_type = 'text', $value = 'default')
+  {
+    $data = Array(
+      'label' => $label,
+      'description' => $description,
+      'type' => $type,
+      'key' => $key,
+      'value' => $value,
+      'value_type' => $value_type
+     );
+    $q = $this->insert($data, 'config');
+    return $q->execute();
+  }
+
+  protected function dropTable($tableName)
+  {
+    $q = $this->raw("DROP TABLE `$tableName`");
+    return $q->execute();
+  }
+}
