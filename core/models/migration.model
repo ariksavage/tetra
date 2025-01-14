@@ -21,9 +21,32 @@ require_once(__dir__ . '/user_role.model');
 use \Core\Models\UserRole;
 
 class Migration extends Base {
-  public $name;
-  protected $start;
-  protected $end;
+  /**
+   * Human friendly name for this migration.
+   * @var string
+   */
+  public string $name = 'migration';
+
+  /**
+   * Timestamp at execution start
+   * @var int
+   */
+  protected int $start;
+
+  /**
+   * Timestamp at execution end
+   * @var int
+   */
+  protected int $end;
+
+  /**
+   * Constructor
+   *
+   * Start the clock.
+   * Check if the migration is already complete
+   *
+   * If not, execute the migration
+   */
   public function __construct() {
     $this->start();
     if ($this->isComplete()) {
@@ -35,7 +58,13 @@ class Migration extends Base {
     }
   }
 
-  protected function start() {
+  /**
+   * Track the start time
+   * and return a line to the CLI
+   *
+   * @return void
+   */
+  protected function start(): void {
     $this->start = time();
     echo $this->name . PHP_EOL;
     $blink = " \033[5m";
@@ -43,12 +72,19 @@ class Migration extends Base {
     echo $blink . "Executing..." . $end . PHP_EOL;
   }
 
-  protected function end($skipped = false) {
+  /**
+   * Track the end time of execution
+   * and output to CLI if successful or skipped.
+   *
+   * @param  bool $skipped True if this migration was skipped
+   *
+   * @return void
+   */
+  protected function end(bool $skipped = false): void {
     $this->end = time();
     echo chr(27) . "[1A";
     if ($skipped) {
       echo "    SKIPPED" . PHP_EOL;
-      return true;
     } else {
       $green = "\033[0;32m";
       $nocolor = "\033[0m";
@@ -56,19 +92,47 @@ class Migration extends Base {
     }
   }
 
-  protected function isComplete() {
+  /**
+   * Test whether this migration is already complete.
+   * ie return true if a column has already been created
+   *
+   * Overridden by each migration
+   *
+   * @return bool True if the migration is complete
+   */
+  protected function isComplete(): bool {
     return false;
   }
 
-  protected function execute() {
+  /**
+   * Execute this migration and do whatever is desired.
+   *
+   * Overridden by each migration
+   *
+   * @return bool Success of the migration
+   */
+  protected function execute(): bool {
     sleep(4);
     return true;
   }
-  protected function elapsed(){
+
+  /**
+   * Get the time of execution in seconds.
+   *
+   * @return string Time of execution in X.xx s
+   */
+  protected function elapsed(): string {
     $t = (float) $this->end - $this->start;
     return number_format($t, 2, '.', '');
   }
 
+  /**
+   * Check if a table exists in the database.
+   *
+   * @param  string $tableName Name of the table
+   *
+   * @return bool           TRUE if table exists.
+   */
   protected function tableExists(string $tableName): bool
   {
     //show tables where tables_in_db = 'config'
@@ -77,6 +141,15 @@ class Migration extends Base {
     return $results->num_rows > 0;
   }
 
+  /**
+   * Create a table in the database.
+   *
+   * @param  string $tableName Name of the table
+   * @param  array  $columns   Array of columns as MySQL statments
+   * @param  array  $key       Array of keys or a single column name as primary key
+   *
+   * @return bool              TRUE if table was created.
+   */
   protected function createTable(string $tableName, array $columns, string|array $key): bool
   {
     $q = "CREATE TABLE `{$tableName}` (";
@@ -96,7 +169,7 @@ class Migration extends Base {
    * Check if a column exists on a given table
    * @param  String $tableName  Table where the column should exist
    * @param  String $columnName Column name
-   * @return Boolean            True if column exists on table.
+   * @return bool               TRUE if column exists on table.
    */
   protected function columnExists(string $tableName, string $columnName): bool
   {
@@ -107,16 +180,26 @@ class Migration extends Base {
 
   /**
    * Rename an existing database table
+   *
    * @var String $from Old table name
-   * @var String $new New table name
+   * @var String $new  New table name
+   *
+   * @return bool      TRUE if successful.
    */
-  protected function renameTable($from, $to)
+  protected function renameTable(string $from, string $to): bool
   {
     $q = $this->raw("RENAME TABLE `$from` TO `$to`");
     return $q->execute();
   }
 
-  protected function configExists($key, $type = 'application') {
+  /**
+   * Test if a configuration option exists in the `config` table
+   * @param  string $key  Option's key
+   * @param  string $type Option's type
+   * @return bool         TRUE if the config exists
+   */
+  protected function configExists(string $key, string $type = 'application'): bool
+  {
     $value = $this->select(['*'], 'config')
       ->where('type', '=', $type)
       ->and('key', '=', $key)
@@ -124,7 +207,19 @@ class Migration extends Base {
     return !!$value;
   }
 
-  protected function createConfig($key, $label, $type = 'application', $description = '', $value_type = 'text', $value = 'default')
+  /**
+   * Create a configuration item in the `config` table.
+   *
+   * @param  string $key         Option's specific key.
+   * @param  string $label       Option's human-readable label.
+   * @param  string $type        Option's type (general category).
+   * @param  string $description Option's description for users.
+   * @param  string $value_type  Option's value type: 'text','longtext','number','bool','object'.
+   * @param  mixed  $value       Option's initial value.
+   *
+   * @return bool                TRUE if the option is created.
+   */
+  protected function createConfig(string $key, string $label, string $type = 'application', string $description = '', string $value_type = 'text', mixed $value = 'default')
   {
     $data = Array(
       'label' => $label,
@@ -138,9 +233,84 @@ class Migration extends Base {
     return $q->execute();
   }
 
-  protected function dropTable($tableName)
+  /**
+   * Drop a table from the database.
+   *
+   * @param  string $tableName Name of the table to be dropped.
+   *
+   * @return bool              TRUE if table is dropped.
+   */
+  protected function dropTable(string $tableName): bool
   {
     $q = $this->raw("DROP TABLE `$tableName`");
     return $q->execute();
+  }
+
+  /**
+   * Check if a column is of a specific type.
+   *
+   * @param  string $tableName  Table to be checked.
+   * @param  string $columnName Column to be checked.
+   * @param  string $type       Expected type
+   *
+   * @return bool               TRUE if the column in the table is of the type.
+   */
+  protected function columnIsType(string $tableName, string $columnName, string $type): bool
+  {
+    $q = $this->raw("SHOW COLUMNS FROM {$tableName} WHERE Field='{$columnName}' and Type like '{$type}%';");
+    $result = $q->execute();
+    return $result->num_rows > 0;
+  }
+
+  /**
+   * Update a column from a unixtime integer into a timestamp.
+   *
+   * @param  string       $tableName      Table name.
+   * @param  string       $columnName     Column name.
+   * @param  bool         $allowNull      TRUE if Column can be NULL
+   * @param  bool         $defaultCurrent TRUE if column should default to using the current_timestamp()
+   * @param  bool|bool    $updateOnUpdate TRUE if column should update to the current_timestamp when a row is updated.
+   *
+   * @return bool                         TRUE if successful.
+   */
+  protected function updateColumnIntegerToTimestamp(string $tableName, string $columnName, bool $allowNull = true, bool $defaultCurrent = true, bool $updateOnUpdate = false)
+  {
+    // Ensure column is nullable
+    $q0 = " ALTER TABLE {$tableName} MODIFY COLUMN {$columnName} Int NULL";
+
+    // Create a temporary column to store the value as a timestamp
+    $q1 = "ALTER TABLE {$tableName} ADD COLUMN temp TIMESTAMP AFTER {$columnName}";
+
+    // Store the value in temp, and remove any values from the original column
+    $q2 = "UPDATE {$tableName} SET temp = FROM_UNIXTIME({$columnName}) WHERE {$columnName} IS NOT NULL AND {$columnName} > 300000000";
+    $q3 = "UPDATE {$tableName} SET {$columnName} = null;";
+
+    // Update the column to be a timestamp
+    $q4 = "ALTER TABLE {$tableName} CHANGE {$columnName} {$columnName} TIMESTAMP";
+    if (!$allowNull){
+      $q4 .= " NOT NULL";
+    }
+    if ($defaultCurrent) {
+      $q4 .= " DEFAULT CURRENT_TIMESTAMP";
+    }
+    if ($updateOnUpdate) {
+      $q4 .= " ON UPDATE CURRENT_TIMESTAMP";
+    }
+
+
+    // Copy the temp values back in.
+    $q5 = "UPDATE $tableName set {$columnName} = temp";
+
+    // Delete the temp column.
+    $q6 = "ALTER TABLE {$tableName} DROP COLUMN temp";
+
+    $queries = [$q0, $q1, $q2, $q3, $q4, $q5, $q6];
+    foreach($queries as $query){
+      $result = $this->raw($query)->execute();
+      if (!$result) {
+        return false;
+      }
+    }
+    return true;
   }
 }
