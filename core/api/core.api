@@ -64,7 +64,7 @@ class Core extends Base {
   {
     $config = new \stdClass();
     $config->name = $this->configValue('name');
-    $config->copyright = $this->configValue('copyright');
+    $config->copyright = $this->configValue('copyright_text');
     $this->success('config', $config);
   }
 

@@ -8,11 +8,11 @@ require_once(__DIR__ . '/update.php');
 require_once(__DIR__ . '/delete.php');
 require_once(__DIR__ . '/raw.php');
 
-// use \Core\Database\selectQuery;
-// use \Core\Database\insertQuery;
-// use \Core\Database\updateQuery;
-// use \Core\Database\deleteQuery;
-// use \Core\Database\rawQuery;
+use \Core\Database\selectQuery;
+use \Core\Database\insertQuery;
+use \Core\Database\updateQuery;
+use \Core\Database\deleteQuery;
+use \Core\Database\rawQuery;
 
 trait Queries {
 

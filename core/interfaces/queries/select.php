@@ -193,8 +193,8 @@ class selectQuery extends Query
               $data[] = $obj;
             }
       }
+      $result->close();
     }
-    $result->close();
     if ($single) {
       return reset($data);
     } else {
