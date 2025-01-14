@@ -7,7 +7,7 @@
 #
 # Host: 127.0.0.1 (MySQL 5.5.5-10.11.10-MariaDB-ubu2204-log)
 # Database: db
-# Generation Time: 2025-01-14 15:29:19 +0000
+# Generation Time: 2025-01-14 16:50:40 +0000
 # ************************************************************
 
 
@@ -46,8 +46,8 @@ LOCK TABLES `config` WRITE;
 
 INSERT INTO `config` (`id`, `label`, `description`, `type`, `key`, `value`, `value_type`, `date_created`, `created_by`, `date_modified`, `modified_by`)
 VALUES
-	(4,'Copyright text',X'5465787420746F20666F6C6C6F772074686520666F6F746572277320C2A9207B796561727D','application','copyright','NULL','text','2025-01-11 01:09:16',1,'2025-01-14 09:24:23',1),
-	(1,'Application Name',NULL,'application','name','Demo Project','text','2025-01-07 12:05:13',1,'2025-01-11 01:47:18',1),
+	(4,'Copyright text',X'5465787420746F20666F6C6C6F772074686520666F6F746572277320C2A9207B796561727D','application','copyright','Tetra','text','2025-01-11 01:09:16',1,'2025-01-14 10:49:50',1),
+	(1,'Application Name',X'4170706C69636174696F6E206E616D652C207573656420696E20746865206C6F676F2C2073697465207469746C652C20657463','application','name','Demo Project','text','2025-01-07 12:05:13',1,'2025-01-14 10:50:19',1),
 	(2,'Password Reset Expires (days)',X'546865206E756D626572206F66206461797320612070617373776F7264207265736574206C696E6B2077696C6C2062652076616C69642E2041667465722074686973206E756D626572206F6620646179732C20746865206C696E6B2077696C6C206E6F206C6F6E67657220776F726B2E','application','password_reset_expires_days','30','number','2025-01-09 10:20:10',0,'2025-01-10 15:34:19',0),
 	(3,'User Session Expires (days)',X'546865206E756D626572206F66206461797320776974686F7574206163746976697479206265666F726520612075736572206973206175746F6D61746963616C6C79206C6F67676564206F75742E20416E792074696D6520746865207573657220696E746572616374732077697468207468652073697465207468652074696D65722077696C6C2072657365742E','application','session_expires_days','1','number','2025-01-07 13:04:50',0,'2025-01-11 01:40:52',0);
 
@@ -91,15 +91,6 @@ CREATE TABLE `user_permissions` (
   UNIQUE KEY `dimension/action` (`dimension`,`action`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
-LOCK TABLES `user_permissions` WRITE;
-/*!40000 ALTER TABLE `user_permissions` DISABLE KEYS */;
-
-INSERT INTO `user_permissions` (`id`, `title`, `dimension`, `action`, `description`, `date_created`, `created_by`, `date_modified`, `modified_by`)
-VALUES
-	(1,'View the Homepage','page:home','VIEW',X'5573657220697320616C6C6F77656420746F20766965772074686520686F6D6570616765','2025-01-09 15:32:12',0,'2025-01-09 15:32:36',0);
-
-/*!40000 ALTER TABLE `user_permissions` ENABLE KEYS */;
-UNLOCK TABLES;
 
 
 # Dump of table user_role_assignments
