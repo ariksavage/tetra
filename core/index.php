@@ -19,43 +19,62 @@ unset($_GET['id']);
 $id2 = $_GET['id2'] ?? null;
 unset($_GET['id2']);
 
-// Check authorization
+/**
+ * Load the appropriate class of API to handle the request.
+ */
 
-// $currentUser = new User();
+/**
+ * If a corresponding $type plugin exists, load it first.
+ */
+$pluginsDir = realpath(SERVER_ROOT . '/plugins');
+if (is_dir($pluginsDir)) {
+  $pluginDir = $pluginsDir . "/{$type}";
+  if (is_dir($pluginDir)) {
+    $files = $images = glob("{$pluginDir}/*.api", GLOB_BRACE);
+    if (count($files) == 1) {
+      $pluginAPIfile = reset($files);
 
-// $skipLogin = ($type == 'users' && $action == 'login') || ($action == 'tetra');
-// var_dump($skipLogin) {
-
-// }
-// if (!$skipLogin && !$currentUser->byToken()) {
-//   \Tetra\error("Not authorized", "Core", 401);
-// }
-
-// Load override classes first, then look to core
-$moduleClassFile = "/core/modules/$type.api";
-if (file_exists($moduleClassFile)) {
-  require_once $moduleClassFile;
-} else if (file_exists(CORE_ROOT . "/api/$type.api")) {
-  require_once CORE_ROOT . "/api/$type.api";
+      require_once $pluginAPIfile;
+      $name = str_replace('.api', '', basename($pluginAPIfile));
+      $APIclass = __NAMESPACE__ . '\\API\\' . $name;
+    }
+  }
 } else {
-  $core->error("$type is not a valid type", 404);
+  mkdir($pluginsDir);
 }
 
-$class = __NAMESPACE__ . '\\API\\' . $core->toCamelCase($type);
-if (class_exists($class)) {
-  $core = new $class();
-} else {
-  $core->error("$class does not found.", 404);
+/**
+ * If no plugin, load from core.
+ */
+if (!$APIclass) {
+  if (file_exists(CORE_ROOT . "/api/$type.api")) {
+    require_once CORE_ROOT . "/api/$type.api";
+    $APIclass = __NAMESPACE__ . '\\API\\' . $core->toCamelCase($type);
+  } else {
+    $core->error("$type is not a valid type", 404);
+  }
 }
 
+/**
+ * Instatiate the API class.
+ */
+if ($APIclass && class_exists($APIclass)) {
+  $api = new $APIclass();
+} else {
+  $core->error("{$APIclass} not found.", 404);
+}
+
+/**
+ * Call the API method as defined by the request type and action.
+ */
 $fn = "$action$method";
 if (method_exists($core, $fn)) {
   if ($id && $id2) {
-    $core->$fn($id, $id2);
+    $api->$fn($id, $id2);
   } else if ($id) {
-    $core->$fn($id);
+    $api->$fn($id);
   } else {
-    $core->$fn();
+    $api->$fn();
   }
 } else {
   $core->error("$type/$action is not a valid $method action", 404);
