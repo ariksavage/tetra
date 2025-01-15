@@ -32,20 +32,13 @@
   background: var(--back);
   color: var(--fore);
   &:hover {
-    color: var(--back);
-    background: var(--fore);
-  }
-
-  &.in-path {
-    color: var(--back);
-    background: var(--fore);
-    opacity: .6;
+    color: var(--primary-text);
+    background: var(--primary);
   }
 
   &.current {
-    color: var(--back);
-    background: var(--fore);
-    opacity: .8;
+    color: var(--primary-text);
+    background: var(--primary);
   }
 }
 

@@ -30,7 +30,6 @@ export class TetraPage {
     protected activeRoute: ActivatedRoute,
     protected userService: UserService
   ) {
-
     userService.getUser().subscribe((user: User | null) => {
       if (user) {
         this.user = user;

@@ -10,15 +10,15 @@ const r : Routes = [
   { path: 'login', component:  LoginPage },
   { path: 'logout', redirectTo: '/', pathMatch: 'full' },
   { path: 'admin', title: 'Admin', children: [
-      { path: '', title: 'Dashboard', component: AdminDashboardPage },
-      { path: 'config',  title: 'Config', children:
-        [
-          {path: '', component: AdminConfigPage },
-          {path: 'menu', title: 'Menu', component: AdminConfigMenuPage }
-        ]
-      }
-    ]
-  }
+    { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    { path: 'dashboard', component: AdminDashboardPage },
+    { path: 'config',  title: 'Config', children:
+      [
+        {path: '', component: AdminConfigPage },
+        {path: 'menu', title: 'Menu', component: AdminConfigMenuPage }
+      ]
+    }
+  ]}
 ];
 
 export const tetraRoutes: Routes = r;

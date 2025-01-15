@@ -12,9 +12,5 @@ import { TetraPage } from '@tetra/page/page.component';
 })
 
 export class AdminDashboardPage extends TetraPage {
-  override title = 'Dashboard';
-
-  override onLoad() {
-    const self = this;
-  }
+  override title = 'Admin Dashboard';
 }

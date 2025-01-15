@@ -276,6 +276,55 @@ class Migration extends Base {
   }
 
   /**
+   * Add a column to a table
+   * @param string $tableName  Table to be altered.
+   * @param string $columnName Column name to be added.
+   * @param string $type       Column type, eg INT(10), VARCHAR(255), TIMESTAMP.
+   * @param bool   $null       TRUE if NULL values are allowed.
+   * @param string $default    Default value as escaped string.
+   * @param string $after      Column name after which to add this.
+   *
+   * @return bool              Success
+   */
+  protected function addColumn(string $tableName, string $columnName, string $type = 'VARCHAR(255)', bool $null = true, string $default = null, string $after = null): bool
+  {
+    $query = "ALTER TABLE {$tableName} ADD COLUMN {$columnName} {$type}";
+    if (!$null) {
+      $query .= " NOT NULL";
+    }
+    if ($default) {
+      $query .= " DEFAULT " . $default;
+    }
+    if ($after){
+      $query .= " AFTER {$after}";
+    }
+    return $this->raw($query)->execute();
+  }
+
+  protected function renameColumn(string $tableName, string $old, string $new): bool
+  {
+    $q = $this->raw("SHOW COLUMNS FROM {$tableName} WHERE Field='{$old}';");
+    $result = $q->execute();
+    $column = $result->fetch_object();
+    // var_dump($column);
+    $query = "ALTER TABLE `{$tableName}` CHANGE `{$old}` `{$new}` {$column->Type}";
+    if ($column->Null == 'NO') {
+      $query .= "NOT NULL";
+    }
+
+    if ($column->Default) {
+      $query .= " DEFAULT " . $column->Default;
+    }
+    return $this->raw($query)->execute();
+  }
+
+  protected function dropColumn(string $tableName, string $columnName): bool
+  {
+    $query = "ALTER TABLE {$tableName} DROP COLUMN {$columnName};";
+    return $this->raw($query)->execute();
+  }
+
+  /**
    * Update a column from a unixtime integer into a timestamp.
    *
    * @param  string       $tableName      Table name.

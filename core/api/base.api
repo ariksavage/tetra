@@ -159,12 +159,10 @@ class Base {
     $search = $this->postValue('search');
     if ($search){
       $query->andGroup();
-      foreach($this->searchColumns() as $k => $column){
+      foreach($this->searchColumns() as $k => $column) {
         if ($k > 0) {
-          $query->or();
+          $query->or($column, 'CONTAINS', $search);
         }
-        $query->where($column, 'CONTAINS', $search);
-
       }
       $query->endGroup();
     }

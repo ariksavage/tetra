@@ -16,7 +16,6 @@ export class TetraBreadcrumbsComponent {
   ) {
 
     app.getBreadcrumbs().subscribe((breadcrumbs: Array<any>) => {
-      console.log('breadcrumbs', breadcrumbs);
       this.breadcrumbs = breadcrumbs;
     });
   }

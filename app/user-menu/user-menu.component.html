@@ -1,6 +1,7 @@
 <span class="logged-in" *ngIf="loggedIn()">Logged in as: {{user.name()}}</span>
-<button class="toggle" [ngClass]="{'open': open}" (click)="toggle()">
-  <i class="fa-solid fa-user" [ngClass]="{'fa-solid': loggedIn(), 'fa-regular': !loggedIn()}"></i></button>
+<button class="toggle icon-only primary" [ngClass]="{'open': open}" (click)="toggle()" icon="user"  [iconStyle]="loggedIn() ? 'solid' : 'regular'">
+  <!-- <i class="fa-solid fa-user" [ngClass]="{'fa-solid': loggedIn(), 'fa-regular': !loggedIn()}"></i> -->
+</button>
 <nav class="dropdown"  [ngClass]="{'open': open}">
   <ul class="dropdown-list">
     <li *ngIf="!loggedIn()" class="dropdown-item login">
