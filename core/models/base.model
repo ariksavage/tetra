@@ -156,7 +156,9 @@ class Base {
             $this->$prop = float($value);
             break;
           case 'timestamp':
-            $this->$prop = strtotime($value);
+            if ($value) {
+              $this->$prop = strtotime($value);
+            }
             break;
           case 'varchar':
           case 'char':
