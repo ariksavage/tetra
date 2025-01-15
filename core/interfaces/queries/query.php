@@ -229,7 +229,7 @@ class Query
 
   public function orderBy($column, $direction = 'ASC')
   {
-    $this->orderConditions[] = "{$column} {$direction}";
+    $this->orderConditions[] = "`{$column}` {$direction}";
     return $this;
   }
 

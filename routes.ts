@@ -10,8 +10,7 @@ const r : Routes = [
   { path: 'login', component:  LoginPage },
   { path: 'logout', redirectTo: '/', pathMatch: 'full' },
   { path: 'admin', title: 'Admin', children: [
-      { path: '', redirectTo: '/admin/dashboard', pathMatch: 'prefix' },
-      { path: 'dashboard', title: 'Dashboard', component: AdminDashboardPage },
+      { path: '', title: 'Dashboard', component: AdminDashboardPage },
       { path: 'config',  title: 'Config', children:
         [
           {path: '', component: AdminConfigPage },

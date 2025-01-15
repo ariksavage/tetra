@@ -1,9 +1,9 @@
-<section *ngFor="let category of categories">
-  <h2>{{category.toUpperCase()}}</h2>
-  <ul class="items-list">
+<p>Sub-navigation here</p>
+<section class="collapse" *ngFor="let category of categories" [ngClass]="category" id="{{category}}-config" [title]="categoryLabel(category)">
+  <ul body class="items-list">
     <li *ngFor="let item of byCategory(category)" class="config-item">
       <h3>{{item.label}}</h3>
-      <button class="icon-only icon-rotate-hover" *ngIf="item.touched()" icon="rotate" (click)="item.reset()"  [attr.aria-label]="'Reset ' + item.label" [attr.title]="'Update ' + item.label"></button>
+      <button class="icon-only icon-rotate-hover " *ngIf="item.touched()" icon="rotate" (click)="item.reset()"  [attr.aria-label]="'Reset ' + item.label"></button>
       <div class="field number"  *ngIf="item.value_type == 'number'" [(model)]="item.value"></div>
       <div class="field text" *ngIf="item.value_type == 'text'" [(model)]="item.value"></div>
       <button *ngIf="item.touched()" icon="floppy-disk" (click)="update(item)" [attr.aria-label]="'Update ' + item.label" [attr.title]="'Update ' + item.label"></button>

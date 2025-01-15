@@ -66,30 +66,44 @@ class Migration extends Base {
    */
   protected function start(): void {
     $this->start = time();
-    echo $this->name . PHP_EOL;
     $blink = " \033[5m";
     $end = "\033[0m";
-    echo $blink . "Executing..." . $end . PHP_EOL;
+    $message = $blink . " Executing..." . $end;
+    $this->echoLine($message);
+  }
+
+  protected function echoLine($text, $overwrite = false) {
+    $n = intval(exec('tput cols'));
+    $n = min($n, 120);
+    $x = $n - strlen($this->name) - strlen($text);
+    if ($overwrite) {
+      echo "\e[2A\e[K";
+    }
+    echo $this->name  . str_repeat('.', $x) . $text . PHP_EOL;
+    echo str_repeat('-', $n) . PHP_EOL;
   }
 
   /**
    * Track the end time of execution
    * and output to CLI if successful or skipped.
    *
-   * @param  bool $skipped True if this migration was skipped
+   * @param  bool $skipped TRUE if this migration was skipped
    *
    * @return void
    */
   protected function end(bool $skipped = false): void {
+    $green = "\033[0;32m";
+    $nocolor = "\033[0m";
     $this->end = time();
-    echo chr(27) . "[1A";
+
+    $message = $green . " COMPLETE";
     if ($skipped) {
-      echo "    SKIPPED" . PHP_EOL;
+      $message .= " (SKIPPED)";
     } else {
-      $green = "\033[0;32m";
-      $nocolor = "\033[0m";
-      echo $green . "    COMPLETE (" . $this->elapsed() . 's)' . $nocolor . PHP_EOL;
+      $message .= " (" . $this->elapsed() . 's)';
     }
+    $message .= $nocolor;
+    $this->echoLine($message, true);
   }
 
   /**
@@ -158,11 +172,10 @@ class Migration extends Base {
       $q .= ", PRIMARY KEY (`{$key}`) )";
     }
     if (is_array($key)) {
-      $q .= ', ' . implode(", ", $key);
+      $q .= ', ' . implode(", ", $key) . ")";
     }
     $q .= " ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
-    $result = $this->raw($q)->execute();
-    return $result;
+    return $this->raw($q)->execute();
   }
 
   /**

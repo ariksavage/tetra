@@ -18,6 +18,14 @@ class Config extends Base {
     return ['label', 'description', 'type', 'value'];
   }
 
+  protected function listQuery()
+  {
+    $query = parent::listQuery();
+    $query->orderBy('type')->orderBy('key');
+    $query->paginate(1, 999999);
+    return $query;
+  }
+
   protected function updateMenuItems($item) {
     $ids = [];
     $data = (array) $item;

@@ -41,7 +41,7 @@ class insertQuery extends Query
     return $str;
   }
 
-  public function execute(){
+  public function execute() {
     if($result = parent::execute()) {
       if ($this->conn->insert_id) {
         return $this->conn->insert_id;

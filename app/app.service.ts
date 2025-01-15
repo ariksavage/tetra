@@ -65,7 +65,6 @@ export class AppService {
           path: lastPath
         });
         routes = crumbRoute.children;
-        console.log('routes', routes);
       }
     }
     this.setBreadcrumbs(crumbs);

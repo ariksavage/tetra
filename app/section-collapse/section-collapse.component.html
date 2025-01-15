@@ -1,0 +1,11 @@
+<div class="header" (click)="toggle()" [ngClass]="{'open': open}">
+
+  <button class="toggle-btn" title="Toggle section {{title}}">
+    <i class="fa-solid" [ngClass]="{'fa-angle-up': !open, 'fa-angle-down': open}"></i>
+  </button>
+  <h2 class="section-title">{{title}}</h2>
+   <ng-content select="[header]"></ng-content>
+</div>
+<div class="body" [ngClass]="{'open': open}">
+  <ng-content select="[body]"></ng-content>
+</div>
