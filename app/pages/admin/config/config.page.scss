@@ -1,3 +1,17 @@
+:host {
+  position: relative;
+}
+
+.control {
+  position: sticky;
+
+  top: 0;
+  padding: 1em;
+  z-index: 5;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .items-list {
   margin: 0;
   padding: 0;

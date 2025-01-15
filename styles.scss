@@ -1,11 +1,15 @@
 :root {
-  --body: #fff;
-  --default-text: #000;
-  --border: #888;
-  --error: #f00;
-  --warning: #fcc32b;
-  --success: #2cbf18;
-  --info: #1890bf;
+  // --body: #fff;
+  // --default-text: #000;
+  // --border: #888;
+  // --error: #f00;
+  // --warning: #fcc32b;
+  // --success: #2cbf18;
+  // --info: #1890bf;
+  --primary: #ff00a4; // apti-pink
+  --primary-text: #000;
+  --secondary: #ffff45; // apti-yellow
+  --secondary-text: #000;
 }
 body {
   margin: 0;

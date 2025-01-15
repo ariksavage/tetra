@@ -5,14 +5,14 @@ import { TetraFieldNumberComponent } from '@tetra/field-number/field-number.comp
 import { TetraFieldTextComponent } from '@tetra/field-text/field-text.component';
 import { Config } from '@tetra/config';
 import { TetraButtonComponent } from '@tetra/button/button.component';
-
+import { SectionCollapseComponent } from '@tetra/section-collapse/section-collapse.component';
 
 @Component({
   selector: "AdminConfigPage",
   standalone: true,
   imports: [
     TetraButtonComponent,
-    CommonModule, TetraFieldNumberComponent, TetraFieldTextComponent, TetraButtonComponent ],
+    CommonModule, TetraFieldNumberComponent, TetraFieldTextComponent, TetraButtonComponent, SectionCollapseComponent ],
   templateUrl: './config.page.html',
   styleUrl: './config.page.scss',
 })
@@ -39,6 +39,10 @@ export class AdminConfigPage extends TetraPage {
     return this.config.filter((item: Config) => {
       return item.type == category;
     });
+  }
+
+  categoryLabel(category: string) {
+    return category.split('_').join(' ').toUpperCase();
   }
 
   reset( item: any ) {

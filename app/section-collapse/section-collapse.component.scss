@@ -1,0 +1,30 @@
+.header {
+  display: flex;
+  border-bottom: 1px solid #000;
+  margin: 0 0 1em;
+
+  h2 {
+    margin: 0;
+  }
+  cursor: pointer;
+}
+
+.toggle-btn {
+  margin-right: 1em;
+  border: 0;
+  background: transparent;
+}
+
+.body {
+  padding: 0 2em;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .5s linear;
+
+
+  &.open {
+    max-height: 100vh;
+    overflow: auto;
+    padding: 0 2em 1em;
+  }
+}

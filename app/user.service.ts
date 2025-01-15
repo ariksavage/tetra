@@ -70,8 +70,9 @@ export class UserService {
     const self = this;
     const data = {username, password};
     return this.core.post('core', 'login', data).then((data)=> {
+      console.log('login', data);
       if (data.token){
-        self.cookies.set('auth', data.token, 1);
+        self.cookies.set('auth', data.token, 100);
         const user = new User(data.user);
         self.setUser(user);
         return data.user;

@@ -8,6 +8,7 @@ export class CookiesService {
   constructor() { }
 
   set(cname: string, cvalue: any, exdays: number = 30) {
+    console.log('set cookie: ' + cname, cvalue);
     const d = new Date();
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
     let expires = "expires="+ d.toUTCString();
