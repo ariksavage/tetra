@@ -205,6 +205,9 @@ class User extends Base {
   {
     $token = $this->getAuthToken();
     $now = date('Y-m-d h:i:s');
+    if (!$token) {
+      return false;
+    }
     $session_q = $this->select(['user_id'], 'user_sessions')->where('token', '=', $token)->and('date_expires', '>', $now)->and('date_ended', 'IS NULL');
     if ($session = $session_q->execute(true)) {
       $q = $this->select()

@@ -1,4 +1,4 @@
-<ul class="items" *ngIf="navItems.length">
+<ul class="items">
   <li class="item" *ngFor="let item of navItems" [ngClass]="{'current': isCurrent(item), 'in-path': inPath(item)}">
     <a class="item-link" [href]="item.path">
       <i *ngIf="item.icon" class="icon fa-solid" [ngClass]="item.icon"></i>
@@ -6,6 +6,3 @@
     </a>
   </li>
 </ul>
-<p *ngIf="!navItems.length">
-  <a href="/admin/config/menu">Configure menu</a>
-</p>

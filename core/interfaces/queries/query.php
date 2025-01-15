@@ -77,7 +77,7 @@ class Query
   {
     
     $last = end($this->whereConditions);
-    if ($last && $last !== 'AND' && $last !== 'OR' && $last !== ' (') {
+    if ($last && $last !== 'AND' && $last !== 'OR' && $last !== '(') {
       die($last . PHP_EOL . $this . PHP_EOL . 'Where conditions must be joined with AND or OR. found: "' . $last . '"');
     }
     // wrap the column name in `backticks`
@@ -158,37 +158,41 @@ class Query
     return $this;
   }
 
-  public function and($column, $comp, $value = null)
+  public function and($column = null, $comp = null, $value = null)
   {
     $last = end($this->whereConditions);
-    if ($last) {
+    if ($last && $last !== '(') {
       $this->whereConditions[] = 'AND';
     }
-    $this->where($column, $comp, $value);
+    if ($column && $comp){
+      $this->where($column, $comp, $value);
+    }
     return $this;
   }
 
-  public function or($column, $comp, $value = null)
+  public function or($column = null, $comp = null, $value = null)
   {
     $last = end($this->whereConditions);
-    $last = end($this->whereConditions);
-    if ($last) {
+    if ($last && $last !== '(') {
       $this->whereConditions[] = 'OR';
     }
-    $this->where($column, $comp, $value);
+    if ($column && $comp){
+      $this->where($column, $comp, $value);
+    }
+    return $this;
   }
 
   public function andGroup()
   {
     $this->and();
-    $this->whereConditions[] = ' (';
+    $this->whereConditions[] = '(';
     return $this;
   }
 
   public function orGroup()
   {
     $this->or();
-    $this->whereConditions[] = ' (';
+    $this->whereConditions[] = '(';
     return $this;
   }
 
@@ -201,10 +205,7 @@ class Query
   public function andIsAnyOf($column, $comparison, $values = []) {
       $this->andGroup();
       foreach($values as $i => $value) {
-        if ($i > 0){
-          $this->or();
-        }
-        $this->where($column, $comparison, $value);
+        $this->of($column, $comparison, $value);
       }
       $this->endGroup();
     return $this;
@@ -216,10 +217,7 @@ class Query
     if ($values){
       $this->orGroup();
       foreach($values as $i => $value) {
-        if ($i > 0){
-          $this->and();
-        }
-        $this->where($column, $comparison, $value);
+        $this->and($column, $comparison, $value);
       }
       $this->endGroup();
     }

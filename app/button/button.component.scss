@@ -45,11 +45,15 @@
     border: none;
     height: 2em;
     width: 2em;
+    padding: 0;
     position: relative;
+    border: 1px solid transparent;
+    --back: var(--fore);
 
     &:hover,
     &:focus-visible {
-      border: 1px solid #000;
+      border-color: var(--back);
+      color: var(--back);
     }
 
     .icon {

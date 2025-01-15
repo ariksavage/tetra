@@ -16,7 +16,7 @@ class Users extends Base {
 
   protected function searchColumns()
   {
-    return ['username', 'name', 'email'];
+    return ['username', 'first_name', 'last_name', 'middle_name', 'email'];
   }
 
   protected function listQuery()

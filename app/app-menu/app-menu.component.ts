@@ -32,7 +32,6 @@ export class TetraAppMenuComponent {
       rootPath = 'admin';
     }
     return this.core.get('core', 'menu-tree', rootPath).then((data) => {
-      console.log(data);
       self.navItems = data.menu.children;
     })
   }
