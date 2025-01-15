@@ -29,7 +29,7 @@ class Base {
    * Default table name.
    * @var String
    */
-  protected string $table;
+  protected string $table = '';
 
   /**
    * Cached data sent via POST request.
@@ -42,19 +42,19 @@ class Base {
    * Classname of the default model
    * @var String
    */
-  protected string $model;
+  protected string $model = '';
 
   /**
    * Label for multiple items
    * @var String
    */
-  protected string $plural;
+  protected string $plural = 'items';
 
   /**
    * Label for a single item
    * @var String
    */
-  protected string $singular;
+  protected string $singular = 'item';
 
   /**
    * Data object to be returned
@@ -68,7 +68,7 @@ class Base {
    * @var String
    * Message
    */
-  public string $message;
+  public string $message = '';
 
   /**
    * Class constructor
@@ -79,14 +79,13 @@ class Base {
    */
   public function __construct(string $table = '', $model = '', $plural = 'items', $singular = 'item')
   {
-    if ($this->checkAuth()) {
-      $this->data = new \stdClass();
-      $this->message = '';
-      $this->table = $table;
-      $this->model = $model;
-      $this->plural = $plural;
-      $this->singular = $singular;
-    }
+    $this->checkAuth();
+    $this->data = new \stdClass();
+    $this->message = '';
+    $this->table = $table;
+    $this->model = $model;
+    $this->plural = $plural;
+    $this->singular = $singular;
   }
 
   /**
