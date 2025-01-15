@@ -22,7 +22,7 @@ unset($_GET['id2']);
 /**
  * Load the appropriate class of API to handle the request.
  */
-
+$APIclass = '';
 /**
  * If a corresponding $type plugin exists, load it first.
  */
@@ -68,7 +68,7 @@ if ($APIclass && class_exists($APIclass)) {
  * Call the API method as defined by the request type and action.
  */
 $fn = "$action$method";
-if (method_exists($core, $fn)) {
+if (method_exists($api, $fn)) {
   if ($id && $id2) {
     $api->$fn($id, $id2);
   } else if ($id) {

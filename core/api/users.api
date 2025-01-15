@@ -28,7 +28,7 @@ class Users extends Base {
   public function currentGET()
   {
     if ($currentUser = $this->getCurrentUser()) {
-      $currentUser->getRoles();
+      // $currentUser->getRoles();
       $this->success('user', $currentUser);
     }
   }
