@@ -19,9 +19,9 @@ class Users extends Base {
     return ['username', 'first_name', 'last_name', 'middle_name', 'email'];
   }
 
-  protected function listQuery()
+  protected function listQuery(int $page = 1, int $per = 20)
   {
-    $query = parent::listQuery();
+    $query = parent::listQuery($page, $per);
     return $query;
   }
 

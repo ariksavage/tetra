@@ -1,4 +1,21 @@
 <?php
+/**
+ * Basic API
+ *
+ * Handle general CRUD operations for a particular database table.
+ *
+ * Will be extended by more specific APIs
+ *
+ * Or overridden by Application
+ *
+ * PHP version 8.4
+ *
+ * @category   API
+ * @package    Core
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @version    1.0
+ * @since      2025-01-10
+ */
 namespace Core\API;
 
 require_once(CORE_ROOT . '/tetra-core.trait');
@@ -12,49 +29,56 @@ class Base {
    * Default table name.
    * @var String
    */
-  protected $table;
+  protected string $table;
 
   /**
    * Cached data sent via POST request.
    * @var Object
    */
 
-  protected $_postdata;
+  protected \stdClass|null $_postdata = null;
 
   /**
    * Classname of the default model
    * @var String
    */
-  protected $model;
+  protected string $model;
 
   /**
    * Label for multiple items
    * @var String
    */
-  protected $plural;
+  protected string $plural;
 
   /**
    * Label for a single item
    * @var String
    */
-  protected $singular;
+  protected string $singular;
 
   /**
    * Data object to be returned
    * @var Object
    * Data
    */
-  public $data;
+  public \stdClass $data;
 
   /**
    * Text message to be returned
    * @var String
    * Message
    */
-  public $message;
+  public string $message;
 
-
-  public function __construct($table = null, $model = null, $plural = null, $singular = null) {
+  /**
+   * Class constructor
+   * @param string $table    Table name. eg "users"
+   * @param string $model    Fully namespaced class for returned items. eg \Core\Models\User
+   * @param string $plural   Plural name for items.                     eg "Users"
+   * @param string $singular Singular name for item.                    eg "User"
+   */
+  public function __construct(string $table = '', $model = '', $plural = 'items', $singular = 'item')
+  {
     if ($this->checkAuth()) {
       $this->data = new \stdClass();
       $this->message = '';
@@ -67,17 +91,19 @@ class Base {
 
   /**
    * Check if authorization is required
-   * @return Boolean True if login is required
+   * @return Boolean TRUE if login is required
    */
-  public function requiresAuth() {
+  public function requiresAuth(): bool
+  {
     return true;
   }
 
   /**
    * If authorization is required, check for an active user
-   * @return [type] [description]
+   * @return bool TRUE if authorized
    */
-  protected function checkAuth() {
+  protected function checkAuth(): bool
+  {
     $user = $this->getCurrentUser();
     if ($this->requiresAuth() && !$user) {
       $this->error('Login required', 401);
@@ -87,6 +113,11 @@ class Base {
     return true;
   }
 
+  /**
+   * Save posted item to the database.
+   *
+   * @return JSON response
+   */
   public function savePOST()
   {
     $key = strtolower($this->singular);
@@ -105,8 +136,10 @@ class Base {
    */
   public function listPOST()
   {
-    $query = $this->listQuery();
-    $list  = $query->execute(false, $this->model);
+    $page = $this->postValue('page', 1, 'integer');
+    $per = $this->postValue('per', 20, 'integer');
+    $query = $this->listQuery($page, $per);
+    $list = $this->paginatedResults($query, $page, $per);
     if (count($list)){
       $this->success($this->plural, $list);
     } else {
@@ -114,7 +147,13 @@ class Base {
     }
   }
 
-  public function deleteDELETE($id)
+  /**
+   * Delete the item with the given $id.
+   *
+   * @param  int    $id Item's ID
+   * @return [type]     [description]
+   */
+  public function deleteDELETE(int $id)
   {
     $model = new $this->model();
     $model->byId($id);
@@ -123,6 +162,45 @@ class Base {
     }
   }
 
+  /**
+   * Get results from a query, along with pagination information.
+   *
+   * @param  \Core\Database\selectQuery $query SELECT Query
+   * @param  int    $page                      Current page of results to return
+   * @param  int    $perPage                   Number of items top return per page
+   * @param string $model                      Fully namespaced class for returned items. eg \Core\Models\User
+   * @return Array<$model>                     Query results
+   */
+  protected function paginatedResults(\Core\Database\selectQuery $query, int $page, int $perPage, string $model = '')
+  {
+    $total = $query->getTotal();
+    if (!$model && $this->model) {
+      $model = $this->model;
+    }
+    $results = $query->execute(false, $model);
+    $pagination = (object) Array(
+      'current_results' => count($results),
+      'total_results' => $total
+    );
+    $pagination->first_page = 1;
+    if ($perPage){
+      $pagination->per_page  = $perPage;
+      $lastPage = ceil($total / $perPage);
+      $pagination->last_page = $lastPage;
+      $pagination->current_page = $page;
+      $pagination->next_page = ($page < $lastPage) ? $page + 1 : null;
+      $pagination->prev_page = ($page > 1) ? $page - 1 : null;
+    }
+
+    $this->data->pagination = $pagination;
+    return $results;
+  }
+
+  /**
+   * Get an item by its ID
+   * @param  int           $id Item ID
+   * @return $this->model      Model
+   */
   protected function getById(int $id)
   {
     $model = new $this->model();
@@ -130,6 +208,12 @@ class Base {
     return $model;
   }
 
+  /**
+   * HTTP GET request for an item by its ID.
+   *
+   * @param  int           $id Item ID
+   * @return $this->model      Model
+   */
   public function idGET($id)
   {
     $model = $this->getById($id);
@@ -151,11 +235,9 @@ class Base {
    * Build a query to list items.
    * May be expanded by specific APIs
    */
-  protected function listQuery()
+  protected function listQuery(int $page = 1, int $per = 20)
   {
     $query = $this->select()->from($this->table);
-    $page = $this->postValue('page', 1, 'integer');
-    $per = $this->postValue('per', 20, 'integer');
     $search = $this->postValue('search');
     if ($search){
       $query->andGroup();

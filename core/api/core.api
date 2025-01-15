@@ -14,7 +14,7 @@ class Core extends Base {
     $this->data = new \stdClass();
   }
 
-  public function requiresAuth() {
+  public function requiresAuth(): bool {
     return false;
   }
 
