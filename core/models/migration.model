@@ -286,7 +286,7 @@ class Migration extends Base {
    *
    * @return bool              Success
    */
-  protected function addColumn(string $tableName, string $columnName, string $type = 'VARCHAR(255)', bool $null = true, string $default = null, string $after = null): bool
+  protected function addColumn(string $tableName, string $columnName, string $type = 'VARCHAR(255)', bool $null = true, string $default = '', string $after = ''): bool
   {
     $query = "ALTER TABLE {$tableName} ADD COLUMN {$columnName} {$type}";
     if (!$null) {
