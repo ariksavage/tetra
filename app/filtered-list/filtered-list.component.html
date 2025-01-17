@@ -1,0 +1,28 @@
+
+<p class="summary" *ngIf="pagination">{{summary()}}</p>
+<div class="pagination" *ngIf="pagination">
+  <label class="items-per-page">Items per page:
+    <select [(ngModel)]="pagination.per_page" (change)="refresh()">
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="50">50</option>
+    </select>
+  </label>
+<nav class="pagination-nav" *ngIf="pagination">
+  <ul>
+    <li><button (click)="setPage(pagination.first_page)" [disabled]="pagination.first_page == pagination.current_page || loading()" [title]="'Page ' + pagination.first_page"><i class="fas fa-angles-left"></i></button></li>
+    <li><button (click)="setPage(pagination.prev_page)" [disabled]="!pagination.prev_page || loading()" [title]="'Page ' + pagination.prev_page"><i class="fas fa-angle-left"></i></button></li>
+    <li><span>page {{pagination.current_page}} of {{pagination.last_page}}</span></li>
+    <li><button (click)="setPage(pagination.next_page)" [disabled]="!pagination.next_page || loading()" [title]="'Page ' + pagination.next_page"><i class="fas fa-angle-right"></i></button></li>
+    <li><button (click)="setPage(pagination.last_page)" [disabled]="pagination.last_page == pagination.current_page || loading()" [title]="'Page ' + pagination.last_page"><i class="fas fa-angles-right"></i></button></li>
+  </ul>
+</nav>
+</div>
+
+<ul class="items">
+  <li class="loading" *ngIf="loading()"><p><i class="spinner"></i> Loading {{plural}}...</p></li>
+  <ng-content *ngIf="!loading()" select=".list-item"></ng-content>
+</ul>
+<div class="filters">
+  <ng-content select=".filter-block"></ng-content>
+</div>

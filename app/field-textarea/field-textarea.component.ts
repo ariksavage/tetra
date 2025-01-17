@@ -12,7 +12,7 @@ import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
     { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' }
   ],
   templateUrl: './field-textarea.component.html',
-  styleUrl: '../field/field.component.scss'
+  styleUrl: './field-textarea.component.scss'
 })
 export class FieldTextAreaComponent extends FieldComponent {
   @ViewChild('area') area: any;

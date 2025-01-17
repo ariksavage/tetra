@@ -7,16 +7,15 @@ export class CookiesService {
 
   constructor() { }
 
-  set(cname: string, cvalue: any, exdays: number = 30) {
-    console.log('set cookie: ' + cname, cvalue);
+  set(cName: string, cValue: any, exDays: number = 30) {
     const d = new Date();
-    d.setTime(d.getTime() + (exdays*24*60*60*1000));
+    d.setTime(d.getTime() + (exDays*24*60*60*1000));
     let expires = "expires="+ d.toUTCString();
-    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+    document.cookie = cName + "=" + cValue + ";" + expires + ";path=/";
   }
 
-  read(cname: string) {
-    let name = cname + "=";
+  read(cName: string) {
+    let name = cName + "=";
     let decodedCookie = decodeURIComponent(document.cookie);
     let ca = decodedCookie.split(';');
     for(let i = 0; i <ca.length; i++) {
@@ -31,7 +30,7 @@ export class CookiesService {
     return "";
   }
 
-  delete(cname: string) {
-    this.set(cname, null, -100);
+  delete(cName: string) {
+    this.set(cName, null, -100);
   }
 }

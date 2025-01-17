@@ -1,5 +1,6 @@
+@import '../../../styles/_global';
 :host {
-  padding: 10px 0;
+
   border-right: 1px solid var(--border);
 
   --fore: var(--default-text);
@@ -8,6 +9,12 @@
   &:hover {
     .item-title {
       max-width: 100vw;
+    }
+  }
+
+  &.open {
+    .items {
+      max-width: 100%;
     }
   }
 }
@@ -21,6 +28,23 @@
   padding: 0;
   margin: 0;
   height: 100%;
+  position: absolute;
+  z-index: 9;
+  background: var(--body);
+  left: 0;
+  width: 100%;
+  max-width: 0;
+  overflow: hidden;
+  transition: max-width 1s;
+  border-right: 1px solid var(--border);
+
+  @include screen-sm-up {
+    padding: 10px 0;
+    position: relative;
+    max-width: 100%;
+    border: none;
+    background: transparent;
+  }
 }
 
 .item {
@@ -51,10 +75,14 @@
 }
 
 .item-title {
-  max-width: 0;
+
   overflow: hidden;
   transition: max-width 1s;
   white-space: nowrap;
+
+  @include screen-sm-up {
+    max-width: 0;
+  }
 
   // Create a margin, unaffected by max-width
   &::after,

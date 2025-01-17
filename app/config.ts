@@ -11,9 +11,6 @@ export class Config extends Model {
 
   constructor(data: Config) {
     super(data);
-  }
-
-  override afterConstruct() {
     this.original = this.value;
   }
 

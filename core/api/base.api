@@ -77,7 +77,7 @@ class Base {
    * @param string $plural   Plural name for items.                     eg "Users"
    * @param string $singular Singular name for item.                    eg "User"
    */
-  public function __construct(string $table = '', $model = '', $plural = 'items', $singular = 'item')
+  public function __construct(string $table = '', string $model = '', string $plural = 'Items', string $singular = 'Item')
   {
     $this->checkAuth();
     $this->data = new \stdClass();
@@ -225,7 +225,7 @@ class Base {
    * 
    * @return Array<String> List of column names.
    */
-  protected function searchColumns()
+  protected function searchColumns(): Array
   {
     return [];
   }
@@ -233,8 +233,13 @@ class Base {
   /**
    * Build a query to list items.
    * May be expanded by specific APIs
+   *
+   * @param int $page     Page number of results to return.
+   * @param int $per      Number of results per page.
+   *
+   * @return selectQuery  Query object
    */
-  protected function listQuery(int $page = 1, int $per = 20)
+  protected function listQuery(int $page = 1, int $per = 20): \Core\Database\selectQuery
   {
     $query = $this->select()->from($this->table);
     $search = $this->postValue('search');
@@ -254,14 +259,15 @@ class Base {
   /**
    * Get data from Angular POST request, or from plain $_POST;
    *
-   * @return Object
+   * @return stdClass|null POST data
    */
-  protected function getPostData()
+  protected function getPostData(): \stdClass|null
   {
     if (!$this->_postdata) {
-        if ($_POST) {
+      if ($_POST) {
         $this->_postdata = (object) $_POST;
       } else {
+
         $rawdata = file_get_contents("php://input");
         $this->_postdata = json_decode($rawdata);
       }

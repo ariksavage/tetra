@@ -1,11 +1,6 @@
+// Load variables, mixins from parent app
+@import '../styles/_global';
 :root {
-  // --body: #fff;
-  // --default-text: #000;
-  // --border: #888;
-  // --error: #f00;
-  // --warning: #fcc32b;
-  // --success: #2cbf18;
-  // --info: #1890bf;
   --primary: #ff00a4; // apti-pink
   --primary-text: #000;
   --secondary: #ffff45; // apti-yellow
@@ -30,4 +25,14 @@ body {
 .visually-hidden,
 .sr-only {
   @extend %visually-hidden;
+}
+
+%screen-sm-only {
+  @media screen and (min-width: #{$screen-sm}) {
+    display: none;
+  }
+}
+
+.mobile-only {
+  @extend %screen-sm-only;
 }
