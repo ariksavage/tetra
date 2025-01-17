@@ -41,6 +41,7 @@ export class TetraPage {
   ngOnInit() {
     const self = this;
     this.userService.loginByToken().then((user: any)=> {
+      console.log('after user', user);
       self.user = user;
       return self.load();
     }, (response: any) => {

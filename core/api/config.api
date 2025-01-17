@@ -1,5 +1,17 @@
 <?php
-
+/**
+ * Configuration API
+ *
+ * Create, Read, Update, Delete application configuration options
+ *
+ * PHP version 8.4
+ *
+ * @category   API
+ * @package    Core
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @version    1.0
+ * @since      2025-01-10
+ */
 namespace Core\API;
 
 require_once(__DIR__ . '/base.api');
@@ -8,25 +20,41 @@ require_once(CORE_ROOT . '/models/config.model');
 
 class Config extends Base {
 
+  /**
+   * Class condstructor
+   */
   public function __construct()
   {
     parent::__construct('config', '\Core\Models\Config', 'Config', 'Config');
   }
 
-  protected function searchColumns()
+  /**
+   * Get a list of columns to be used for search queries.
+   * To be overridden by specific APIs.
+   *
+   * @return Array<String> List of column names.
+   */
+  protected function searchColumns(): Array
   {
     return ['label', 'description', 'type', 'value'];
   }
-
-  protected function listQuery()
+  /**
+   * Build a query to list config.
+   *
+   * @param int $page     Page number of results to return.
+   * @param int $per      Number of results per page.
+   *
+   * @return selectQuery  Query object
+   */
+  protected function listQuery(int $page = 1, int $per = 999999): \Core\Database\selectQuery
   {
-    $query = parent::listQuery();
+    $query = parent::listQuery($page, $per);
     $query->orderBy('type')->orderBy('key');
-    $query->paginate(1, 999999);
     return $query;
   }
 
-  protected function updateMenuItems($item) {
+  protected function updateMenuItems($item)
+  {
     $ids = [];
     $data = (array) $item;
     unset($data['children']);

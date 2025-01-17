@@ -8,9 +8,10 @@ export class User extends Model {
   public last_name!: string;
   public name_suffix!: string;
   public email!: string;
+
   public roles: Array<any> = [];
 
-  constructor(data: any = null) {
+  constructor(data: any = {}) {
     super(data);
   }
 

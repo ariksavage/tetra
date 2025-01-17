@@ -14,14 +14,29 @@ class Users extends Base {
     parent::__construct('users', '\Core\Models\User', 'Users', 'User');
   }
 
-  protected function searchColumns()
+  /**
+   * Get a list of columns to be used for search queries.
+   * To be overridden by specific APIs.
+   *
+   * @return Array<String> List of column names.
+   */
+  protected function searchColumns(): Array
   {
     return ['username', 'first_name', 'last_name', 'middle_name', 'email'];
   }
 
-  protected function listQuery(int $page = 1, int $per = 20)
+  /**
+   * Build a query to list users.
+   *
+   * @param int $page     Page number of results to return.
+   * @param int $per      Number of results per page.
+   *
+   * @return selectQuery  Query object
+   */
+  protected function listQuery(int $page = 1, int $per = 20): \Core\Database\selectQuery
   {
     $query = parent::listQuery($page, $per);
+    // update query here
     return $query;
   }
 

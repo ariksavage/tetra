@@ -38,6 +38,7 @@ export class UserService {
     } else {
       this.token = this.cookies.read('auth');
     }
+    console.log('login by', this.token);
 
     if (!this.token) {
       return new Promise((resolve, reject) => {reject('no token found')});
@@ -51,7 +52,7 @@ export class UserService {
         return user;
       } else {
         self.token = '';
-        const user = new User({});
+        const user = new User();
         self.setUser(user);
         self.cookies.delete('auth');
         return false;

@@ -1,14 +1,15 @@
-<span class="logged-in" *ngIf="loggedIn()">Logged in as: {{user.name()}}</span>
-<button class="toggle icon-only primary" [ngClass]="{'open': open}" (click)="toggle()" icon="user"  [iconStyle]="loggedIn() ? 'solid' : 'regular'">
-  <!-- <i class="fa-solid fa-user" [ngClass]="{'fa-solid': loggedIn(), 'fa-regular': !loggedIn()}"></i> -->
-</button>
-<nav class="dropdown"  [ngClass]="{'open': open}">
-  <ul class="dropdown-list">
-    <li *ngIf="!loggedIn()" class="dropdown-item login">
-      <a class="dropdown-link" href="/login">Log In</a>
-    </li>
-    <li *ngIf="loggedIn()" class="dropdown-item logout">
-      <a class="dropdown-link" href="/logout" (click)="logout()">Logout</a>
-    </li>
-  </ul>
+
+<button class="toggle icon-only primary" [ngClass]="{'open': open}" (click)="toggle()" icon="user"  [iconStyle]="loggedIn() ? 'solid' : 'regular'"></button>
+<nav class="dropdown" [ngClass]="{'open': open}">
+  <div class="dropdown-content">
+    <span class="logged-in" *ngIf="loggedIn()">Logged in as: {{user.name()}}</span>
+    <ul class="dropdown-list">
+      <li *ngIf="!loggedIn()" class="dropdown-item login">
+        <a class="dropdown-link" href="/login">Log In</a>
+      </li>
+      <li *ngIf="loggedIn()" class="dropdown-item logout">
+        <a class="dropdown-link" href="/logout" (click)="logout()">Logout</a>
+      </li>
+    </ul>
+  </div>
 </nav>

@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [ CommonModule, FormsModule ],
   templateUrl: '../field/field.component.html',
-  styleUrl: '../field/field.component.scss'
+  styleUrl: './field-email.component.scss'
 })
 
 export class TetraFieldEmailComponent extends TetraFieldComponent {
