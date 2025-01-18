@@ -12,6 +12,7 @@ export class AppService {
   isAdmin: boolean = false;
   private _pageTitle: string = '';
   private pageTitle = new BehaviorSubject<string>('');
+
   private _pageConfig: any = {
     showHeader: true,
     showTitle: true
@@ -20,6 +21,8 @@ export class AppService {
 
   private _breadcrumbs: Array<any> = [];
   private breadcrumbs = new BehaviorSubject<any>([]);
+  private _config: any = {};
+  private config = new BehaviorSubject<any>({});
   replacements: Array<any> = [];
 
   constructor(private router: Router, protected activeRoute: ActivatedRoute, protected title:Title, protected core: CoreService) {
@@ -27,7 +30,7 @@ export class AppService {
       if (val instanceof NavigationEnd) {
         this.mapBreadcrumbs();
       }
-    })
+    });
   }
 
   mapBreadcrumbs() {
@@ -71,7 +74,20 @@ export class AppService {
   }
 
   getConfig() {
-    return this.core.get('core', 'app');
+    return this.config.asObservable();
+  }
+
+  init() {
+    console.log('app init')
+    return this.core.get('app', 'index').then((data: any) => {
+      this.setConfig(data.app.config);
+    });
+  }
+
+  setConfig(config: any) {
+    console.log('set config', config);
+    this._config = config;
+    this.config.next(this._config);
   }
 
   setPageTitle(title: string) {

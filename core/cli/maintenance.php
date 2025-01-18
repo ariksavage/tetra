@@ -14,7 +14,7 @@ asort($migrations);
 
 
 foreach($migrations as $migration) {
-  $name = preg_replace('/^[0-9]+-|\.php/', '', $migration);
+  $name = preg_replace('/^[0-9]+-|\.migration/', '', $migration);
   $class = '\\Core\\Migrations\\' . $name;
   require_once($migrations_dir . '/' . $migration);
   $migration = new $class();

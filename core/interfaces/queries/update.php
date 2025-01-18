@@ -22,8 +22,7 @@ class updateQuery extends Query
   public function __toString()
   {
     if (!$this->data) {
-      \Tetra\error('no data to update');
-      return false;
+      $this->error("No data found.");
     }
 
     $str = "{$this->method} {$this->table} SET";

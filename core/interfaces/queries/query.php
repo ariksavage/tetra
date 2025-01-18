@@ -3,6 +3,7 @@
 namespace Core\Database;
 
 require_once(__dir__ . '/../db.php');
+require_once(CORE_ROOT . '/error.trait');
 
 class Query
 {
@@ -13,6 +14,8 @@ class Query
   protected $limit;
   protected $offset;
   protected $orderConditions = [];
+
+  use \Core\Error;
 
   public function __construct($method, $table)
   {

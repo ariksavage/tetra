@@ -15,7 +15,9 @@ import { Title } from "@angular/platform-browser";
 })
 
 export class TetraAppComponent {
-  title = '';
+  config: any = {
+    name: 'Application'
+  };
   pageTitle: string = '';
   showHeader: boolean = true;
   showTitle: boolean = true;
@@ -31,10 +33,12 @@ export class TetraAppComponent {
     protected titleService:Title,
   ) {
     const self = this;
-    appService.getConfig().then((data: any) => {
-      self.title = data.config.name;
-      self.copyright = data.config.copyright;
-      self.titleService.setTitle(self.title);
+    console.log('app component construct');
+    // appService.init().then((data: any) => {
+      appService.getConfig().subscribe((config: any) => {
+        self.config = config;
+        self.titleService.setTitle(config.name);
+      });
       appService.getPageTitle().subscribe((title: string) => {
         self.pageTitle = title;
         self.setTitle();
@@ -48,11 +52,12 @@ export class TetraAppComponent {
           self.user = user;
         }
       });
-    });
+    // });
+    appService.init();
   }
 
   setTitle() {
-    this.titleService.setTitle(this.title + ' | ' + this.pageTitle);
+    this.titleService.setTitle(this.config.name + ' | ' + this.pageTitle);
   }
 
   setBodyClass() {

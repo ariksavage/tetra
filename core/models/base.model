@@ -16,14 +16,16 @@
 
 namespace Core\Models;
 
+require_once(CORE_ROOT . '/core.trait');
+require_once(CORE_ROOT . '/error.trait');
 require_once(CORE_ROOT . '/interfaces/queries/queries.trait');
-require_once(CORE_ROOT . '/tetra-core.trait');
 
 /**
  * Base model class.
  */
 class Base {
   use \Core\Common;
+  use \Core\Error;
   use \Core\Database\Queries;
 
   /**
@@ -227,7 +229,9 @@ class Base {
       $data = $this->prepareSave();
       $original = (array) $this->getDataById($this->id);
       $diff = array_diff($data, $original);
-      $this->update($diff)->where('id', '=', $this->id)->execute();
+      if ($diff) {
+        $this->update($diff)->where('id', '=', $this->id)->execute();
+      }
     }
 
     $this->refresh();
