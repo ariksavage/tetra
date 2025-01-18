@@ -1,13 +1,15 @@
 <?php
 
 namespace Core\Database;
-require_once(CORE_ROOT . '/tetra-core.trait');
+require_once(CORE_ROOT . '/core.trait');
+require_once(CORE_ROOT . '/error.trait');
 
 mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 class DB extends \mysqli
 {
   use \Core\Common;
+  use \Core\Error;
 
   public function __construct()
   {

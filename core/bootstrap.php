@@ -14,4 +14,4 @@ define('SERVER_ROOT', realpath(CORE_ROOT . '/../../'));
 define('CONFIG_PATH', __dir__ . '/../../config');
 
 require_once(CORE_ROOT . '/api/base.api');
-require_once(CORE_ROOT . '/api/core.api');
+require_once(CORE_ROOT . '/api/app.api');

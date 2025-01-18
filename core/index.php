@@ -3,7 +3,7 @@ namespace Core;
 
 require_once(__dir__ . '/bootstrap.php');
 
-$core = new \Core\API\Core();
+$core = new \Core\API\App();
 
 // Globals
 

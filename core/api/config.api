@@ -38,11 +38,14 @@ class Config extends Base {
   {
     return ['label', 'description', 'type', 'value'];
   }
+
   /**
    * Build a query to list config.
    *
    * @param int $page     Page number of results to return.
    * @param int $per      Number of results per page.
+   *
+   * Override $per to show all options at once
    *
    * @return selectQuery  Query object
    */
@@ -53,6 +56,14 @@ class Config extends Base {
     return $query;
   }
 
+  /**
+   * Recursive function to update a menu item and its children
+   *   And each child's children...
+   *     And each child's children...
+   *
+   * @param  object $item Menu item
+   * @return Array<int> Array of IDs that have been processed.
+   */
   protected function updateMenuItems($item)
   {
     $ids = [];
@@ -80,7 +91,12 @@ class Config extends Base {
     return $ids;
   }
 
-  public function menuPATCH() {
+  /**
+   * Handle a PATCH request to update the menu
+   * @return JSON response.
+   */
+  public function menuPATCH()
+  {
     $menu = $this->postValue('menu');
     $ids = [];
     foreach($menu->children as $item) {
@@ -94,14 +110,29 @@ class Config extends Base {
     $this->success('menu', $menu);
   }
 
-  public function typeGET($type) {
+  /**
+   * Handle a GET request to retrieve all configuration of a given type
+   *
+   * @param  string $type Type of configuration to find.
+   *
+   * @return JSON response.
+   */
+  public function typeGET($type)
+  {
     $config = $this->select()
       ->where('type', '=', $type)
       ->execute(false, '\Core\Models\Config');
     $this->success('config', $config);
   }
 
-  public function valuePATCH($id)
+  /**
+   * Handle PATCH request to update a given config value
+   *
+   * @param  int $id Config option's ID
+   *
+   * @return JSON response
+   */
+  public function valuePATCH(int $id)
   {
     $value = $this->postValue('value');
 
