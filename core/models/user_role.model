@@ -27,21 +27,21 @@ class UserRole extends Base {
    * Shorthand string for this role
    * @var String
    */
-  public $key;
+  public string $key = '';
 
   /**
    * Shorthand string for this role
    * @var String
    */
-  public $title;
+  public string $title = '';
 
   /**
    * Shorthand string for this role
    * @var String
    */
-  public $description;
+  public string $description = '';
 
-  public $permissions;
+  public object $permissions;
 
   /**
    * Construct the model
@@ -56,6 +56,7 @@ class UserRole extends Base {
   public function __construct(object|null $data = null, array $flags = [])
   {
     parent::__construct('Role', 'user_roles', $data, $flags = []);
+    $this->permissions = new \stdClass();
     $this->getPermissions();
     return $this;
   }
@@ -76,16 +77,84 @@ class UserRole extends Base {
     return $data;
   }
 
-  public function getPermissions() {
-
-      if ($this->key == 'root') {
-        $query = $this->select()->from('user_permissions');
+  /**
+   * Load this role's permissions from the database.
+   *
+   * Defines permissions as an associative array of objects,
+   * for ease of finding
+   *
+   * @return void
+   */
+  public function getPermissions()
+  {
+    $roleIds = Array($this->id);
+    $hasInherit = true;
+    while($hasInherit) {
+      $query = $this->select()->from('user_role_inherit_permissions')
+      ->where('role_id', 'IN', $roleIds)
+      ->and('inherits_role', 'NOT IN', $roleIds);
+      $inherits = $query->execute(false);
+      if (count($inherits) > 0){
+        foreach($inherits as $inherit) {
+          $roleIds[] = $inherit->inherits_role;
+        }
+        $hasInherit = true;
       } else {
-        $query = $this->select(['user_permissions.*'])
-        ->from('user_role_permissions_assignments')
-        ->leftJoin('user_permissions', 'permission_id', 'id')
-        ->where('user_role_permissions_assignments.role_id', '=', $this->id);
+        $hasInherit = false;
       }
-      $this->permissions = $query->execute(false, '\Core\Models\UserPermission');
+    }
+    $query = $this->select(['user_permissions.*'])
+    ->from('user_role_permissions_assignments')
+    ->leftJoin('user_permissions', 'permission_id', 'id')
+    ->where('user_role_permissions_assignments.role_id', 'IN', $roleIds);
+
+    $permissions = $query->execute(false, '\Core\Models\UserPermission');
+    foreach($permissions as $permission) {
+      $dimension = $permission->dimension;
+      if (!isset($this->permissions->$dimension)){
+        $this->permissions->$dimension = new \stdClass();
+      }
+      $action = $permission->action;
+      $this->permissions->$dimension->$action = $permission;
+    }
+  }
+
+  /**
+   * Test if this role has a given permission.
+   *
+   * If the required permission is VIEW OWN,
+   *   The VIEW action will also be allowed.
+   *
+   * If the role has ALL (*) permissions for a dimension
+   *   It will be allowed for any action.
+   *
+   * @param  string  $dimension Permission's dimension - general category
+   * @param  string  $action    Specific action being tested
+   * @return boolean            TRUE if the role contains this permission
+   */
+  public function hasPermission(string $dimension, string $action = ''): bool
+  {
+    if (!isset($this->permissions->$dimension)) {
+      return false;
+    }
+
+    if (!$action) {
+      return true;
+    }
+
+    // ALL permissions are allowed for the dimension.
+    $all = '*';
+    if (isset($this->permissions->$dimension->$all)) {
+      return true;
+    }
+
+    // If the permission required is VIEW OWN, VIEW will be allowed
+    if (stristr($action, ' OWN')) {
+      $parentAction = str_replace(' OWN', '', $action);
+      if (isset($this->permissions->$dimension->$parentAction)) {
+        return true;
+      }
+    }
+    return isset($this->permissions->$dimension->$action);
   }
 }

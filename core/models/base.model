@@ -32,44 +32,44 @@ class Base {
    * Database table
    * @var String
    */
-  protected string $table;
+  protected string $table = '';
 
   /**
    * Singular item label
    * for use in messages / errors
    * @var String
    */
-  protected string $itemLabel;
+  protected string $itemLabel = '';
 
   /**
    * Item ID
    * @var Integer
    */
-  public int $id;
+  public int $id = 0;
 
   /**
    * Date Created
    * @var Date
    */
-  public int $date_created;
+  public int $date_created = 0;
 
   /**
    * User ID of creator
    * @var Integer
    */
-  public int $created_by;
+  public int $created_by = 0;
 
   /**
    * Date Modified
    * @var Date
    */
-  public int $date_modified;
+  public int $date_modified = 0;
 
   /**
    * ID of last user to modify this item
    * @var Integer
    */
-  public int $modified_by;
+  public int $modified_by = 0;
 
   /**
    * Construct the model
@@ -106,7 +106,7 @@ class Base {
       ->where('id', '=', $id)
       ->execute(true);
     if (!$data) {
-      $this->error("{$this->itemLabel} {$id} Not Found", 404, "{$this->label} Not Found");
+      $this->error("{$this->itemLabel} {$id} Not Found", 404, "{$this->itemlabel} Not Found");
     }
     return $data;
   }
@@ -136,52 +136,82 @@ class Base {
    */
   protected function mapData(object $data)
   {
-    $schema = $this->describeTable();
+    // $schema = $this->describeTable();
     foreach($data as $prop => $value) {
       if (property_exists($this, $prop)) {
-        $column = $schema->columns[$prop];
-        switch($column->type) {
-          case 'tinyint':
-          case 'boolean':
-          case 'bool':
+        // $column = $schema->columns[$prop];
+
+        switch(gettype($this->$prop)){
+          case "boolean":
             $this->$prop = !!$value;
             break;
-          case 'int':
-          case 'bigint':
-            $this->$prop = intval($value);
-            break;
-          case 'float':
-          case 'double':
-          case 'doubleprecision':
-          case 'real':
-          case 'decimal':
-            $this->$prop = float($value);
-            break;
-          case 'timestamp':
-            if ($value) {
+          case "integer":
+            if (stristr($prop, 'date') && $value) {
               $this->$prop = strtotime($value);
+            } else {
+              $this->$prop = intval($value);
             }
             break;
-          case 'varchar':
-          case 'char':
-          case 'text':
-          case 'tinytext':
-          case 'mediumtext':
-          case 'longtext':
-          case 'enum':
+          case "double": // (for historical reasons "double" is returned in case of a float, and not simply "float")
+            $this->$prop = floatval($value);
+            break;
+          case "string":
             $this->$prop = strval($value);
             break;
-          case 'blob':
-          case 'longblob':
-            if ($value && json_decode($value)) {
-              $this->$prop = json_decode($value);
-            } else {
-              $this->$prop = strval($value);
-            }
+          case "array":
+          case "object":
+            $this->$prop = json_decode($value);
             break;
           default:
-            $this->prop = $value;
+            echo "$prop => $value";
+            die("unhandled type: " . gettype($this->$prop));
+            break;
         }
+
+        // switch(strtolower($column->type)) {
+        //   case 'tinyint':
+        //   case 'boolean':
+        //   case 'bool':
+        //     $this->$prop = !!$value;
+        //     break;
+        //   case 'int':
+        //   case 'bigint':
+        //     $this->$prop = intval($value);
+        //     break;
+        //   case 'float':
+        //   case 'double':
+        //   case 'doubleprecision':
+        //   case 'real':
+        //   case 'decimal':
+        //     $this->$prop = float($value);
+        //     break;
+        //   case 'timestamp':
+        //     if ($value) {
+        //       $this->$prop = strtotime($value);
+        //     }
+        //     break;
+        //   case 'varchar':
+        //   case 'char':
+        //   case 'text':
+        //   case 'tinytext':
+        //   case 'mediumtext':
+        //   case 'longtext':
+        //   case 'enum':
+        //     $this->$prop = strval($value);
+        //     break;
+        //   case 'blob':
+        //   case 'longblob':
+        //   echo $prop . ' => ' . $value . PHP_EOL;
+        //   echo gettype(($this->$prop));
+        //     // if ($value == '{}' || ($value && json_decode($value))) {
+        //       // $this->$prop = json_decode($value);
+        //     // } else {;
+        //     //   $this->$prop = strval($value);
+        //     // }
+        //     break;
+        //   default:
+        //     $this->prop = $value;
+        // }
       }
     }
     return $this;

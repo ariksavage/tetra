@@ -24,30 +24,31 @@ class UserPermission extends Base {
    * Human-friendly title
    * @var String
    */
-  public $title;
+  public string $title = '';
   /**
    * Entity to which this permission applies
    * @var String
    */
-  public $dimension;
+  public string $dimension = '';
   /**
    * Action a user is allowed to take:
-   * - View,
-   * - View Own
-   * - Create
-   * - Udate
-   * - Update Own
-   * - Delete
-   * - Delete Own
-   * - (all)
+   * - VIEW,
+   * - VIEW OWN
+   * - CREATE
+   * - UDATE
+   * - UPDATE OWN
+   * - DELETE
+   * - DELETE OWN
+   * - * (ALL)
    *
    * @var String
    */
-  public $action;
+  public string $action = '';
+
   /**
    * Human-friendly description of the permission
    */
-  public $description;
+  public string $description = '';
 
   /**
    * Construct the model

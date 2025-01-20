@@ -73,6 +73,12 @@ class Base {
   public string $message = '';
 
   /**
+   * Permissions dimension (default)
+   * @var string
+   */
+  protected string $dimension = '';
+
+  /**
    * Class constructor
    * @param string $table    Table name. eg "users"
    * @param string $model    Fully namespaced class for returned items. eg "\Core\Models\User"
@@ -88,6 +94,7 @@ class Base {
     $this->model = $model;
     $this->plural = $plural;
     $this->singular = $singular;
+    $this->dimension = $table;
   }
 
   /**
@@ -124,6 +131,7 @@ class Base {
    */
   public function savePOST()
   {
+    $this->reqPermission('UPDATE');
     $key = strtolower($this->singular);
     $data = $this->postValue($key);
     $model = new $this->model($data);
@@ -147,6 +155,7 @@ class Base {
    */
   public function listPOST()
   {
+    $this->reqPermission('VIEW');
     $page = $this->postValue('page', 1, 'integer');
     $per = $this->postValue('per', 20, 'integer');
     $query = $this->listQuery($page, $per);
@@ -167,6 +176,7 @@ class Base {
    */
   public function deleteDELETE(int $id)
   {
+    $this->reqPermission('DELETE');
     $model = new $this->model();
     $model->byId($id);
     if ($model->delete()) {
@@ -232,6 +242,7 @@ class Base {
    */
   public function idGET($id)
   {
+    $this->reqPermission('VIEW');
     $model = $this->getById($id);
     $this->success($this->singular, $model);
   }
@@ -336,7 +347,7 @@ class Base {
    */
   public function addData($key = '', $data = null)
   {
-    if ($key){
+    if ($key) {
       $key = strtolower($key);
       $this->data->$key = $data;
     }
@@ -380,4 +391,3 @@ class Base {
     return $this->success('', null, $message);
   }
 }
-?>

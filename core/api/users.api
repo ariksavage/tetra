@@ -42,7 +42,9 @@ class Users extends Base {
 
   public function currentGET()
   {
+    $this->requirePermission('users', 'VIEW OWN');
     if ($currentUser = $this->getCurrentUser()) {
+      $currentUser->getRoles();
       $this->success('user', $currentUser);
     }
   }
@@ -61,6 +63,31 @@ class Users extends Base {
     $host = $this->postValue('host');
     $link = $user->passwordResetLink($host);
     $this->success('password-reset', $link);
+  }
+
+    /**
+   * Saves a user to the database.
+   *
+   * Overrides base to allow a user to update their own profile
+   *
+   * @return JSON response
+   */
+  public function savePOST()
+  {
+    $key = strtolower($this->singular);
+    $data = $this->postValue($key);
+    $model = new $this->model($data);
+    if ($model->isCurrentUser()) {
+      $this->reqPermission('UPDATE OWN');
+    } else {
+      $this->reqPermission('UPDATE');
+    }
+    $success = $model->save();
+    if ($success) {
+      $this->success($this->singular, $model, "Successfully saved {$this->singular}.");
+    } else {
+      $this->error("Could not save {$this->singular}.", $this->plural, $code = 500, $data);
+    }
   }
 }
 ?>

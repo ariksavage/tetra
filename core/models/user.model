@@ -27,58 +27,58 @@ class User extends Base {
    * Username
    * @var String
    */
-  public $username;
+  public string $username = '';
 
   /**
    * Name prefix eg. "Ms.", "Dr.", "Mr."
    * @var String
    */
-  public $name_prefix;
+  public string $name_prefix = '';
 
   /**
    * First Name
    * @var String
    */
-  public $first_name;
+  public string $first_name = '';
 
   /**
    * Middle Name
    * @var String
    */
-  public $middle_name;
+  public string $middle_name = '';
 
   /**
    * Last Name
    * @var String
    */
-  public $last_name;
+  public string $last_name = '';
 
   /**
    * Name Suffix eg. "jr.", "OBE"
    * @var String
    */
-  public $name_suffix;
+  public string $name_suffix = '';
 
   /**
    * Email address
    * @var String
    */
-  public $email;
+  public string $email = '';
 
   /**
    * Password
    * @var String
    */
-  protected $password;
+  protected string $password = '';
 
   /**
    * Roles
    */
-  public $roles;
+  public Array $roles;
 
 
   /**
-   * Construct the model
+   * Construct the user
    *
    * @param string      $label Singular name for this item, eg "User"
    * @param string      $table Database table where this item is stored, eg "users"
@@ -90,6 +90,7 @@ class User extends Base {
   public function __construct(object|null $data = null, array $flags = [])
   {
     parent::__construct('User', 'users', $data, $flags = []);
+
     return $this;
   }
 
@@ -113,8 +114,17 @@ class User extends Base {
         $data['password'] = $this->passwordHash($this->password);
       }
     }
+    if(!$this->id && !isset($data['password'])) {
+      $data['password'] = $this->generateAuthToken();
+    }
+
+
+
+    // Handle roles in a separate function, not here
+    unset($data['roles']);
     return $data;
   }
+
 
   /**
    * Get the user's full name as a single string:
@@ -373,10 +383,35 @@ class User extends Base {
   }
 
   public function getRoles() {
-    $this->roles = $this->select(['user_roles.*'])
+    $roles = $this->select(['user_roles.*'])
       ->from('user_role_assignments')
       ->leftJoin('user_roles', 'role_id', 'id')
       ->where('user_role_assignments.user_id', '=', $this->id)
       ->execute(false, '\Core\Models\UserRole');
+    foreach($roles as $role) {
+      $this->roles[$role->key] = $role;
+    }
+  }
+
+  /**
+   * Check all roles for the given permission.
+   * @param  string  $dimension Permission dimension
+   * @param  string  $action    Permission action (VIEW, UPDATE, DELETE, etc)
+   * @return bool               TRUE if permission is found.
+   */
+  public function hasPermission(string $dimension, string $action = ''): bool
+  {
+    $this->getRoles();
+    foreach($this->roles as $role) {
+      if ($role->hasPermission($dimension, $action)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  public function isCurrentUser() {
+    $current = $this->getCurrentUser();
+    return (isset($this->id) && $this->id && $this->id === $current->id);
   }
 }
