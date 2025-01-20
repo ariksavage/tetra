@@ -40,6 +40,24 @@ class Users extends Base {
     return $query;
   }
 
+  /**
+   * Assign roles to the given user.
+   *
+   * Any roles not included in the request will be removed.
+   * @param  [type] $userId [description]
+   * @return [type]         [description]
+   */
+  public function rolesPUT($userId) {
+    $this->requirePermission('user_roles', 'UPDATE');
+    $user = $this->getById($userId);
+    $roles = $this->postValue('roles');
+
+    $success = $user->updateRoles($roles);
+    if ($success) {
+      $this->successMsg("User ({$userId}) roles successfully updated");
+    }
+  }
+
   public function currentGET()
   {
     $this->requirePermission('users', 'VIEW OWN');
