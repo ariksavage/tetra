@@ -394,6 +394,53 @@ class User extends Base {
   }
 
   /**
+   * Update user role assignments for this user.
+   *
+   * Adds any roles that are not already assigned
+   *
+   * Removes any roles not included in $roles here.
+   *
+   * @param  Array  $roles Array of role IDs
+   * @return bool          TRUE if successful.
+   */
+  public function updateRoles(Array $roles): bool
+  {
+    $existing_roles_query = $this->select()->from('user_role_assignments')->where('user_id', '=', $this->id);
+    $existing = $existing_roles_query->execute();
+    $existing_roles = array_map(function($item){ return intval($item->role_id);}, $existing);
+
+    // Add un-assigned roles
+    $add_roles = array_diff($roles, $existing_roles);
+    $success = true;
+    if ($success && count($add_roles)) {
+      foreach($add_roles as $role) {
+        $data = ['user_id' => $this->id, 'role_id' => $role];
+        if (!$this->insert($data, 'user_role_assignments')->execute()) {
+          $success = false;
+          $this->error("Could not assign role ({$role}) to user ({$this->id})");
+          break;
+        }
+      }
+    }
+
+    // Remove roles not included in the function's parameters.
+    $remove_roles = array_diff($existing_roles, $roles);
+    if ($success && count($remove_roles)) {
+      foreach($remove_roles as $role) {
+        $delete_role_query = $this->deleteQuery('user_role_assignments')
+          ->where('user_id', '=', $this->id)
+          ->and('role_id', '=', $role);
+        if(!$delete_role_query->execute()) {
+          $success = false;
+          $this->error("Could not assign role ({$role}) to user ({$this->id})");
+          break;
+        }
+      }
+    }
+    return $success;
+  }
+
+  /**
    * Check all roles for the given permission.
    * @param  string  $dimension Permission dimension
    * @param  string  $action    Permission action (VIEW, UPDATE, DELETE, etc)
