@@ -25,6 +25,7 @@ class Config extends Base {
    */
   public function __construct()
   {
+    $this->requirePermission('config');
     parent::__construct('config', '\Core\Models\Config', 'Config', 'Config');
   }
 
@@ -42,10 +43,11 @@ class Config extends Base {
   /**
    * Build a query to list config.
    *
-   * @param int $page     Page number of results to return.
-   * @param int $per      Number of results per page.
+   * @param int $page Page number of results to return.
+   * @param int $per  Number of results per page.
    *
    * Override $per to show all options at once
+   * Order by type, then by key
    *
    * @return selectQuery  Query object
    */
@@ -97,6 +99,7 @@ class Config extends Base {
    */
   public function menuPATCH()
   {
+    $this->requirePermission('menu', 'UPDATE');
     $menu = $this->postValue('menu');
     $ids = [];
     foreach($menu->children as $item) {
@@ -119,6 +122,7 @@ class Config extends Base {
    */
   public function typeGET($type)
   {
+    $this->reqPermission('VIEW');
     $config = $this->select()
       ->where('type', '=', $type)
       ->execute(false, '\Core\Models\Config');
@@ -134,6 +138,7 @@ class Config extends Base {
    */
   public function valuePATCH(int $id)
   {
+    $this->reqPermission('UPDATE');
     $value = $this->postValue('value');
 
     $config = new \Core\Models\Config();
@@ -142,4 +147,3 @@ class Config extends Base {
     $this->success('config', $config);
   }
 }
-?>

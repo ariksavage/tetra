@@ -16,6 +16,62 @@ use \Core\Models\User;
 
 trait Common {
 
+  protected function permissionExists(string $dimension, string $action = ''): bool
+  {
+    $query = $this->select()->from('user_permissions')->where('dimension', '=', $dimension);
+    if ($action) {
+      $query->and('action', '=', $action);
+    }
+    $permission = $query->execute(true);
+    if (!$permission) {
+      $permission = Array(
+        'title' => "User is allowed to " . ucwords(strtolower($action)) . " " . ucwords(strtolower($dimension)),
+        'dimension' => $dimension,
+        'action' => $action
+      );
+      if ($this->insert($permission, 'user_permissions')->execute()) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
+    }
+  }
+
+  /**
+   * Check that the current user has the required permission
+   *
+   * @param  string $dimension Permission dimension
+   * @param  string $action    Permission action (VIEW, UPDATE, DELETE)
+   *
+   * @return bool              Permission exists.
+   *                           On failure, a 401 unauthorized error is thrown
+   *                           and the current script is killed.
+   */
+  protected function requirePermission(string $dimension, string $action = ''): bool
+  {
+    $user = $this->getCurrentUser();
+    if (!$user->hasPermission($dimension, $action)) {
+      // ensure the permission exists
+      $this->permissionExists($dimension, $action);
+      $this->error("Permission Denied", 401);
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Shorthand function to check permission
+   * Uses the current object's dimension as default.
+   * @param  string $action action being checked: VIEW, UPDATE, DELETE, etc
+   * @return [type]         [description]
+   */
+  protected function reqPermission(string $action = ''): bool
+  {
+    $dimension = $this->dimension;
+    return $this->requirePermission($dimension, $action);
+  }
   /**
    * Shorthand function to get a config value
    * @param  string $key  Config key
