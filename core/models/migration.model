@@ -270,7 +270,7 @@ class Migration extends Base {
    */
   protected function columnIsType(string $tableName, string $columnName, string $type): bool
   {
-    $q = $this->raw("SHOW COLUMNS FROM {$tableName} WHERE Field='{$columnName}' and Type like '{$type}%';");
+    $q = $this->raw("SHOW COLUMNS FROM `{$tableName}` WHERE Field='{$columnName}' and Type like '{$type}%';");
     $result = $q->execute();
     return $result->num_rows > 0;
   }
@@ -279,21 +279,25 @@ class Migration extends Base {
    * Add a column to a table
    * @param string $tableName  Table to be altered.
    * @param string $columnName Column name to be added.
-   * @param string $type       Column type, eg INT(10), VARCHAR(255), TIMESTAMP.
+   * @param string $type       Column type, eg TINYINT(1) INT(10), VARCHAR(255), TIMESTAMP.
    * @param bool   $null       TRUE if NULL values are allowed.
    * @param string $default    Default value as escaped string.
-   * @param string $after      Column name after which to add this.
+   * @param string $comment    Optional comment to be added to the column.
+   * @param string $after      Column name after which to add this one.
    *
    * @return bool              Success
    */
-  protected function addColumn(string $tableName, string $columnName, string $type = 'VARCHAR(255)', bool $null = true, string $default = '', string $after = ''): bool
+  protected function addColumn(string $tableName, string $columnName, string $type = 'VARCHAR(255)', bool $null = true, string $default = '', string $comment = '', string $after = ''): bool
   {
-    $query = "ALTER TABLE {$tableName} ADD COLUMN {$columnName} {$type}";
+    $query = "ALTER TABLE `{$tableName}` ADD COLUMN `{$columnName}` {$type}";
     if (!$null) {
       $query .= " NOT NULL";
     }
     if ($default) {
-      $query .= " DEFAULT " . $default;
+      $query .= " DEFAULT {$default}";
+    }
+    if ($comment) {
+      $query .= " COMMENT '{$comment}'";
     }
     if ($after){
       $query .= " AFTER {$after}";
@@ -303,7 +307,7 @@ class Migration extends Base {
 
   protected function renameColumn(string $tableName, string $old, string $new): bool
   {
-    $q = $this->raw("SHOW COLUMNS FROM {$tableName} WHERE Field='{$old}';");
+    $q = $this->raw("SHOW COLUMNS FROM `{$tableName}` WHERE Field='{$old}';");
     $result = $q->execute();
     $column = $result->fetch_object();
     // var_dump($column);
@@ -332,7 +336,7 @@ class Migration extends Base {
     return $column;
   }
 
-  protected function updateColumn($tableName, $columnName, $newName = '', $type = '', $null = '', $default = '')
+  protected function updateColumn(string $tableName, string $columnName, string $newName = '', string $type = '', string $null = '', mixed$default = '', string $comment = '')
   {
     $column = $this->getColumn($tableName, $columnName);
 
@@ -363,6 +367,10 @@ class Migration extends Base {
       $query .= " DEFAULT " . $column->Default;
     } else if ($column->Default) {
       $query .= " DEFAULT " . $column->Default;
+    }
+
+    if ($comment) {
+      $query .= " COMMENT '{$comment}'";
     }
 
     return $this->raw($query)->execute();

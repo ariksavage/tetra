@@ -120,9 +120,43 @@ class User extends Base {
 
 
 
-    // Handle roles in a separate function, not here
+    // Handle roles in a postSave();
     unset($data['roles']);
     return $data;
+  }
+
+  /**
+   * Operations to be conducted after the modek is saved.
+   *
+   * By default: refresh this model to acurately reflect the database.
+   *
+   * @return $this
+   */
+  protected function postSave() {
+    $this->getRoles();
+
+    if (count($this->roles) == 0) {
+      $roles = $this->select()->from('user_roles')->where('default', '=', '1')->execute(false);
+      foreach($roles as $role) {
+        $this->addRole($role->id);
+      }
+    }
+    $this->getRoles();
+    return parent::postSave();
+  }
+
+  /**
+   * Post-delete cleanup.
+   *
+   * eg. Delete items from related tables
+   *
+   * @return $this
+   */
+  public function postDelete()
+  {
+    if ($this->deleteQuery('user_role_assignments')->where('user_id', '=', $this->id)->execute()) {
+      return parent::postDelete();
+    }
   }
 
 
@@ -383,6 +417,7 @@ class User extends Base {
   }
 
   public function getRoles() {
+    $this->roles = array();
     $roles = $this->select(['user_roles.*'])
       ->from('user_role_assignments')
       ->leftJoin('user_roles', 'role_id', 'id')
@@ -413,9 +448,8 @@ class User extends Base {
     $add_roles = array_diff($roles, $existing_roles);
     $success = true;
     if ($success && count($add_roles)) {
-      foreach($add_roles as $role) {
-        $data = ['user_id' => $this->id, 'role_id' => $role];
-        if (!$this->insert($data, 'user_role_assignments')->execute()) {
+      foreach($add_roles as $roleId) {
+        if (!$this->addRole($roleId)) {
           $success = false;
           $this->error("Could not assign role ({$role}) to user ({$this->id})");
           break;
@@ -426,16 +460,48 @@ class User extends Base {
     // Remove roles not included in the function's parameters.
     $remove_roles = array_diff($existing_roles, $roles);
     if ($success && count($remove_roles)) {
-      foreach($remove_roles as $role) {
-        $delete_role_query = $this->deleteQuery('user_role_assignments')
-          ->where('user_id', '=', $this->id)
-          ->and('role_id', '=', $role);
-        if(!$delete_role_query->execute()) {
+      foreach($remove_roles as $roleId) {
+        if (!$this->removeRole($roleId)) {
           $success = false;
-          $this->error("Could not assign role ({$role}) to user ({$this->id})");
-          break;
+          $this->error("Could not assign role ({$roleId}) to user ({$this->id})");
         }
       }
+    }
+    return $success;
+  }
+
+  /**
+   * Assign a role to this user.
+   * @param int $roleId Role ID
+   *
+   * @return bool       Success
+   */
+  protected function addRole(int $roleId): bool
+  {
+    $success = true;
+    $data = ['user_id' => $this->id, 'role_id' => $roleId];
+    if (!$this->insert($data, 'user_role_assignments')->execute()) {
+      $success = false;
+      $this->error("Could not assign role ({$roleId}) to user ({$this->id})");
+    }
+    return $success;
+  }
+
+  /**
+   * Remove a role from this user.
+   * @param int $roleId Role ID
+   *
+   * @return bool       Success
+   */
+  protected function removeRole(int $roleId): bool
+  {
+    $success = true;
+    $delete_role_query = $this->deleteQuery('user_role_assignments')
+      ->where('user_id', '=', $this->id)
+      ->and('role_id', '=', $roleId);
+    if(!$delete_role_query->execute()) {
+      $success = false;
+      $this->error("Could not assign role ({$roleId}) to user ({$this->id})");
     }
     return $success;
   }
