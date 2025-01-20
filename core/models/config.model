@@ -26,37 +26,37 @@ class Config extends Base {
    * User facing label
    * @var String
    */
-  public $label;
+  public string $label = '';
 
   /**
    * User facing description
    * @var String
    */
-  public $description;
+  public string $description = '';
 
   /**
    * General type of the configuration, essentially a category
    * @var String
    */
-  public $type;
+  public string $type = '';
 
   /**
    * Config key
    * @var String
    */
-  public $key;
+  public string $key = '';
 
   /**
    * Config value
    * @var String
    */
-  public $value;
+  public mixed $value = '';
 
   /**
    * Type of the value: string, number, boolean, etc
    * @var String
    */
-  public $value_type;
+  public string $value_type = '';
 
   /**
    * Construct the model
