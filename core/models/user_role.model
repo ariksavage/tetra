@@ -6,7 +6,6 @@
  *
  * PHP version 8.4
  *
- *
  * @category   Model
  * @package    Core
  * @author     Arik Savage <ariksavage@gmail.com>
@@ -15,11 +14,6 @@
  */
 
 namespace Core\Models;
-
-require_once(__dir__ . '/base.model');
-require_once(__dir__ . '/user_permission.model');
-
-use \Core\Models\UserPermission;
 
 class UserRole extends Base {
 
@@ -53,7 +47,7 @@ class UserRole extends Base {
    *
    * @return            $this
    */
-  public function __construct(object|null $data = null, array $flags = [])
+  public function __construct(object|null $data = NULL, array $flags = [])
   {
     parent::__construct('Role', 'user_roles', $data, $flags = []);
     $this->permissions = new \stdClass();
@@ -72,7 +66,8 @@ class UserRole extends Base {
    *
    * @return Array
    */
-  public function prepareSave() {
+  public function prepareSave()
+  {
     $data = parent::prepareSave();
     return $data;
   }
@@ -87,20 +82,20 @@ class UserRole extends Base {
    */
   public function getPermissions()
   {
-    $roleIds = Array($this->id);
-    $hasInherit = true;
-    while($hasInherit) {
+    $roleIds = array($this->id);
+    $hasInherit = TRUE;
+    while ($hasInherit) {
       $query = $this->select()->from('user_role_inherit_permissions')
       ->where('role_id', 'IN', $roleIds)
       ->and('inherits_role', 'NOT IN', $roleIds);
-      $inherits = $query->execute(false);
-      if (count($inherits) > 0){
-        foreach($inherits as $inherit) {
+      $inherits = $query->execute(FALSE);
+      if (count($inherits) > 0) {
+        foreach ($inherits as $inherit) {
           $roleIds[] = $inherit->inherits_role;
         }
-        $hasInherit = true;
+        $hasInherit = TRUE;
       } else {
-        $hasInherit = false;
+        $hasInherit = FALSE;
       }
     }
     $query = $this->select(['user_permissions.*'])
@@ -108,10 +103,11 @@ class UserRole extends Base {
     ->leftJoin('user_permissions', 'permission_id', 'id')
     ->where('user_role_permissions_assignments.role_id', 'IN', $roleIds);
 
-    $permissions = $query->execute(false, '\Core\Models\UserPermission');
-    foreach($permissions as $permission) {
+    require_once(__dir__ . '/user_permission.model');
+    $permissions = $query->execute(FALSE, '\Core\Models\UserPermission');
+    foreach ($permissions as $permission) {
       $dimension = $permission->dimension;
-      if (!isset($this->permissions->$dimension)){
+      if (!isset($this->permissions->$dimension)) {
         $this->permissions->$dimension = new \stdClass();
       }
       $action = $permission->action;
@@ -135,24 +131,24 @@ class UserRole extends Base {
   public function hasPermission(string $dimension, string $action = ''): bool
   {
     if (!isset($this->permissions->$dimension)) {
-      return false;
+      return FALSE;
     }
 
     if (!$action) {
-      return true;
+      return TRUE;
     }
 
     // ALL permissions are allowed for the dimension.
     $all = '*';
     if (isset($this->permissions->$dimension->$all)) {
-      return true;
+      return TRUE;
     }
 
     // If the permission required is VIEW OWN, VIEW will be allowed
     if (stristr($action, ' OWN')) {
       $parentAction = str_replace(' OWN', '', $action);
       if (isset($this->permissions->$dimension->$parentAction)) {
-        return true;
+        return TRUE;
       }
     }
     return isset($this->permissions->$dimension->$action);

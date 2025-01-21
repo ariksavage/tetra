@@ -15,10 +15,6 @@
 
 namespace Core\Models;
 
-require_once(__dir__ . '/base.model');
-require_once(__dir__ . '/user_role.model');
-
-use \Core\Models\UserRole;
 
 class Migration extends Base {
   /**
@@ -47,10 +43,11 @@ class Migration extends Base {
    *
    * If not, execute the migration
    */
-  public function __construct() {
+  public function __construct()
+  {
     $this->start();
     if ($this->isComplete()) {
-      $this->end(true);
+      $this->end(TRUE);
     } else {
       if ($this->execute()) {
         $this->end();
@@ -64,7 +61,8 @@ class Migration extends Base {
    *
    * @return void
    */
-  protected function start(): void {
+  protected function start(): void
+  {
     $this->start = time();
     $blink = " \033[5m";
     $end = "\033[0m";
@@ -72,15 +70,28 @@ class Migration extends Base {
     $this->echoLine($message);
   }
 
-  protected function echoLine($text, $overwrite = false) {
+  /**
+   * Echo a line of text padded out from the middle with '-'
+   *
+   * Text will begin with the current migration's name, then '-', and finally the $text
+   * Line width is the lesser of the console width and the provided $max
+   *
+   * @param  string  $text      Text to write on the right end of the line.
+   * @param  boolean $overwrite If TRUE, erase the previous line of text in the console before writing.
+   * @param  string  $char      Character to repeat between name and $text.
+   * @param  int     $max       Line max-length.
+   * @return void               Prints text to the console.
+   */
+  protected function echoLine(string $text, bool $overwrite = FALSE, string $char = '-', int $max = 120)
+  {
     $n = intval(exec('tput cols'));
-    $n = min($n, 120);
+    $n = min($n, $max);
     $x = $n - strlen($this->name) - strlen($text);
     if ($overwrite) {
       echo "\e[2A\e[K";
     }
     echo $this->name  . str_repeat('.', $x) . $text . PHP_EOL;
-    echo str_repeat('-', $n) . PHP_EOL;
+    echo str_repeat($char, $n) . PHP_EOL;
   }
 
   /**
@@ -91,7 +102,8 @@ class Migration extends Base {
    *
    * @return void
    */
-  protected function end(bool $skipped = false): void {
+  protected function end(bool $skipped = FALSE): void
+  {
     $green = "\033[0;32m";
     $nocolor = "\033[0m";
     $this->end = time();
@@ -103,7 +115,7 @@ class Migration extends Base {
       $message .= " (" . $this->elapsed() . 's)';
     }
     $message .= $nocolor;
-    $this->echoLine($message, true);
+    $this->echoLine($message, TRUE);
   }
 
   /**
@@ -112,10 +124,11 @@ class Migration extends Base {
    *
    * Overridden by each migration
    *
-   * @return bool True if the migration is complete
+   * @return bool TRUE if the migration is complete
    */
-  protected function isComplete(): bool {
-    return false;
+  protected function isComplete(): bool
+  {
+    return FALSE;
   }
 
   /**
@@ -125,9 +138,10 @@ class Migration extends Base {
    *
    * @return bool Success of the migration
    */
-  protected function execute(): bool {
+  protected function execute(): bool
+  {
     sleep(4);
-    return true;
+    return TRUE;
   }
 
   /**
@@ -135,7 +149,8 @@ class Migration extends Base {
    *
    * @return string Time of execution in X.xx s
    */
-  protected function elapsed(): string {
+  protected function elapsed(): string
+  {
     $t = (float) $this->end - $this->start;
     return number_format($t, 2, '.', '');
   }
@@ -168,7 +183,7 @@ class Migration extends Base {
   {
     $q = "CREATE TABLE `{$tableName}` (";
     $q .= implode(", ", $columns);
-    if (is_string($key)){
+    if (is_string($key)) {
       $q .= ", PRIMARY KEY (`{$key}`) )";
     }
     if (is_array($key)) {
@@ -216,7 +231,7 @@ class Migration extends Base {
     $value = $this->select(['*'], 'config')
       ->where('type', '=', $type)
       ->and('key', '=', $key)
-      ->execute(true);
+      ->execute(TRUE);
     return !!$value;
   }
 
@@ -232,9 +247,15 @@ class Migration extends Base {
    *
    * @return bool                TRUE if the option is created.
    */
-  protected function createConfig(string $key, string $label, string $type = 'application', string $description = '', string $value_type = 'text', mixed $value = 'default')
-  {
-    $data = Array(
+  protected function createConfig(
+      string $key,
+      string $label,
+      string $type = 'application',
+      string $description = '',
+      string $value_type = 'text',
+      mixed $value = 'default'
+  ) {
+    $data = array(
       'label' => $label,
       'description' => $description,
       'type' => $type,
@@ -287,8 +308,15 @@ class Migration extends Base {
    *
    * @return bool              Success
    */
-  protected function addColumn(string $tableName, string $columnName, string $type = 'VARCHAR(255)', bool $null = true, string $default = '', string $comment = '', string $after = ''): bool
-  {
+  protected function addColumn(
+      string $tableName,
+      string $columnName,
+      string $type = 'VARCHAR(255)',
+      bool   $null = TRUE,
+      string $default = '',
+      string $comment = '',
+      string $after = ''
+  ): bool {
     $query = "ALTER TABLE `{$tableName}` ADD COLUMN `{$columnName}` {$type}";
     if (!$null) {
       $query .= " NOT NULL";
@@ -299,7 +327,7 @@ class Migration extends Base {
     if ($comment) {
       $query .= " COMMENT '{$comment}'";
     }
-    if ($after){
+    if ($after) {
       $query .= " AFTER {$after}";
     }
     return $this->raw($query)->execute();
@@ -336,8 +364,15 @@ class Migration extends Base {
     return $column;
   }
 
-  protected function updateColumn(string $tableName, string $columnName, string $newName = '', string $type = '', string $null = '', mixed$default = '', string $comment = '')
-  {
+  protected function updateColumn(
+      string $tableName,
+      string $columnName,
+      string $newName = '',
+      string $type = '',
+      string $null = '',
+      mixed  $default = '',
+      string $comment = ''
+  ) {
     $column = $this->getColumn($tableName, $columnName);
 
     // rename column
@@ -398,8 +433,13 @@ class Migration extends Base {
    *
    * @return bool                         TRUE if successful.
    */
-  protected function updateColumnIntegerToTimestamp(string $tableName, string $columnName, bool $allowNull = true, bool $defaultCurrent = true, bool $updateOnUpdate = false)
-  {
+  protected function updateColumnIntegerToTimestamp(
+      string $tableName,
+      string $columnName,
+      bool $allowNull = TRUE,
+      bool $defaultCurrent = TRUE,
+      bool $updateOnUpdate = FALSE
+  ): bool {
     // Ensure column is nullable
     $q0 = " ALTER TABLE {$tableName} MODIFY COLUMN {$columnName} Int NULL";
 
@@ -407,12 +447,13 @@ class Migration extends Base {
     $q1 = "ALTER TABLE {$tableName} ADD COLUMN temp TIMESTAMP AFTER {$columnName}";
 
     // Store the value in temp, and remove any values from the original column
-    $q2 = "UPDATE {$tableName} SET temp = FROM_UNIXTIME({$columnName}) WHERE {$columnName} IS NOT NULL AND {$columnName} > 300000000";
-    $q3 = "UPDATE {$tableName} SET {$columnName} = null;";
+    $q2  =  "UPDATE {$tableName} SET temp = FROM_UNIXTIME({$columnName})";
+    $q2 .= " WHERE {$columnName} IS NOT NULL AND {$columnName} > 300000000";
+    $q3 =  "UPDATE {$tableName} SET {$columnName} = NULL;";
 
     // Update the column to be a timestamp
     $q4 = "ALTER TABLE {$tableName} CHANGE {$columnName} {$columnName} TIMESTAMP";
-    if (!$allowNull){
+    if (!$allowNull) {
       $q4 .= " NOT NULL";
     }
     if ($defaultCurrent) {
@@ -424,18 +465,18 @@ class Migration extends Base {
 
 
     // Copy the temp values back in.
-    $q5 = "UPDATE $tableName set {$columnName} = temp";
+    $q5 = "UPDATE $tableName SET {$columnName} = temp";
 
     // Delete the temp column.
     $q6 = "ALTER TABLE {$tableName} DROP COLUMN temp";
 
     $queries = [$q0, $q1, $q2, $q3, $q4, $q5, $q6];
-    foreach($queries as $query){
+    foreach ($queries as $query) {
       $result = $this->raw($query)->execute();
       if (!$result) {
-        return false;
+        return FALSE;
       }
     }
-    return true;
+    return TRUE;
   }
 }
