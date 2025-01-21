@@ -1,14 +1,6 @@
 <?php
 namespace Core;
 
-require_once(CORE_ROOT . '/interfaces/queries/query.php');
-require_once(CORE_ROOT . '/interfaces/queries/select.php');
-require_once(CORE_ROOT . '/interfaces/queries/insert.php');
-require_once(CORE_ROOT . '/interfaces/queries/update.php');
-require_once(CORE_ROOT . '/interfaces/queries/delete.php');
-require_once(CORE_ROOT . '/models/user.model');
-require_once(CORE_ROOT . '/error.trait');
-
 use \Core\Database\selectQuery;
 use \Core\Database\insertQuery;
 use \Core\Database\updateQuery;

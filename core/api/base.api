@@ -18,10 +18,6 @@
  */
 namespace Core\API;
 
-require_once(CORE_ROOT . '/core.trait');
-require_once(CORE_ROOT . '/error.trait');
-require_once(CORE_ROOT . '/interfaces/queries/queries.trait');
-
 class Base {
   use \Core\Common;
   use \Core\Error;
@@ -35,7 +31,7 @@ class Base {
 
   /**
    * Cached data sent via POST request.
-   * @var object|null
+   * @var object|NULL
    */
 
   protected object $_postdata;
@@ -86,12 +82,11 @@ class Base {
    * @param string $singular Singular name for item.                    eg "User"
    */
   public function __construct(
-    string $table = '',
-    string $model = '',
-    string $plural = 'Items',
-    string $singular = 'Item'
-  )
-  {
+      string $table = '',
+      string $model = '',
+      string $plural = 'Items',
+      string $singular = 'Item'
+  ) {
     $this->checkAuth();
     $this->data = new \stdClass();
     $this->message = '';
@@ -112,7 +107,7 @@ class Base {
    */
   public function requiresAuth(): bool
   {
-    return true;
+    return TRUE;
   }
 
   /**
@@ -125,10 +120,10 @@ class Base {
     $user = $this->getCurrentUser();
     if ($this->requiresAuth() && !$user) {
       $this->error('Login required', 401);
-      return false;
+      return FALSE;
     } else {
       $user->updateSession();
-      return true;
+      return TRUE;
     }
   }
 
@@ -200,21 +195,20 @@ class Base {
    * @param  int                        $perPage  Number of items top return per page
    * @param string $model                         Fully namespaced class for returned items. eg \Core\Models\User
    *
-   * @return Array<$model>                        Query results
+   * @return array<$model>                        Query results
    */
   protected function paginatedResults(
-    \Core\Database\selectQuery $query,
-    int $page,
-    int $perPage,
-    string $model = ''
-  )
-  {
+      \Core\Database\selectQuery $query,
+      int $page,
+      int $perPage,
+      string $model = ''
+  ) {
     $total = $query->getTotal();
     if (!$model && $this->model) {
       $model = $this->model;
     }
-    $results = $query->execute(false, $model);
-    $pagination = (object) Array(
+    $results = $query->execute(FALSE, $model);
+    $pagination = (object) array(
       'current_results' => count($results),
       'total_results' => $total
     );
@@ -224,8 +218,8 @@ class Base {
       $lastPage = ceil($total / $perPage);
       $pagination->last_page = $lastPage;
       $pagination->current_page = $page;
-      $pagination->next_page = ($page < $lastPage) ? $page + 1 : null;
-      $pagination->prev_page = ($page > 1) ? $page - 1 : null;
+      $pagination->next_page = ($page < $lastPage) ? $page + 1 : NULL;
+      $pagination->prev_page = ($page > 1) ? $page - 1 : NULL;
     }
 
     $this->data->pagination = $pagination;
@@ -263,10 +257,10 @@ class Base {
   /**
    * Get a list of columns to be used for search queries.
    * To be overridden by specific APIs.
-   * 
-   * @return Array<string> List of column names.
+   *
+   * @return array<string> List of column names.
    */
-  protected function searchColumns(): Array
+  protected function searchColumns(): array
   {
     return [];
   }
@@ -284,9 +278,9 @@ class Base {
   {
     $query = $this->select()->from($this->table);
     $search = $this->getValue('search');
-    if ($search){
+    if ($search) {
       $query->andGroup();
-      foreach($this->searchColumns() as $k => $column) {
+      foreach ($this->searchColumns() as $k => $column) {
         if ($k > 0) {
           $query->or($column, 'CONTAINS', $search);
         }
@@ -300,9 +294,9 @@ class Base {
   /**
    * Get data from Angular POST request, or from plain $_POST;
    *
-   * @return stdClass|null POST data
+   * @return stdClass|NULL POST data
    */
-  protected function getPostData(): \stdClass|null
+  protected function getPostData(): \stdClass|NULL
   {
     if (!isset($this->_postdata) || $this->_postdata) {
       if ($_POST) {
@@ -318,9 +312,9 @@ class Base {
 
   /**
    * Get a value from $postdata
-   * 
+   *
    * @param string $key object key to be retrieved
-   * 
+   *
    * @return Mixed Postdata value
    */
   protected function postValue($key, $default = '', $type = 'string')
@@ -332,7 +326,7 @@ class Base {
       $value = $postdata->$key;
     }
 
-    switch($type) {
+    switch ($type) {
       case 'integer':
         $value = intval($value);
         break;
@@ -363,9 +357,7 @@ class Base {
     if (isset($_GET[$key])) {
       $value = $_GET[$key];
     }
-
-
-    switch($type) {
+    switch ($type) {
       case 'integer':
         $value = intval($value);
         break;
@@ -385,13 +377,13 @@ class Base {
 
   /**
    * Set a parameter of the API's response data.
-   * 
+   *
    * @param string $key  Data key to be set.
    * @param Mixed  $data Data to be set to the value of $key.
-   * 
+   *
    * @return $this
    */
-  public function addData($key = '', $data = null)
+  public function addData($key = '', $data = NULL)
   {
     if ($key) {
       $key = strtolower($key);
@@ -402,14 +394,14 @@ class Base {
 
   /**
    * End the API interaction as successful.
-   * 
+   *
    * @param string $key     Data key to be set.
    * @param mixed  $data    Data to be set to the value of $key.
    * @param string $message User facing success message.
-   * 
+   *
    * @return JSON.
    */
-  public function success(string $key = '', mixed $data = null, string $message = '')
+  public function success(string $key = '', mixed $data = NULL, string $message = '')
   {
     if ($data) {
       if ($key) {
@@ -427,13 +419,13 @@ class Base {
 
   /**
    * End the API interaction with a success message, and no data.
-   * 
+   *
    * @param string $message User facing success message.
-   * 
+   *
    * @return JSON.
    */
   public function successMsg(string $message = '')
   {
-    return $this->success('', null, $message);
+    return $this->success('', NULL, $message);
   }
 }

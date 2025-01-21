@@ -14,10 +14,6 @@
  */
 namespace Core\API;
 
-require_once(__DIR__ . '/base.api');
-require_once(CORE_ROOT . '/models/config.model');
-
-
 class Config extends Base {
 
   /**
@@ -26,6 +22,9 @@ class Config extends Base {
   public function __construct()
   {
     $this->requirePermission('config');
+
+    require_once(CORE_ROOT . '/models/config.model');
+
     parent::__construct('config', '\Core\Models\Config', 'Config', 'Config');
   }
 
@@ -72,20 +71,20 @@ class Config extends Base {
     $data = (array) $item;
     unset($data['children']);
     unset($data['id']);
-    if (isset($item->id)){
+    if (isset($item->id)) {
       $q = $this->update($data, 'menu')->where('id', '=', $item->id);
       $q->execute();
     } else {
       $q = $this->insert($data, 'menu');
       $item->id = $q->execute();
-      foreach($item->children as &$child){
+      foreach ($item->children as &$child) {
         $child->parent = $item->id;
       }
     }
     $ids[] = $item->id;
 
-    if($item->children) {
-      foreach($item->children as $child) {
+    if ($item->children) {
+      foreach ($item->children as $child) {
         $child_ids = $this->updateMenuItems($child);
         $ids = array_merge($ids, $child_ids);
       }
@@ -102,7 +101,7 @@ class Config extends Base {
     $this->requirePermission('menu', 'UPDATE');
     $menu = $this->postValue('menu');
     $ids = [];
-    foreach($menu->children as $item) {
+    foreach ($menu->children as $item) {
       $child_ids = $this->updateMenuItems($item);
         $ids = array_merge($ids, $child_ids);
     }
@@ -125,7 +124,7 @@ class Config extends Base {
     $this->reqPermission('VIEW');
     $config = $this->select()
       ->where('type', '=', $type)
-      ->execute(false, '\Core\Models\Config');
+      ->execute(FALSE, '\Core\Models\Config');
     $this->success('config', $config);
   }
 

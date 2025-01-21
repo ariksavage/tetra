@@ -2,8 +2,6 @@
 
 namespace Core\API;
 
-require_once(__DIR__ . '/base.api');
-require_once(CORE_ROOT . '/models/user.model');
 
 use Models\User;
 
@@ -47,7 +45,8 @@ class Users extends Base {
    * @param  [type] $userId [description]
    * @return [type]         [description]
    */
-  public function rolesPUT($userId) {
+  public function rolesPUT($userId)
+  {
     $this->requirePermission('user_roles', 'UPDATE');
     $user = $this->getById($userId);
     $roles = $this->postValue('roles');
@@ -70,7 +69,7 @@ class Users extends Base {
   public function logoutGET()
   {
     $currentUser = $this->getCurrentUser();
-    if($currentUser->logout()) {
+    if ($currentUser->logout()) {
       $this->successMsg("Successfully logged out.");
     }
   }

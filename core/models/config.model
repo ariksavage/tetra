@@ -15,11 +15,6 @@
 
 namespace Core\Models;
 
-require_once(__dir__ . '/base.model');
-require_once(__dir__ . '/user_role.model');
-
-use \Core\Models\UserRole;
-
 class Config extends Base {
 
   /**
@@ -68,16 +63,24 @@ class Config extends Base {
    *
    * @return            $this
    */
-  public function __construct(object|null $data = null, array $flags = [])
+  public function __construct(object|null $data = NULL, array $flags = [])
   {
     parent::__construct('Config', 'config', $data, $flags = []);
     return $this;
   }
 
+  /**
+   * Take data from the database, or POST
+   * and map it to the model.
+   *
+   * @param object $data Data to map.
+   *
+   * @return $this.
+   */
   protected function mapData(object $data)
   {
     parent::mapData($data);
-    switch($this->value_type) {
+    switch ($this->value_type) {
       case 'text':
       case 'longtext':
         break;
@@ -95,7 +98,8 @@ class Config extends Base {
     return $this;
   }
 
-  public function setValue($value) {
+  public function setValue($value)
+  {
     $this->value = $value;
     $this->save();
   }

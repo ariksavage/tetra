@@ -16,10 +16,6 @@
 
 namespace Core\Models;
 
-require_once(CORE_ROOT . '/core.trait');
-require_once(CORE_ROOT . '/error.trait');
-require_once(CORE_ROOT . '/interfaces/queries/queries.trait');
-
 /**
  * Base model class.
  */
@@ -81,13 +77,17 @@ class Base {
    *
    * @return            $this
    */
-  public function __construct(string $itemLabel, string $table, object|null $data = null, array $flags = [])
-  {
+  public function __construct(
+      string $itemLabel,
+      string $table,
+      object|null $data = NULL,
+      array $flags = []
+  ) {
     $this->table = $table;
     $this->itemLabel = $itemLabel;
     $schema = $this->describeTable();
     if ($data) {
-      if (isset($data->id)){
+      if (isset($data->id)) {
         $this->byId($data->id);
       }
       $this->mapData($data);
@@ -104,7 +104,7 @@ class Base {
   {
     $data = $this->select()
       ->where('id', '=', $id)
-      ->execute(true);
+      ->execute(TRUE);
     if (!$data) {
       $this->error("{$this->itemLabel} {$id} Not Found", 404, "{$this->itemlabel} Not Found");
     }
@@ -136,10 +136,9 @@ class Base {
    */
   protected function mapData(object $data)
   {
-    foreach($data as $prop => $value) {
+    foreach ($data as $prop => $value) {
       if (property_exists($this, $prop)) {
-
-        switch(gettype($this->$prop)){
+        switch (gettype($this->$prop)) {
           case "boolean":
             $this->$prop = !!$value;
             break;
@@ -186,7 +185,8 @@ class Base {
    *
    * @return Array
    */
-  public function prepareSave() {
+  public function prepareSave()
+  {
     $currentUser = $this->getCurrentUser();
     $this->modified_by = intval($currentUser->id);
     $data = $this->toArray();
@@ -226,7 +226,8 @@ class Base {
    *
    * @return $this
    */
-  protected function postSave() {
+  protected function postSave()
+  {
     $this->refresh();
     return $this;
   }

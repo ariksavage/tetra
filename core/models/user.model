@@ -16,11 +16,6 @@
 
 namespace Core\Models;
 
-require_once(__dir__ . '/base.model');
-require_once(__dir__ . '/user_role.model');
-
-use \Core\Models\UserRole;
-
 class User extends Base {
 
   /**
@@ -74,7 +69,7 @@ class User extends Base {
   /**
    * Roles
    */
-  public Array $roles;
+  public array $roles;
 
 
   /**
@@ -87,7 +82,7 @@ class User extends Base {
    *
    * @return            $this
    */
-  public function __construct(object|null $data = null, array $flags = [])
+  public function __construct(object|null $data = NULL, array $flags = [])
   {
     parent::__construct('User', 'users', $data, $flags = []);
 
@@ -103,9 +98,10 @@ class User extends Base {
    *
    * - Ensure the user's password is hashed, if provided.
    *
-   * @return Array
+   * @return array
    */
-  public function prepareSave() {
+  public function prepareSave()
+  {
     $data = parent::prepareSave();
     if ($this->password) {
       if (strlen($this->password) == 60) { // password is hashed
@@ -114,30 +110,29 @@ class User extends Base {
         $data['password'] = $this->passwordHash($this->password);
       }
     }
-    if(!$this->id && !isset($data['password'])) {
+    if (!$this->id && !isset($data['password'])) {
       $data['password'] = $this->generateAuthToken();
     }
 
-
-
-    // Handle roles in a postSave();
+    // Roles are added / removed in their oewn separate process
     unset($data['roles']);
     return $data;
   }
 
   /**
-   * Operations to be conducted after the modek is saved.
+   * Operations to be conducted after the model is saved.
    *
    * By default: refresh this model to acurately reflect the database.
    *
    * @return $this
    */
-  protected function postSave() {
+  protected function postSave()
+  {
     $this->getRoles();
 
     if (count($this->roles) == 0) {
-      $roles = $this->select()->from('user_roles')->where('default', '=', '1')->execute(false);
-      foreach($roles as $role) {
+      $roles = $this->select()->from('user_roles')->where('default', '=', '1')->execute(FALSE);
+      foreach ($roles as $role) {
         $this->addRole($role->id);
       }
     }
@@ -213,7 +208,7 @@ class User extends Base {
   public function logout()
   {
     $_SESSION['authorization_token'] = NULL;
-    $_SESSION['user'] = null;
+    $_SESSION['user'] = NULL;
     return $this->endSession();
   }
 
@@ -250,20 +245,23 @@ class User extends Base {
     $token = $this->getAuthToken();
     $now = date('Y-m-d h:i:s');
     if (!$token) {
-      return false;
+      return FALSE;
     }
-    $session_q = $this->select(['user_id'], 'user_sessions')->where('token', '=', $token)->and('date_expires', '>', $now)->and('date_ended', 'IS NULL');
-    if ($session = $session_q->execute(true)) {
+    $session_query = $this->select(['user_id'], 'user_sessions')
+      ->where('token', '=', $token)
+      ->and('date_expires', '>', $now)
+      ->and('date_ended', 'IS NULL');
+    if ($session = $session_query->execute(TRUE)) {
       $q = $this->select()
         ->where('id', '=', $session->user_id);
-        if ($data = $q->execute(true)) {
+      if ($data = $q->execute(TRUE)) {
         $this->mapData($data);
-        return true;
+        return TRUE;
       } else {
-        return false;
+        return FALSE;
       }
     } else {
-      return false;
+      return FALSE;
     }
   }
 
@@ -277,8 +275,8 @@ class User extends Base {
   {
     $q = $this->select()
       ->where('username', '=', $username);
-    $data = $q->execute(true);
-    if($data) {
+    $data = $q->execute(TRUE);
+    if ($data) {
       $this->mapData($data);
       return $this;
     } else {
@@ -304,7 +302,7 @@ class User extends Base {
   {
     $passwordHash = $this->password;
     if (!$passwordHash) {
-      return false;
+      return FALSE;
     }
     return password_verify($password, $passwordHash);
   }
@@ -345,7 +343,7 @@ class User extends Base {
   protected function startSession($expiresDays)
   {
     $token = $this->generateAuthToken();
-    $data = Array();
+    $data = array();
     $data['user_id'] = $this->id;
     $data['token'] = $token;
     $data['date_started'] = date('Y-m-d h:i:s');
@@ -357,7 +355,7 @@ class User extends Base {
       $_SESSION['user'] = $this;
       return $token;
     } else {
-      return false;
+      return FALSE;
     }
   }
 
@@ -372,14 +370,14 @@ class User extends Base {
   public function updateSession(string $token = '')
   {
     $token = $this->getAuthToken();
-    $data = Array();
+    $data = array();
     $now = date('Y-m-d h:i:s');
     $data['date_last_access'] = $now; // updated by the table itself
     $expiresDays = $this->configValue('session_expires_days');
     $data['date_expires'] = date('Y-m-d h:i:s', strtotime("+{$expiresDays} days"));
     if ($this->update($data, 'user_sessions')->where('token', '=', $token)->and('user_id', '=', $this->id)->execute()) {
       $this->cleanupSessions();
-      return true;
+      return TRUE;
     }
   }
 
@@ -392,7 +390,7 @@ class User extends Base {
   protected function endSession()
   {
     $token = $this->getAuthToken();
-    $data = Array();
+    $data = array();
     $data['date_ended'] = date('Y-m-d h:i:s');
     return $this->update($data, 'user_sessions')
       ->where('token', '=', $token)
@@ -409,22 +407,29 @@ class User extends Base {
   protected function cleanupSessions()
   {
     $now = date('Y-m-d h:i:s');
-    $data = Array('date_ended' => $now);
+    $data = array('date_ended' => $now);
       return $this->update($data, 'user_sessions')
       ->where('user_id', '=', $this->id)
       ->and('date_expires', '<', $now)
-      ->and('date_ended','IS NULL')
+      ->and('date_ended', 'IS NULL')
       ->execute();
   }
 
-  public function getRoles() {
+  /**
+   * Get all roles assigned to this user.
+   *
+   * @return void Roles are assigned to the Roles property.
+   */
+  public function getRoles()
+  {
     $this->roles = array();
+    require_once(__dir__ . '/user_role.model');
     $roles = $this->select(['user_roles.*'])
       ->from('user_role_assignments')
       ->leftJoin('user_roles', 'role_id', 'id')
       ->where('user_role_assignments.user_id', '=', $this->id)
-      ->execute(false, '\Core\Models\UserRole');
-    foreach($roles as $role) {
+      ->execute(FALSE, '\Core\Models\UserRole');
+    foreach ($roles as $role) {
       $this->roles[$role->key] = $role;
     }
   }
@@ -436,22 +441,24 @@ class User extends Base {
    *
    * Removes any roles not included in $roles here.
    *
-   * @param  Array  $roles Array of role IDs
+   * @param  array  $roles array of role IDs
    * @return bool          TRUE if successful.
    */
-  public function updateRoles(Array $roles): bool
+  public function updateRoles(array $roles): bool
   {
     $existing_roles_query = $this->select()->from('user_role_assignments')->where('user_id', '=', $this->id);
     $existing = $existing_roles_query->execute();
-    $existing_roles = array_map(function($item){ return intval($item->role_id);}, $existing);
+    $existing_roles = array_map( function ($item) {
+      return intval($item->role_id);
+    }, $existing);
 
     // Add un-assigned roles
     $add_roles = array_diff($roles, $existing_roles);
-    $success = true;
+    $success = TRUE;
     if ($success && count($add_roles)) {
-      foreach($add_roles as $roleId) {
+      foreach ($add_roles as $roleId) {
         if (!$this->addRole($roleId)) {
-          $success = false;
+          $success = FALSE;
           $this->error("Could not assign role ({$role}) to user ({$this->id})");
           break;
         }
@@ -461,9 +468,9 @@ class User extends Base {
     // Remove roles not included in the function's parameters.
     $remove_roles = array_diff($existing_roles, $roles);
     if ($success && count($remove_roles)) {
-      foreach($remove_roles as $roleId) {
+      foreach ($remove_roles as $roleId) {
         if (!$this->removeRole($roleId)) {
-          $success = false;
+          $success = FALSE;
           $this->error("Could not assign role ({$roleId}) to user ({$this->id})");
         }
       }
@@ -479,10 +486,10 @@ class User extends Base {
    */
   protected function addRole(int $roleId): bool
   {
-    $success = true;
+    $success = TRUE;
     $data = ['user_id' => $this->id, 'role_id' => $roleId];
     if (!$this->insert($data, 'user_role_assignments')->execute()) {
-      $success = false;
+      $success = FALSE;
       $this->error("Could not assign role ({$roleId}) to user ({$this->id})");
     }
     return $success;
@@ -496,12 +503,12 @@ class User extends Base {
    */
   protected function removeRole(int $roleId): bool
   {
-    $success = true;
+    $success = TRUE;
     $delete_role_query = $this->deleteQuery('user_role_assignments')
       ->where('user_id', '=', $this->id)
       ->and('role_id', '=', $roleId);
-    if(!$delete_role_query->execute()) {
-      $success = false;
+    if (!$delete_role_query->execute()) {
+      $success = FALSE;
       $this->error("Could not assign role ({$roleId}) to user ({$this->id})");
     }
     return $success;
@@ -516,15 +523,21 @@ class User extends Base {
   public function hasPermission(string $dimension, string $action = ''): bool
   {
     $this->getRoles();
-    foreach($this->roles as $role) {
+    foreach ($this->roles as $role) {
       if ($role->hasPermission($dimension, $action)) {
-        return true;
+        return TRUE;
       }
     }
-    return false;
+    return FALSE;
   }
 
-  public function isCurrentUser() {
+  /**
+   * Test whether or not this user is the user currently performing actions.
+   *
+   * @return True if this is the user that is in this session
+   */
+  public function isCurrentUser(): bool
+  {
     $current = $this->getCurrentUser();
     return (isset($this->id) && $this->id && $this->id === $current->id);
   }

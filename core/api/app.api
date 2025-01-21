@@ -2,9 +2,6 @@
 
 namespace Core\API;
 
-require_once(__DIR__ . '/base.api');
-require_once(CORE_ROOT . '/models/user.model');
-
 use \Core\Models\User;
 
 class App extends Base {
@@ -20,8 +17,9 @@ class App extends Base {
    *
    * @return Boolean TRUE if login is required
    */
-  public function requiresAuth(): bool {
-    return false;
+  public function requiresAuth(): bool
+  {
+    return FALSE;
   }
 
   /**
@@ -32,10 +30,10 @@ class App extends Base {
   {
     $data = new \stdClass();
     $data->config = new \stdClass();
-    $config = $this->select()->from('config')->where('type', '=', 'application')->execute(false);
-    foreach($config as $item){
+    $config = $this->select()->from('config')->where('type', '=', 'application')->execute(FALSE);
+    foreach ($config as $item) {
       $key = $item->key;
-      switch($item->value_type) {
+      switch ($item->value_type) {
         case 'number':
           $value = floatval($item->value);
           break;
@@ -66,7 +64,7 @@ class App extends Base {
     ->where('parent', '=', $parentID)
     ->orderBy('weight')
     ->execute();
-    foreach($items as &$item) {
+    foreach ($items as &$item) {
       $item->id = intval($item->id);
       $item->parent = intval($item->parent);
       $item->weight = intval($item->weight);
@@ -86,16 +84,15 @@ class App extends Base {
     $root = '/' . $root;
     $parent = new \stdClass();
     $parent->path = $root;
-    $parent->icon = null;
-    $parent->title = null;
-    if ($root == '/'){
+    $parent->icon = NULL;
+    $parent->title = NULL;
+    if ($root == '/') {
       $parent->id = 0;
-
     } else {
       $parent = $this->select()
       ->from('menu')
       ->where('path', '=', $root)
-      ->execute(true);
+      ->execute(TRUE);
     }
     $parent->children = $this->getMenuChildren($parent->id);
     return $parent;
@@ -106,7 +103,8 @@ class App extends Base {
    * @param  string $root Root path from which to build the menu
    * @return JSON Response
    */
-  public function menuTreeGET($root = '') {
+  public function menuTreeGET($root = '')
+  {
     $menu = $this->menuTree($root);
     $this->success('menu', $menu);
   }
