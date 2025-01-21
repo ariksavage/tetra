@@ -38,7 +38,7 @@ class Base {
    * @var object|null
    */
 
-  protected \stdClass|null $_postdata = null;
+  protected object $_postdata;
 
   /**
    * Namespaced class of the default model
@@ -63,7 +63,7 @@ class Base {
    * @var object
    * Data
    */
-  public \stdClass $data;
+  public object $data;
 
   /**
    * Text message to be returned in JSON response
@@ -85,7 +85,12 @@ class Base {
    * @param string $plural   Plural name for items.                     eg "Users"
    * @param string $singular Singular name for item.                    eg "User"
    */
-  public function __construct(string $table = '', string $model = '', string $plural = 'Items', string $singular = 'Item')
+  public function __construct(
+    string $table = '',
+    string $model = '',
+    string $plural = 'Items',
+    string $singular = 'Item'
+  )
   {
     $this->checkAuth();
     $this->data = new \stdClass();
@@ -118,10 +123,11 @@ class Base {
     $user = $this->getCurrentUser();
     if ($this->requiresAuth() && !$user) {
       $this->error('Login required', 401);
+      return false;
     } else {
       $user->updateSession();
+      return true;
     }
-    return true;
   }
 
   /**
@@ -144,7 +150,7 @@ class Base {
   }
 
   /**
-   * Handle POST request for a list of items.
+   * Handle GET request for a list of items.
    *
    * POST values may include:
    * - int    page    The current page of results to return.
@@ -153,11 +159,11 @@ class Base {
    *
    * - Specific APIs may have additional parameters.
    */
-  public function listPOST()
+  public function listGET()
   {
     $this->reqPermission('VIEW');
-    $page = $this->postValue('page', 1, 'integer');
-    $per = $this->postValue('per', 20, 'integer');
+    $page = $this->getValue('page', 1, 'integer');
+    $per = $this->getValue('per', 20, 'integer');
     $query = $this->listQuery($page, $per);
     $list = $this->paginatedResults($query, $page, $per);
     if (count($list)) {
@@ -170,9 +176,9 @@ class Base {
   /**
    * Delete the item with the given $id.
    *
-   * @param  int    $id Item's ID
+   * @param  int  $id Item's ID
    *
-   * @return            JSON success message.
+   * @return      JSON success message.
    */
   public function deleteDELETE(int $id)
   {
@@ -194,7 +200,12 @@ class Base {
    *
    * @return Array<$model>                        Query results
    */
-  protected function paginatedResults(\Core\Database\selectQuery $query, int $page, int $perPage, string $model = '')
+  protected function paginatedResults(
+    \Core\Database\selectQuery $query,
+    int $page,
+    int $perPage,
+    string $model = ''
+  )
   {
     $total = $query->getTotal();
     if (!$model && $this->model) {
@@ -206,7 +217,7 @@ class Base {
       'total_results' => $total
     );
     $pagination->first_page = 1;
-    if ($perPage){
+    if ($perPage) {
       $pagination->per_page  = $perPage;
       $lastPage = ceil($total / $perPage);
       $pagination->last_page = $lastPage;
@@ -270,7 +281,7 @@ class Base {
   protected function listQuery(int $page = 1, int $per = 20): \Core\Database\selectQuery
   {
     $query = $this->select()->from($this->table);
-    $search = $this->postValue('search');
+    $search = $this->getValue('search');
     if ($search){
       $query->andGroup();
       foreach($this->searchColumns() as $k => $column) {
@@ -318,6 +329,39 @@ class Base {
     if (isset($postdata->$key)) {
       $value = $postdata->$key;
     }
+
+    switch($type) {
+      case 'integer':
+        $value = intval($value);
+        break;
+      case 'float':
+        $value = floatval($value);
+        break;
+      case 'boolean':
+        $value = !!$value;
+        break;
+      case 'string':
+      default:
+        break;
+    }
+
+    return $value;
+  }
+
+    /**
+   * Get a value from $the $_GET querystring
+   *
+   * @param string $key object key to be retrieved
+   *
+   * @return Mixed Query parameter value
+   */
+  protected function getValue($key, $default = '', $type = 'string')
+  {
+    $value = $default;
+    if (isset($_GET[$key])) {
+      $value = $_GET[$key];
+    }
+
 
     switch($type) {
       case 'integer':
