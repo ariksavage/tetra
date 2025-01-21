@@ -351,6 +351,7 @@ class User extends Base {
     $data['date_started'] = date('Y-m-d h:i:s');
     $data['date_last_access'] = $data['date_started'];
     $data['date_expires'] = date('Y-m-d h:i:s', strtotime("+{$expiresDays} days"));
+    // die( $this->insert($data, 'user_sessions') );
     if ($this->insert($data, 'user_sessions')->execute()) {
       $_SESSION['authorization_token'] = $token;
       $_SESSION['user'] = $this;

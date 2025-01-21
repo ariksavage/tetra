@@ -1,7 +1,7 @@
 <?php
-
 namespace Core\Database;
 
+require_once(__DIR__ . '/query.php');
 require_once(__DIR__ . '/select.php');
 require_once(__DIR__ . '/insert.php');
 require_once(__DIR__ . '/update.php');
@@ -23,7 +23,7 @@ trait Queries {
    *
    * @return selectQuery    Query object
    */
-  protected function select($fields = ['*'], $table = null)
+  protected function select($fields = ['*'], string $table = '')
   {
     if (!$table && $this->table) {
       $table = $this->table;
@@ -41,7 +41,7 @@ trait Queries {
    *
    * @return selectQuery    Query object
    */
-  protected function update(array $data, $table = null)
+  protected function update(array $data, string $table = '')
   {
     if (!$table && $this->table) {
       $table = $this->table;
@@ -58,7 +58,7 @@ trait Queries {
    * 
    * @return insertQuery $query Query Object.
    */
-  protected function insert($data, $table = null)
+  protected function insert($data, string $table = '')
   {
     if (!$table && isset($this->table)) {
       $table = $this->table;
@@ -78,7 +78,7 @@ trait Queries {
    *
    * @return insertQuery $query Query Object.
    */
-  protected function deleteQuery($table = null, $id = null)
+  protected function deleteQuery($table = '', $id = null)
   {
     if (!$table && isset($this->table)) {
       $table = $this->table;

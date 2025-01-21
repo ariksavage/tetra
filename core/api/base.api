@@ -100,6 +100,8 @@ class Base {
     $this->plural = $plural;
     $this->singular = $singular;
     $this->dimension = $table;
+
+    $this->_postdata = new \stdClass();
   }
 
   /**
@@ -302,7 +304,7 @@ class Base {
    */
   protected function getPostData(): \stdClass|null
   {
-    if (!$this->_postdata) {
+    if (!isset($this->_postdata) || $this->_postdata) {
       if ($_POST) {
         $this->_postdata = (object) $_POST;
       } else {

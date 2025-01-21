@@ -1,17 +1,16 @@
 <?php
 namespace Core;
-/**
-* Get current user,
-* Define constants
-*/
+require_once(CORE_ROOT . '/error.trait');
+require_once(CORE_ROOT . '/core.trait');
 
-// All back end time is used / stored in UTC.
-// On the front end, it can be converted to local time.
-date_default_timezone_set('UTC');
+require_once(CORE_ROOT . '/interfaces/db.php');
+require_once(CORE_ROOT . '/interfaces/queries/query.php');
 
-define('CORE_ROOT', __dir__);
-define('SERVER_ROOT', realpath(CORE_ROOT . '/../../'));
-define('CONFIG_PATH', __dir__ . '/../../config');
 
+
+require_once(CORE_ROOT . '/interfaces/queries/queries.trait');
 require_once(CORE_ROOT . '/api/base.api');
 require_once(CORE_ROOT . '/api/app.api');
+
+
+
