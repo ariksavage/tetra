@@ -1,24 +1,45 @@
 <?php
-
+/**
+ * SELECT Query
+ *
+ * MySQL raw query, stored as a string
+ * without conditions like the more specific query types
+ *
+ * PHP version 8.4
+ *
+ * @category   Database
+ * @package    Core
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @version    1.0
+ * @since      2025-01-10
+ */
 namespace Core\Database;
 
-require_once('query.php');
-
-class rawQuery extends Query
+class RawQuery extends Query
 {
-  public $string;
+  /**
+   * Query string
+   * @var string
+   */
+  public string $string;
 
-  public function __construct($string)
+  /**
+   * Construct the query by storing the raw string.
+   * @param string $query Query string
+   */
+  public function __construct(string $query)
   {
-    parent::__construct(null, null);
-    $this->string = $string;
+    parent::__construct('', '');
+    $this->string = $query;
+    return $this;
   }
+
+  /**
+   * Overrides default query behavior by returning the raw string.
+   * @return string Query string as entered.
+   */
   public function __toString()
   {
     return $this->string;
-  }
-
-  public function execute(){
-    return parent::execute();
   }
 }

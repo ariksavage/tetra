@@ -1,6 +1,7 @@
 <?php
 namespace Core;
 
+require_once(CORE_ROOT . '/interfaces/queries/query.php');
 require_once(CORE_ROOT . '/interfaces/queries/select.php');
 require_once(CORE_ROOT . '/interfaces/queries/insert.php');
 require_once(CORE_ROOT . '/interfaces/queries/update.php');
