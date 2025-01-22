@@ -78,14 +78,12 @@ export class AppService {
   }
 
   init() {
-    console.log('app init')
     return this.core.get('app', 'index').then((data: any) => {
       this.setConfig(data.app.config);
     });
   }
 
   setConfig(config: any) {
-    console.log('set config', config);
     this._config = config;
     this.config.next(this._config);
   }
