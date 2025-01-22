@@ -70,7 +70,7 @@ export class UserService {
   login(username: string, password: string) {
     const self = this;
     const data = {username, password};
-    return this.core.post('core', 'login', data).then((data)=> {
+    return this.core.post('app', 'login', data).then((data)=> {
       console.log('login', data);
       if (data.token){
         self.cookies.set('auth', data.token, 100);

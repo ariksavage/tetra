@@ -22,11 +22,7 @@ export class TetraUserMenuComponent {
   }
 
   loggedIn() {
-    if (this.user && this.user.id) {
-      return true;
-    } else {
-      return false;
-    }
+    return (this.user && this.user.id);
   }
 
   logout() {
