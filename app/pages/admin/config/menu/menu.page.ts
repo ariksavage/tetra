@@ -51,7 +51,7 @@ export class AdminConfigMenuPage extends TetraPage {
     const data = {
       menu: this.menu
     };
-    this.core.patch('config', 'menu', null, data).then((data: any) => {
+    this.core.patch(data, 'config', 'menu').then((data: any) => {
       window.location.reload();
     })
   }
