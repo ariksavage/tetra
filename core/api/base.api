@@ -303,8 +303,9 @@ class Base {
         $this->_postdata = (object) $_POST;
       } else {
         // Read data from Angular
-        $rawdata = file_get_contents("php://input");
-        $this->_postdata = json_decode($rawdata);
+        if($rawdata = file_get_contents("php://input")){
+          $this->_postdata = json_decode($rawdata);
+        }
       }
     }
     return $this->_postdata;
@@ -335,6 +336,11 @@ class Base {
         break;
       case 'boolean':
         $value = !!$value;
+        break;
+      case 'object':
+        if (!$value) {
+          $value = new \stdClass();
+        }
         break;
       case 'string':
       default:

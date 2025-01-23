@@ -25,10 +25,13 @@ export class CoreService {
     if (result) {
       if (result.message) {
         let now = new Date();
-      let hours = now.getHours().toString().padStart(2, '0');
-      let minutes = now.getMinutes().toString().padStart(2, '0');
-      let seconds = now.getSeconds().toString().padStart(2, '0');
-        console.log(`${hours}:${minutes}:${seconds}`, result.message);
+      let hours = now.getHours();
+      let a = hours > 12 ? 'pm' : 'am';
+      hours = hours > 12 ? hours - 12 : hours;
+      let h = hours.toString().padStart(2, '0');
+      let i = now.getMinutes().toString().padStart(2, '0');
+      let s = now.getSeconds().toString().padStart(2, '0');
+        console.log(`${h}:${i}:${s}${a}`, result.message);
       }
       if (result.data) {
         return result.data;

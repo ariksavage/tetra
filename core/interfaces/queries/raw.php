@@ -42,4 +42,21 @@ class RawQuery extends Query
   {
     return $this->string;
   }
+
+  /**
+   * Execute the query
+   * @return int|bool Returns the insert_id if available
+   *                  Otherwise returns TRUE on success.
+   */
+  public function executeInsert(): int|bool
+  {
+    if ($result = parent::execute()) {
+      if ($this->conn->insert_id) {
+        return $this->conn->insert_id;
+      } else {
+        return TRUE;
+      }
+    }
+    return FALSE;
+  }
 }
