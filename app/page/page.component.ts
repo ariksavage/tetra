@@ -6,7 +6,7 @@ import { CoreService } from '@tetra/core.service';
 import { AppService } from '@tetra/app.service';
 import { UserService } from '@tetra/user.service';
 import { User } from '@tetra/user';
-import { WindowRefService, ICustomWindow } from '@tetra/window.service'
+
 
 @Component({
   selector: 'app-page',
@@ -23,17 +23,15 @@ export class TetraPage {
     showHeader: true,
     showTitle: true
   };
-  protected _window: ICustomWindow;
+  protected ready: boolean = false;
 
   constructor(
-    protected core: CoreService,
+    public core: CoreService,
     protected app: AppService,
     protected route: Router,
     protected activeRoute: ActivatedRoute,
-    protected userService: UserService,
-    protected windowRef: WindowRefService
+    protected userService: UserService
   ) {
-    this._window = windowRef.nativeWindow;
     userService.getUser().subscribe((user: User | null) => {
       if (user) {
         this.user = user;
@@ -66,5 +64,6 @@ export class TetraPage {
 
   onLoad() {
     const self = this;
+    this.ready = true;
   }
 }

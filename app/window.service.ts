@@ -2,10 +2,8 @@ import { Injectable } from '@angular/core';
 
 // This interface is optional, showing how you can add strong typings for custom globals.
 // Just use "Window" as the type if you don't have custom global stuff
-export interface ICustomWindow extends Window {
+export interface TetraCustomWindow extends Window {
     // __custom_global_stuff: string;
-    API: any;
-    API_1484_11: any;
 }
 
 function getWindow (): any {
@@ -13,8 +11,8 @@ function getWindow (): any {
 }
 
 @Injectable()
-export class WindowRefService {
-    get nativeWindow (): ICustomWindow {
+export class TetraWindowService {
+    get nativeWindow (): TetraCustomWindow {
         return getWindow();
     }
 }

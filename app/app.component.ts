@@ -19,8 +19,7 @@ export class TetraAppComponent {
     name: 'Application'
   };
   pageTitle: string = '';
-  showHeader: boolean = true;
-  showTitle: boolean = true;
+  pageConfig: any;
   year = new Date().getFullYear();
   user: User|null = null;
   copyright: string = '';
@@ -33,26 +32,23 @@ export class TetraAppComponent {
     protected titleService:Title,
   ) {
     const self = this;
-    console.log('app component construct');
-    // appService.init().then((data: any) => {
-      appService.getConfig().subscribe((config: any) => {
-        self.config = config;
-        self.titleService.setTitle(config.name);
-      });
-      appService.getPageTitle().subscribe((title: string) => {
-        self.pageTitle = title;
-        self.setTitle();
-        self.setBodyClass();
-      });
-      appService.getPageConfig().subscribe((config: any) => {
-        this.handleConfig(config);
-      });
-      userService.getUser().subscribe((user: User | null) => {
-        if (user) {
-          self.user = user;
-        }
-      });
-    // });
+    appService.getConfig().subscribe((config: any) => {
+      self.config = config;
+      self.titleService.setTitle(config.name);
+    });
+    appService.getPageTitle().subscribe((title: string) => {
+      self.pageTitle = title;
+      self.setTitle();
+      self.setBodyClass();
+    });
+    appService.getPageConfig().subscribe((config: any) => {
+      self.pageConfig = config;
+    });
+    userService.getUser().subscribe((user: User | null) => {
+      if (user) {
+        self.user = user;
+      }
+    });
     appService.init();
   }
 
@@ -62,14 +58,5 @@ export class TetraAppComponent {
 
   setBodyClass() {
     this.bodyClass = 'page-' + this.pageTitle.toLowerCase().replace(' ', '-');
-  }
-
-  handleConfig(config: any) {
-    if (typeof config.showHeader !== 'undefined') {
-      this.showHeader = config.showHeader
-    }
-    if (typeof config.showTitle !== 'undefined') {
-      this.showTitle = config.showTitle
-    }
   }
 }
