@@ -158,5 +158,8 @@ trait Common {
     }
     return $str;
   }
+  protected function timestamp(string $date = 'now') {
+    return date('Y-m-d h:i:s', strtotime($date));
+  }
 }
 ?> 
