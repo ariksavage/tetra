@@ -303,7 +303,7 @@ class Base {
         $this->_postdata = (object) $_POST;
       } else {
         // Read data from Angular
-        if($rawdata = file_get_contents("php://input")){
+        if ($rawdata = file_get_contents("php://input")) {
           $this->_postdata = json_decode($rawdata);
         }
       }
