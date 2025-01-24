@@ -26,7 +26,16 @@ unset($_GET['id2']);
 /**
  * Load the appropriate class of API to handle the request.
  */
+
 $APIclass = '';
+
+/**
+ * Find core plugin, if it exists
+ */
+if (file_exists(CORE_ROOT . "/api/$type.api")) {
+  require_once CORE_ROOT . "/api/$type.api";
+  $APIclass = __NAMESPACE__ . '\\API\\' . $core->toCamelCase($type);
+}
 /**
  * If a corresponding $type plugin exists, load it first.
  */
@@ -48,24 +57,12 @@ if (is_dir($pluginsDir)) {
 }
 
 /**
- * If no plugin, load from core.
- */
-if (!$APIclass) {
-  if (file_exists(CORE_ROOT . "/api/$type.api")) {
-    require_once CORE_ROOT . "/api/$type.api";
-    $APIclass = __NAMESPACE__ . '\\API\\' . $core->toCamelCase($type);
-  } else {
-    $core->error("$type is not a valid type", 404);
-  }
-}
-
-/**
  * Instatiate the API class.
  */
 if ($APIclass && class_exists($APIclass)) {
   $api = new $APIclass();
 } else {
-  $core->error("{$APIclass} not found.", 404);
+  $core->error("$type is not a valid type", 404);
 }
 
 /**

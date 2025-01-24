@@ -79,10 +79,6 @@ echo " */" >> $path
 echo "" >> $path
 echo "namespace Core\Migrations;" >> $path
 echo "" >> $path
-echo "require_once CORE_ROOT . '/models/migration.model';" >> $path
-echo "" >> $path
-echo "" >> $path
-
 echo "class $class extends \Core\Models\Migration" >> $path
 echo "{" >> $path
 echo "" >> $path
@@ -95,21 +91,22 @@ echo "" >> $path
 echo "  /**" >> $path
 echo "   * Check if this migration has been completed." >> $path
 echo "   *" >> $path
-echo "   * @return bool True if this migration is complete " >> $path
+echo "   * @return Boolean TRUE if this migration is complete." >> $path
 echo "   */" >> $path
-echo "   protected function isComplete(): bool" >> $path
-echo "   {" >> $path
-echo "     return true;" >> $path
-echo "   }" >> $path
-echo "   /**" >> $path
-maxlength 80 "$description" "    *" >> $path
-echo "    *" >> $path
-echo "    * @return Boolean TRUE if successful." >> $path
-echo "    */" >> $path
-echo "   protected function execute(): bool " >> $path
-echo "   {" >> $path
-echo "     return true;" >> $path
-echo "   }" >> $path
+echo "  protected function isComplete(): bool" >> $path
+echo "  {" >> $path
+echo "    return TRUE;" >> $path
+echo "  }" >> $path
+echo "" >> $path
+echo "  /**" >> $path
+maxlength 80 "$description" "   *" >> $path
+echo "   *" >> $path
+echo "   * @return Boolean TRUE if successful." >> $path
+echo "   */" >> $path
+echo "  protected function execute(): bool" >> $path
+echo "  {" >> $path
+echo "    return TRUE;" >> $path
+echo "  }" >> $path
 echo "}" >> $path
 echo ""
 echo "$path has been created."

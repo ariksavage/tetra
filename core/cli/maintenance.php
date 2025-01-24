@@ -3,6 +3,7 @@
 namespace kdCore;
 
 require_once(__dir__ . '/../bootstrap.php');
+require_once CORE_ROOT . '/models/migration.model';
 
 // look for migrations and run them if not manual
 
