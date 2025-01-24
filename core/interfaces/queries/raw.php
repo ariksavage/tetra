@@ -59,4 +59,28 @@ class RawQuery extends Query
     }
     return FALSE;
   }
+
+  public function executeSelect(bool $single = FALSE, string $class = '', array $flags = []): mixed
+  {
+    $data = FALSE;
+    $result = parent::execute();
+    if ($result) {
+      $data = [];
+
+      while ($obj = $result->fetch_object()) {
+        if ($class) {
+          $data[] = new $class($obj, $flags);
+        } else {
+          $data[] = $obj;
+        }
+      }
+
+      $result->close();
+    }
+    if ($single) {
+      return reset($data);
+    } else {
+      return $data;
+    }
+  }
 }

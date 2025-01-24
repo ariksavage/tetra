@@ -113,6 +113,10 @@ class Migration extends Base {
       $message .= " (SKIPPED)";
     } else {
       $message .= " (" . $this->elapsed() . 's)';
+      $data = array(
+        'label' => $this->name
+      );
+      $this->insert($data, 'migrations')->execute();
     }
     $message .= $nocolor;
     $this->echoLine($message, TRUE);
@@ -478,5 +482,61 @@ class Migration extends Base {
       }
     }
     return TRUE;
+  }
+
+  public function permissionExists(string $dimension, string $action = ''): bool
+  {
+    $permission = $this->select()
+    ->from('user_permissions')
+    ->where('dimension', '=', $dimension)
+    ->and('action', '=', $action)
+    ->execute(FALSE);
+    return count($permission) > 0;
+  }
+
+  public function createPermission($dimension, $action, $title = '', $description = '')
+  {
+    $dimensionName = preg_replace('/_+/', ' ', $dimension);
+    $dimensionName = ucwords($dimensionName);
+    if (!$title) {
+      $title = ucwords($action) . ' '. ucwords($dimensionName);
+    }
+    if (!$description) {
+      $description = "User is allowed to " . strtolower($action) . ' ' . $dimensionName;
+    }
+    $permission = array(
+      'dimension' => $dimension,
+      'action' => $action,
+      'title' => $title,
+      'description' => $description
+    );
+    $q = $this->insert($permission, 'user_permissions');
+    return $q->execute();
+  }
+
+  public function assignPermission($permissionId, $roles)
+  {
+    $roleKeys = "('" . implode("', '", $roles) . "')";
+    $query = "INSERT INTO user_role_permissions_assignments (role_id, permission_id)
+      SELECT id, $permissionId FROM user_roles WHERE `key` in $roleKeys";
+    return $this->raw($query)->executeInsert();
+  }
+
+  public function roleInheritanceExists($role, $inheritsFromRole)
+  {
+    $query  = "SELECT * FROM user_role_inherit_permissions";
+    $query .= " WHERE role_id = (SELECT id FROM user_roles WHERE `key`='$role')";
+    $query .= " AND inherits_role = (SELECT id FROM user_roles WHERE `key`='$inheritsFromRole')";
+    $results = $this->raw($query)->executeSelect(FALSE);
+    return count($results) > 0;
+  }
+
+  public function createRoleInheritance($role, $inheritsFromRole)
+  {
+    $query = "INSERT INTO `user_role_inherit_permissions` (`role_id`, `inherits_role`) VALUES (
+      (SELECT `id` FROM `user_roles` WHERE `key`='$role'),
+      (SELECT `id` FROM `user_roles` WHERE `key`='$inheritsFromRole')
+    )";
+    return $this->raw($query)->executeInsert();
   }
 }
