@@ -349,7 +349,8 @@ class Query
    */
   public function orderBy(string $column, string $direction = 'ASC')
   {
-    $this->orderConditions[] = "`{$column}` {$direction}";
+    $orderColumn = $this->escapeColumn($column);
+    $this->orderConditions[] = "{$orderColumn} {$direction}";
     return $this;
   }
 
