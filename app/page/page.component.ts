@@ -24,6 +24,7 @@ export class TetraPage {
     showTitle: true
   };
   protected ready: boolean = false;
+  protected routeParams: any = null;
 
   constructor(
     public core: CoreService,
@@ -59,7 +60,20 @@ export class TetraPage {
     if (this.requiresLogin && !(this.user && this.user.id)) {
       this.userService.loginRedirect();
     }
+    this.activeRoute.paramMap.subscribe((params) => {
+      this.routeParams = params;
+    });
     return this.onLoad();
+  }
+
+  getParam(key: string){
+    let value = this.routeParams.get(key);
+
+    if (!isNaN(value)){
+      return value;
+    } else {
+      return parseInt(value);
+    }
   }
 
   onLoad() {
