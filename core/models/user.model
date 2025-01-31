@@ -304,6 +304,7 @@ class User extends Base {
     if (!$passwordHash) {
       return FALSE;
     }
+    // die($this->passwordHash($password));
     return password_verify($password, $passwordHash);
   }
 

@@ -17,7 +17,7 @@ namespace Core\API;
 class Config extends Base {
 
   /**
-   * Class condstructor
+   * Class constructor
    */
   public function __construct()
   {

@@ -13,7 +13,6 @@ $migrations = scandir($migrations_dir);
 $migrations = array_diff($migrations, ['.', '..', '.DS_Store']);
 asort($migrations);
 
-
 foreach ($migrations as $migration) {
   $name = preg_replace('/^[0-9]+-|\.migration/', '', $migration);
   $class = '\\Core\\Migrations\\' . $name;

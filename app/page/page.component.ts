@@ -5,6 +5,7 @@ import { Observable, Subject, BehaviorSubject} from 'rxjs';
 import { CoreService } from '@tetra/core.service';
 import { AppService } from '@tetra/app.service';
 import { UserService } from '@tetra/user.service';
+import { ErrorService } from '@tetra/error.service';
 import { User } from '@tetra/user';
 
 
@@ -31,7 +32,8 @@ export class TetraPage {
     protected app: AppService,
     protected route: Router,
     protected activeRoute: ActivatedRoute,
-    protected userService: UserService
+    protected userService: UserService,
+    protected errorService: ErrorService
   ) {
     userService.getUser().subscribe((user: User | null) => {
       if (user) {
@@ -42,6 +44,8 @@ export class TetraPage {
 
   ngOnInit() {
     const self = this;
+    let bodyClass = 'page-' + this.title;
+    this.app.setBodyClass(bodyClass);
     this.userService.loginByToken().then((user: any)=> {
       self.user = user;
       return self.load();

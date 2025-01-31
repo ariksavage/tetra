@@ -17,12 +17,17 @@ trait Common {
     }
     $permission = $query->execute(true);
     if (!$permission) {
-      $permission = Array(
-        'title' => "User is allowed to " . ucwords(strtolower($action)) . " " . ucwords(strtolower($dimension)),
-        'dimension' => $dimension,
-        'action' => $action
-      );
-      if ($this->insert($permission, 'user_permissions')->execute()) {
+      if ($action){
+        $title = "{$action} {$dimension}";
+        $description = "User is allowed to " . ucwords(strtolower($action)) . " " . ucwords(strtolower($dimension));
+      } else {
+        $title = "{$dimension} ALL";
+        $description = "User has full access to " . ucwords(strtolower($dimension));
+        $action = "*";
+      }
+      $query = "INSERT INTO `user_permissions` (`dimension`, `action`, `title`, `description`)";
+      $query .= " VALUES('{$dimension}', '{$action}', '{$title}', '{$description}')";
+      if ($this->raw($query)->execute()) {
         return true;
       } else {
         return false;
@@ -45,7 +50,7 @@ trait Common {
   protected function requirePermission(string $dimension, string $action = ''): bool
   {
     $user = $this->getCurrentUser();
-    if (!$user->hasPermission($dimension, $action)) {
+    if (!$user || !$user->hasPermission($dimension, $action)) {
       // ensure the permission exists
       $this->permissionExists($dimension, $action);
       $this->error("Permission Denied", 401);

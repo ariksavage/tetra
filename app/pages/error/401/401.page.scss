@@ -1,0 +1,15 @@
+@import "../../../page/page.component.scss";
+
+.page-title {
+  font-size: 10em;
+  text-align: center;
+  width: 100%;
+  margin: 0 0 .2em;
+  text-transform: uppercase;
+  font-family: sans-serif;
+}
+
+.message {
+  text-align: center;
+  font-size: 3em;
+}

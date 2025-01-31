@@ -13,4 +13,9 @@ import { TetraPage } from '@tetra/page/page.component';
 
 export class AdminDashboardPage extends TetraPage {
   override title = 'Admin Dashboard';
+  override pageConfig: any = {
+    showHeader: true,
+    titleInHeader: true,
+    showMenu: true,
+  };
 }

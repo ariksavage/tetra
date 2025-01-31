@@ -21,10 +21,15 @@ export class AdminConfigPage extends TetraPage {
   override title = 'Config';
   config: Array<Config> = [];
   categories: Array<string> = [];
+  override pageConfig: any = {
+    showHeader: true,
+    titleInHeader: false,
+    showMenu: true,
+  };
 
   override onLoad() {
     const self = this;
-    this.core.post('config', 'list').then((data: any) => {
+    this.core.get('config', 'list').then((data: any) => {
       this.config = data.config.map((item: Config) => {
         if (!(this.categories.indexOf(item.type) > -1)) {
           this.categories.push(item.type);
@@ -51,7 +56,8 @@ export class AdminConfigPage extends TetraPage {
   update( item: any ) {
     const value = item.value;
     const data = {value};
-    this.core.patch('config', 'value', item.id, data).then((config: Config) => {
+    console.log('update', data);
+    this.core.patch(data, 'config', 'value', item.id).then((config: Config) => {
     })
   }
 }

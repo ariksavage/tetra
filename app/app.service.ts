@@ -13,6 +13,9 @@ export class AppService {
   private _pageTitle: string = '';
   private pageTitle = new BehaviorSubject<string>('');
 
+  private _bodyClass: string = '';
+  private bodyClass = new BehaviorSubject<string>('');
+
   private _pageConfig: any = {
     showHeader: true,
     showTitle: true
@@ -23,6 +26,8 @@ export class AppService {
   private breadcrumbs = new BehaviorSubject<any>([]);
   private _config: any = {};
   private config = new BehaviorSubject<any>({});
+  private _error: any = {};
+  private error = new BehaviorSubject<any>({});
   replacements: Array<any> = [];
 
   constructor(private router: Router, protected activeRoute: ActivatedRoute, protected title:Title, protected core: CoreService) {
@@ -79,6 +84,7 @@ export class AppService {
 
   init() {
     return this.core.get('app', 'index').then((data: any) => {
+      console.log('config', data);
       this.setConfig(data.app.config);
     });
   }
@@ -97,6 +103,15 @@ export class AppService {
     return this.pageTitle.asObservable();
   }
 
+  setBodyClass(bodyClass: string) {
+    this._bodyClass = bodyClass;
+    this.bodyClass.next(bodyClass);
+  }
+
+  getBodyClass() {
+    return this.bodyClass.asObservable();
+  }
+
   setPageConfig(config: any) {
     this._pageConfig = config;
     this.pageConfig.next(config);
@@ -104,6 +119,15 @@ export class AppService {
 
   getPageConfig() {
     return this.pageConfig.asObservable();
+  }
+
+  setError(error: any) {
+    this._error = error;
+    this.error.next(error);
+  }
+
+  getError() {
+    return this.error.asObservable();
   }
 
   setBreadcrumbs(crumbs: Array<any>){

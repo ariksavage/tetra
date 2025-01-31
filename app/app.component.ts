@@ -39,7 +39,9 @@ export class TetraAppComponent {
     appService.getPageTitle().subscribe((title: string) => {
       self.pageTitle = title;
       self.setTitle();
-      self.setBodyClass();
+    });
+    appService.getBodyClass().subscribe((bodyClass: string) => {
+      self.setBodyClass(bodyClass);
     });
     appService.getPageConfig().subscribe((config: any) => {
       self.pageConfig = config;
@@ -56,7 +58,9 @@ export class TetraAppComponent {
     this.titleService.setTitle(this.config.name + ' | ' + this.pageTitle);
   }
 
-  setBodyClass() {
-    this.bodyClass = 'page-' + this.pageTitle.toLowerCase().replace(' ', '-');
+  setBodyClass(bodyClass: string) {
+    bodyClass = bodyClass.toLowerCase();
+    bodyClass = bodyClass.replace(/[^a-z\-]+/g,"-");
+    // this.bodyClass = bodyClass;
   }
 }

@@ -130,6 +130,7 @@ class UserRole extends Base {
    */
   public function hasPermission(string $dimension, string $action = ''): bool
   {
+    $this->getPermissions();
     if (!isset($this->permissions->$dimension)) {
       return FALSE;
     }

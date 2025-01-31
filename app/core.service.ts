@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { ErrorService } from '@tetra/error.service';
+import { Router } from '@angular/router';
 
 
 @Injectable({
@@ -10,7 +12,9 @@ export class CoreService {
   private authToken: string = '';
 
   constructor(
-    private http: HttpClient
+    private errorService: ErrorService,
+    private http: HttpClient,
+    private route: Router
   ) {}
 
   getProxy() {
@@ -45,10 +49,24 @@ export class CoreService {
 
   /**
    * Set error message
+   *
+   * and redirect to error page, if necessary.
+   *
    * @param Object error Error object
    */
   handleError(url: string, error: any) {
-    console.error(url, error);
+    if (error) {
+      this.errorService.setError(error);
+      console.error(url, error);
+      switch(error.code) {
+        case 401:
+          this.route.navigateByUrl('/401');
+          break;
+        case 404:
+          this.route.navigateByUrl('/404');
+          break;
+      }
+    }
     return false;
   }
 
