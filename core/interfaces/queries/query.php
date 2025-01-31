@@ -108,6 +108,8 @@ class Query
       return 'NULL';
     } else if ($value === '*') {
       return '*';
+    } else if ($value === "'*'") {
+      return "'*'";
     } else if ($value === FALSE) {
       return 0;
     } else if ($value === TRUE) {

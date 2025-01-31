@@ -31,15 +31,9 @@ maxlength() {
   echo -e "$split_string"
 }
 
-
 echo "New Migration"
 read -p 'Describe the purpose of this migration in 5 words or fewer: ' title
-# title="Users: add created_by"
 read -p 'What will this migration do? ' description
-# description="add a created_by column to the users table in the database"
-# description="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer suscipit gravida enim, commodo gravida eros porttitor eget. Vivamus lacinia elit et nulla faucibus, vitae imperdiet sem sagittis. Cras a lorem eu leo placerat ornare. Sed eleifend mattis mauris sed auctor. Mauris ut cursus magna. Vestibulum volutpat facilisis accumsan. Nulla sem lorem, cursus sit amet metus sit amet, finibus tempor quam. Phasellus neque odio, semper sit amet quam aliquam, tincidunt pharetra orci. Nullam sit amet lectus fermentum, pulvinar justo ut, fringilla massa. Morbi quis nulla accumsan, posuere diam id, aliquam diam. Donec volutpat metus id tempor dictum. Pellentesque eget libero enim."
-
-
 
 class="${title//[^[:alnum:]]/ }"
 echo $class

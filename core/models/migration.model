@@ -309,6 +309,8 @@ class Migration extends Base {
    * @param string $default    Default value as escaped string.
    * @param string $comment    Optional comment to be added to the column.
    * @param string $after      Column name after which to add this one.
+   * @param string $extra      Additional arguments to be added to the query
+   *                             eg. "ON UPDATE current_timestamp()"
    *
    * @return bool              Success
    */
@@ -319,7 +321,8 @@ class Migration extends Base {
       bool   $null = TRUE,
       string $default = '',
       string $comment = '',
-      string $after = ''
+      string $after = '',
+      string $extra = '',
   ): bool {
     $query = "ALTER TABLE `{$tableName}` ADD COLUMN `{$columnName}` {$type}";
     if (!$null) {
@@ -331,8 +334,12 @@ class Migration extends Base {
     if ($comment) {
       $query .= " COMMENT '{$comment}'";
     }
+
+    if ($extra) {
+      $query .= " {$extra}";
+    }
     if ($after) {
-      $query .= " AFTER {$after}";
+      $query .= " AFTER `{$after}`";
     }
     return $this->raw($query)->execute();
   }
@@ -522,6 +529,29 @@ class Migration extends Base {
     return $this->raw($query)->executeInsert();
   }
 
+  public function getPermissionId($dimension, $action) {
+    $permission = $this->select()->from('user_permissions')
+    ->where('dimension', '=', $dimension)
+    ->and('action', '=', $action)
+    ->execute(true);
+    if ($permission) {
+      return $permission->id;
+    } else {
+      return FALSE;
+    }
+  }
+
+  public function roleHasPermission($role, $dimension, $action)
+  {
+    $query = "SELECT * FROM `user_role_permissions_assignments` WHERE";
+    $roleSubQ = "SELECT `id` FROM `user_roles` WHERE `key`='$role'";
+    $query .= " `role_id` IN ($roleSubQ)";
+    $permissionSubQ = "SELECT `id` FROM `user_permissions` WHERE `action` = '$action' AND `dimension` = '$dimension'";
+    $query .= " AND permission_id IN ($permissionSubQ)";
+    $results = $this->raw($query)->executeSelect(FALSE);
+    return count($results) > 0;
+  }
+
   public function roleInheritanceExists($role, $inheritsFromRole)
   {
     $query  = "SELECT * FROM user_role_inherit_permissions";
@@ -538,5 +568,50 @@ class Migration extends Base {
       (SELECT `id` FROM `user_roles` WHERE `key`='$inheritsFromRole')
     )";
     return $this->raw($query)->executeInsert();
+  }
+
+  public function describeTableProperties(string $tableName)
+  {
+    echo PHP_EOL;
+    echo PHP_EOL;
+    $results = $this->raw("SHOW COLUMNS FROM {$tableName}")->execute();
+    while($column = $results->fetch_object()) {
+      $label = preg_replace('/_/', ' ', $column->Field);
+      $label = trim(ucfirst($label));
+      switch(TRUE) {
+        case stristr($column->Type, 'tinyint'):
+          $type = 'bool';
+          $default = "FALSE";
+          break;
+        case stristr($column->Type, 'int'):
+        case stristr($column->Type, 'decimal'):
+          $type = 'int';
+          $default = "0";
+          break;
+        case stristr($column->Type, 'enum'):
+        case stristr($column->Type, 'varchar'):
+        case stristr($column->Type, 'text'):
+        case stristr($column->Type, 'blob'):
+          $type = 'string';
+          $default = "''";
+          break;
+        case stristr($column->Type, 'timestamp'):
+          $type = 'int';
+          $default = "0";
+          break;
+        default:
+          var_dump($column);die();
+          break;
+      }
+      echo "/**" . PHP_EOL;
+      echo " * {$label}" . PHP_EOL;
+      echo " * @var {$type}" . PHP_EOL;
+      echo " */" . PHP_EOL;
+      echo "public {$type} \${$column->Field} = {$default};" . PHP_EOL;
+      echo PHP_EOL;
+    }
+
+    echo PHP_EOL;
+    echo PHP_EOL;
   }
 }

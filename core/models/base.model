@@ -106,7 +106,7 @@ class Base {
       ->where('id', '=', $id)
       ->execute(TRUE);
     if (!$data) {
-      $this->error("{$this->itemLabel} {$id} Not Found", 404, "{$this->itemlabel} Not Found");
+      $this->error("{$this->itemLabel} {$id} Not Found", 404, "{$this->itemLabel} Not Found");
     }
     return $data;
   }
@@ -193,6 +193,38 @@ class Base {
     unset($data['date_created']);
     unset($data['date_modified']);
     unset($data['id']);
+    foreach ($data as $prop => $value) {
+      if (property_exists($this, $prop)) {
+        switch (gettype($this->$prop)) {
+          case "boolean":
+            // $this->$prop = !!$value;
+            $data[$prop] = $value ? 1 : 0;
+            break;
+          case "integer":
+          case "double":
+          case "string":
+            if ($value){
+              $data[$prop] = $value;
+            } else {
+              $data[$prop] = NULL;
+            }
+            break;
+          case "array":
+          case "object":
+            if (!is_string($value)){
+              $data[$prop] = json_encode($value);
+            }
+            break;
+          default:
+            echo "$prop => $value";
+            die("unhandled type: " . gettype($this->$prop));
+            break;
+        }
+      }
+    }
+    if (!isset($data['created_by']) || !$data['created_by'] ) {
+      !$data['created_by'] = 0;
+    }
     return $data;
   }
 
@@ -210,6 +242,7 @@ class Base {
       $this->id = $this->insert($data)->execute();
     } else { // NO ID, create new.
       $data = $this->prepareSave();
+
       $original = (array) $this->getDataById($this->id);
       $diff = array_diff($data, $original);
       if ($diff) {
@@ -254,6 +287,22 @@ class Base {
   public function postDelete()
   {
     return $this;
+  }
+
+  protected function getAssetURI(string $field, bool $deleteOrphan = false)
+  {
+    $assetId = $this->$field;
+    if ($assetId) {
+      $asset = $this->select()->from('assets')->where('id', '=', $assetId)->execute(true);
+      if ($asset && $asset->uri && is_file($asset->uri)){
+        return $asset->uri;
+      } else if ($deleteOrphan) {
+        $this->$field = 0;
+        $this->update([$field => 0])->execute();
+        $this->$field = 0;
+      }
+    }
+    return '';
   }
 
   /**

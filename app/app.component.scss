@@ -24,12 +24,18 @@ main {
   grid-area: main;
   display: grid;
   grid-template-columns: auto 1fr;
+  grid-template-areas: 'menu content';
   width: 100%;
   overflow: hidden;
 }
 
+.app-menu {
+  grid-area: menu;
+}
+
 .main-content {
-  // padding: 10px;
+  grid-area: content;
+  padding: 10px;
   box-sizing: border-box;
   width: 100%;
   overflow: hidden;
