@@ -501,7 +501,7 @@ class Migration extends Base {
     return count($permission) > 0;
   }
 
-  public function createPermission($dimension, $action, $title = '', $description = '')
+  public function createPermission($dimension, $action, $title = '', $description = ''): int
   {
     $dimensionName = preg_replace('/_+/', ' ', $dimension);
     $dimensionName = ucwords($dimensionName);
@@ -532,12 +532,12 @@ class Migration extends Base {
   public function getPermissionId($dimension, $action) {
     $permission = $this->select()->from('user_permissions')
     ->where('dimension', '=', $dimension)
-    ->and('action', '=', $action)
+    ->and('action', '=', "'$action'")
     ->execute(true);
     if ($permission) {
       return $permission->id;
     } else {
-      return FALSE;
+      return $this->createPermission($dimension, $action);
     }
   }
 
@@ -546,7 +546,7 @@ class Migration extends Base {
     $query = "SELECT * FROM `user_role_permissions_assignments` WHERE";
     $roleSubQ = "SELECT `id` FROM `user_roles` WHERE `key`='$role'";
     $query .= " `role_id` IN ($roleSubQ)";
-    $permissionSubQ = "SELECT `id` FROM `user_permissions` WHERE `action` = '$action' AND `dimension` = '$dimension'";
+    $permissionSubQ = "SELECT `id` FROM `user_permissions` WHERE `action` IN('*', '$action') AND `dimension` = '$dimension'";
     $query .= " AND permission_id IN ($permissionSubQ)";
     $results = $this->raw($query)->executeSelect(FALSE);
     return count($results) > 0;
