@@ -26,6 +26,7 @@ export class TetraPage {
   };
   protected ready: boolean = false;
   protected routeParams: any = null;
+  protected styles: string = '';
 
   constructor(
     public core: CoreService,
@@ -54,6 +55,18 @@ export class TetraPage {
     });
   }
 
+  setStyles()
+  {
+    if (this.styles) {
+      const head = document.getElementsByTagName('head')[0];
+      const style = document.createElement('style');
+      style.type = 'text/css';
+      style.id = this.title;
+      style.appendChild(document.createTextNode(this.styles));
+      head.appendChild(style);
+    }
+  }
+
   checkPermissions() {
 
   }
@@ -67,7 +80,8 @@ export class TetraPage {
     this.activeRoute.paramMap.subscribe((params) => {
       this.routeParams = params;
     });
-    return this.onLoad();
+    this.onLoad();
+    this.setStyles();
   }
 
   getParam(key: string){
