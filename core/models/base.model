@@ -319,12 +319,21 @@ class Base {
     die(json_encode($data));
   }
 
+  protected function hiddenProps()
+  {
+    return Array();
+  }
+
   /**
    * Convert the model to a JSON String.
    */
   public function toString()
   {
-    $json = json_encode($this);
+    $data = $this;
+    foreach($this->hiddenProps() as $prop) {
+      unset($data->$prop);
+    }
+    $json = json_encode($data);
     return $json;
   }
 

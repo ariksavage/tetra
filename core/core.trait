@@ -166,5 +166,13 @@ trait Common {
   protected function timestamp(string $date = 'now') {
     return date('Y-m-d h:i:s', strtotime($date));
   }
+
+  public function baseUrl(){
+    return sprintf(
+      "%s://%s",
+      isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http',
+      $_SERVER['SERVER_NAME']
+    );
+  }
 }
 ?> 

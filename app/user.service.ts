@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CookiesService } from './cookies.service';
+import { CookiesService } from '@tetra/cookies.service';
 import { CoreService } from './core.service';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Observable, Subject, BehaviorSubject} from 'rxjs';
