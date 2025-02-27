@@ -35,7 +35,7 @@ export class CoreService {
       let h = hours.toString().padStart(2, '0');
       let i = now.getMinutes().toString().padStart(2, '0');
       let s = now.getSeconds().toString().padStart(2, '0');
-        console.log(`${h}:${i}:${s}${a}`, result.message);
+        // console.log(`${h}:${i}:${s}${a}`, result.message);
       }
       if (result.data) {
         return result.data;
