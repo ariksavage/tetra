@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
 
 @Component({
+		standalone: true,
   selector: '.field.wysiwyg',
   standalone: true,
   imports: [ CommonModule, FormsModule, EditorComponent],

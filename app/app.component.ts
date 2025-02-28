@@ -1,5 +1,4 @@
 import { Component, HostBinding } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { UserService } from '@tetra/user.service';
 import { User } from '@tetra/user';
 import { CoreService } from '@tetra/core.service';
@@ -7,11 +6,10 @@ import { AppService } from '@tetra/app.service';
 import { Title } from "@angular/platform-browser";
 
 @Component({
-  selector: 'tetra-app-root',
-  standalone: true,
-  imports: [RouterOutlet],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss'
+		standalone: true,
+    selector: 'tetra-app-root',
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss'
 })
 
 export class TetraAppComponent {

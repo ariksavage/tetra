@@ -1,0 +1,967 @@
+Searching 5350 files for "\@Component\(\{" (regex, case sensitive)
+
+~/kd-tetra/node_modules/@angular/animations/index.d.ts:
+  292   *
+  293   * ```typescript
+  294:  * @Component({
+  295   *   host: {
+  296   *     '[@myAnimationTrigger]': 'someExpression',
+  ...
+ 1029   *
+ 1030   * ```typescript
+ 1031:  * @Component({
+ 1032   *   selector: 'inner',
+ 1033   *   template: `
+ ....
+ 1134   * ```typescript
+ 1135   * import {trigger, transition, style, animate, query, stagger} from '@angular/animations';
+ 1136:  * @Component({
+ 1137   *   templateUrl: 'list.component.html',
+ 1138   *   animations: [
+ ....
+ 1443   *
+ 1444   * ```typescript
+ 1445:  * @Component({
+ 1446   *   selector: "my-component",
+ 1447   *   templateUrl: "my-component-tpl.html",
+ ....
+ 1480   * }
+ 1481   *
+ 1482:  * @Component({
+ 1483   *   selector: 'my-component',
+ 1484   *   templateUrl: 'my-component-tpl.html',
+ ....
+ 1506   *
+ 1507   * ```typescript
+ 1508:  * @Component({
+ 1509   *   selector: 'my-component',
+ 1510   *   template: `
+ ....
+ 1537   * import {Component, HostBinding} from '@angular/core';
+ 1538   *
+ 1539:  * @Component({
+ 1540   *   selector: 'app-component',
+ 1541   *   templateUrl: 'app.component.html',
+
+~/kd-tetra/node_modules/@angular/common/index.d.ts:
+  402   *
+  403   * ```
+  404:  * @Component({
+  405   *  selector: 'date-pipe',
+  406   *  template: `<div>
+  ...
+ 2399   *
+ 2400   * // ... or a standalone Component
+ 2401:  * @Component({
+ 2402   *   standalone: true
+ 2403   *   imports: [NgOptimizedImage],
+
+~/kd-tetra/node_modules/@angular/core/index.d.ts:
+  143   * ### Example
+  144   * ```ts
+  145:  * @Component({
+  146   *   selector: 'my-chart-cmp',
+  147   *   template: `<div #chart>{{ ... }}</div>`,
+  ...
+  203   * ### Example
+  204   * ```ts
+  205:  * @Component({
+  206   *   selector: 'my-chart-cmp',
+  207   *   template: `<div #chart>{{ ... }}</div>`,
+  ...
+  283   * ### Example
+  284   * ```ts
+  285:  * @Component({
+  286   *   selector: 'my-cmp',
+  287   *   template: `<span #content>{{ ... }}</span>`,
+  ...
+  342   * ### Example
+  343   * ```ts
+  344:  * @Component({
+  345   *   selector: 'my-cmp',
+  346   *   template: `<span #content>{{ ... }}</span>`,
+  ...
+ 1722       * }
+ 1723       *
+ 1724:      * @Component({
+ 1725       *   selector: 'greet',
+ 1726       *   viewProviders: [
+ ....
+ 2183   *
+ 2184   * ```ts
+ 2185:  * @Component({...})
+ 2186   * export class TestComponent {
+ 2187   *   headerEl = contentChild<ElementRef>('h');                    // Signal<ElementRef|undefined>
+ ....
+ 2441   *
+ 2442   * ```typescript
+ 2443:  * @Component({
+ 2444   *   standalone: true,
+ 2445   *   template: `Hello {{ name }}!`
+ ....
+ 2449   * }
+ 2450   *
+ 2451:  * @Component({
+ 2452   *   standalone: true,
+ 2453   *   template: `<div id="hello-component-host"></div>`
+ ....
+ 3253       *
+ 3254       * ```typescript
+ 3255:      * @Component({
+ 3256       *   selector: 'bank-account',
+ 3257       *   inputs: ['bankName', {name: 'id', alias: 'account-id'}],
+ ....
+ 3289       *
+ 3290       * ```typescript
+ 3291:      * @Component({
+ 3292       *   selector: 'child-dir',
+ 3293       *   outputs: [ 'bankNameChange' ],
+ ....
+ 3298       * }
+ 3299       *
+ 3300:      * @Component({
+ 3301       *   selector: 'main',
+ 3302       *   template: `
+ ....
+ 3334       * }
+ 3335       *
+ 3336:      * @Component({
+ 3337       *   selector: 'main',
+ 3338       *   template: `<child-dir #c="child"></child-dir>`
+ ....
+ 3356       *
+ 3357       * ```ts
+ 3358:      * @Component({
+ 3359       *   selector: 'someDir',
+ 3360       *   queries: {
+ ....
+ 4098   *
+ 4099   * ```html
+ 4100:  * @Component({
+ 4101   *   selector: 'zippy',
+ 4102   *   template: `
+ ....
+ 4336   * ### Circular standalone reference import example
+ 4337   * ```ts
+ 4338:  * @Component({
+ 4339   *   standalone: true,
+ 4340   *   imports: [ChildComponent],
+ ....
+ 4347   *
+ 4348   *
+ 4349:  * @Component({
+ 4350   *   standalone: true,
+ 4351   *   imports: [CommonModule, forwardRef(() => ParentComponent)],
+ ....
+ 4784       *   @HostBinding('id') get id() { return this.control.value?.length ? 'odd':  'even'; }
+ 4785       *
+ 4786:      * @Component({
+ 4787       *   selector: 'app',
+ 4788       *   template: `<input [(ngModel)]="prop">`,
+ ....
+ 4975       * }
+ 4976       *
+ 4977:      * @Component({
+ 4978       *   selector: 'app',
+ 4979       *   template: '<button counting>Increment</button>',
+ ....
+ 4987       * import { HostListener, Component } from "@angular/core";
+ 4988       *
+ 4989:      * @Component({
+ 4990       *   selector: 'app',
+ 4991       *   template: `<h1>Hello, you have pressed enter {{counter}} number of times!</h1> Press enter
+ ....
+ 5970   *
+ 5971   * ```ts
+ 5972:  * @Component({
+ 5973   *   ...
+ 5974   * })
+ ....
+ 6013       * ```typescript
+ 6014       * import { Component, Input, numberAttribute, booleanAttribute } from '@angular/core';
+ 6015:      * @Component({
+ 6016       *   selector: 'bank-account',
+ 6017       *   template: `
+ ....
+ 6036       * }
+ 6037       *
+ 6038:      * @Component({
+ 6039       *   selector: 'app',
+ 6040       *   template: `
+ ....
+ 6381       *
+ 6382       * ```
+ 6383:      * @Component({
+ 6384       *   viewProviders: [
+ 6385       *     IterableDiffers.extend([new ImmutableListDiffer()])
+ ....
+ 6534       *
+ 6535       * ```
+ 6536:      * @Component({
+ 6537       *   viewProviders: [
+ 6538       *     KeyValueDiffers.extend([new ImmutableMapDiffer()])
+ ....
+ 7581   * import {NgIf} from '@angular/common';
+ 7582   *
+ 7583:  * @Component({
+ 7584   *   selector: 'ng-zone-demo',
+ 7585   *   template: `
+ ....
+ 8602   * ### Example
+ 8603   * ```typescript
+ 8604:  * @Component({...})
+ 8605   * class Container {
+ 8606   *   @ViewChildren(Item) items:QueryList<Item>;
+ ....
+ 8877   *
+ 8878   * ```typescript
+ 8879:  * @Component({
+ 8880   *   standalone: true,
+ 8881   *   selector: 'foo-component',
+ ....
+ 11490   *
+ 11491   * ```ts
+ 11492:  * @Component({template: '<div #el></div><my-component #cmp />'})
+ 11493   * export class TestComponent {
+ 11494   *   divEl = viewChild<ElementRef>('el');                   // Signal<ElementRef|undefined>
+ .....
+ 11718   *
+ 11719   * ```typescript
+ 11720:  * @Component({
+ 11721   *   standalone: true,
+ 11722   *   selector: 'dynamic',
+ .....
+ 11727   * }
+ 11728   *
+ 11729:  * @Component({
+ 11730   *   standalone: true,
+ 11731   *   selector: 'app',
+ .....
+ 13660   * Example:
+ 13661   * ```
+ 13662:  * @Component({
+ 13663   *   selector: 'my-comp',
+ 13664   *   templateUrl: 'my-comp.html', // This requires asynchronous resolution
+ .....
+ 14083       *
+ 14084       * ```typescript
+ 14085:      * @Component({
+ 14086       *   selector: 'app-root',
+ 14087       *   template: `Number of ticks: {{numberOfTicks}}`
+ .....
+ 14129       * }
+ 14130       *
+ 14131:      * @Component({
+ 14132       *   selector: 'giant-list',
+ 14133       *   template: `
+ .....
+ 14144       * }
+ 14145       *
+ 14146:      * @Component({
+ 14147       *   selector: 'app',
+ 14148       *   providers: [DataProvider],
+ .....
+ 14182       * }
+ 14183       *
+ 14184:      * @Component({
+ 14185       *   selector: 'live-data',
+ 14186       *   inputs: ['live'],
+ .....
+ 14199       * }
+ 14200       *
+ 14201:      * @Component({
+ 14202       *   selector: 'app-root',
+ 14203       *   providers: [DataProvider],
+
+~/kd-tetra/node_modules/@angular/platform-browser/index.d.ts:
+   57   *
+   58   * ```typescript
+   59:  * @Component({
+   60   *   standalone: true,
+   61   *   template: 'Hello world!'
+
+~/kd-tetra/node_modules/@angular/router/index.d.ts:
+  109   *
+  110   * ```
+  111:  * @Component({templateUrl:'./my-component.html'})
+  112   * class MyComponent {
+  113   *   constructor(route: ActivatedRoute) {
+  ...
+ 2238   *
+ 2239   * ```
+ 2240:  * @Component({
+ 2241   *  selector: "app-hero",
+ 2242   *  templateUrl: "hero.component.html",
+ ....
+ 2374   *
+ 2375   * ```ts
+ 2376:  * @Component({template: ''})
+ 2377   * export class HeroDetailComponent {
+ 2378   *   private activatedRoute = inject(ActivatedRoute);
+ ....
+ 4044   *
+ 4045   * ```
+ 4046:  * @Component({templateUrl:'template.html'})
+ 4047   * class MyComponent {
+ 4048   *   constructor(router: Router) {
+ ....
+ 4079   *
+ 4080   * ```
+ 4081:  * @Component({templateUrl:'template.html'})
+ 4082   * class MyComponent {
+ 4083   *   constructor(router: Router) {
+ ....
+ 4286       *
+ 4287       * ```
+ 4288:      *  @Component({...})
+ 4289       *  class ChildComponent {
+ 4290       *    constructor(private router: Router, private route: ActivatedRoute) {}
+ ....
+ 4434   *
+ 4435   * ```
+ 4436:  * @Component({templateUrl:'template.html'})
+ 4437   * class MyComponent {
+ 4438   *   constructor(router: Router) {
+ ....
+ 4534   *
+ 4535   * ```
+ 4536:  * @Component({templateUrl:'template.html'})
+ 4537   * class MyComponent {
+ 4538   *   constructor(router: Router) {
+
+~/kd-tetra/pages/about/about.page.ts:
+    3  import { TetraPage } from '@tetra/page/page.component';
+    4  
+    5: @Component({
+    6    selector: "AboutPage",
+    7    standalone: true,
+
+~/kd-tetra/pages/admin/users/users.page.ts:
+    8  import { ListItemComponent } from '@app/list-item/list-item.component';
+    9  
+   10: @Component({
+   11    selector: "UsersPage",
+   12    standalone: true,
+
+~/kd-tetra/pages/course/course.page.ts:
+   11  import { Course } from '@app/course';
+   12  
+   13: @Component({
+   14    selector: "CoursePage",
+   15    standalone: true,
+
+~/kd-tetra/pages/course-player/course-player.page.ts:
+   11  import { Course } from '@app/course';
+   12  
+   13: @Component({
+   14    selector: "CoursePlayerPage",
+   15    standalone: true,
+
+~/kd-tetra/pages/courses/courses.page.ts:
+   10  import { Course } from '@app/course';
+   11  
+   12: @Component({
+   13    selector: "CoursePage",
+   14    standalone: true,
+
+~/kd-tetra/pages/enrollments/enrollments.page.ts:
+   10  import { Course } from '@app/course';
+   11  
+   12: @Component({
+   13    selector: "EnrollmentsPage",
+   14    standalone: true,
+
+~/kd-tetra/pages/home/home.page.ts:
+    4  
+    5  
+    6: @Component({
+    7    selector: "HomePage",
+    8    standalone: true,
+
+~/kd-tetra/pages/logout/logout.page.ts:
+    4  import { TetraPage } from '@tetra/page/page.component';
+    5  
+    6: @Component({
+    7    selector: "LogoutPage",
+    8    standalone: true,
+
+~/kd-tetra/src/app/app.component.ts:
+   10  import { TetraButtonComponent } from '@tetra/button/button.component';
+   11  
+   12: @Component({
+   13    selector: '.app-root',
+   14    standalone: true,
+
+~/kd-tetra/src/app/list-item/list-item.component.ts:
+    2  import { CommonModule } from '@angular/common';
+    3  
+    4: @Component({
+    5    selector: '.list-item',
+    6    standalone: true,
+
+~/kd-tetra/src/app/scorm-player/scorm-player.component.ts:
+   17  import { kdxAgent } from '@app/kdxapi/agent';
+   18  
+   19: @Component({
+   20    selector: 'div.scorm-player',
+   21    standalone: true,
+
+~/kd-tetra/tetra/app/app.component.ts:
+    6  import { Title } from "@angular/platform-browser";
+    7  
+    8: @Component({
+    9      selector: 'tetra-app-root',
+   10      templateUrl: './app.component.html',
+
+~/kd-tetra/tetra/app/app-menu/app-menu.component.ts:
+    4  import { CoreService } from '@tetra/core.service';
+    5  
+    6: @Component({
+    7      selector: 'nav.app-menu',
+    8      imports: [CommonModule],
+
+~/kd-tetra/tetra/app/breadcrumbs/breadcrumbs.component.ts:
+    3  import { AppService } from '@tetra/app.service';
+    4  
+    5: @Component({
+    6      selector: 'nav.breadcrumbs',
+    7      imports: [CommonModule],
+
+~/kd-tetra/tetra/app/button/button.component.ts:
+    2  import { CommonModule } from '@angular/common';
+    3  
+    4: @Component({
+    5      standalone: true,
+    6      selector: 'button',
+
+~/kd-tetra/tetra/app/edit-menu-item/edit-menu-item.component.ts:
+    4  import { TetraPopupComponent } from '@tetra/popup/popup.component';
+    5  
+    6: @Component({
+    7    standalone: true,
+    8    selector: '.edit-menu-item',
+
+~/kd-tetra/tetra/app/field/field.component.ts:
+    3  import { CommonModule } from '@angular/common';
+    4  
+    5: @Component({
+    6      imports: [CommonModule, FormsModule],
+    7      templateUrl: './field.component.html',
+
+~/kd-tetra/tetra/app/field-checkbox/field-checkbox.component.ts:
+    4  import { CommonModule } from '@angular/common';
+    5  
+    6: @Component({
+    7    selector: '.field.checkbox',
+    8    standalone: true,
+
+~/kd-tetra/tetra/app/field-color/field-color.component.ts:
+    5  import { ColorPickerModule } from 'ngx-color-picker'; // https://www.npmjs.com/package/ngx-color-picker
+    6  
+    7: @Component({
+    8    selector: '.field.color',
+    9    standalone: true,
+
+~/kd-tetra/tetra/app/field-date/field-date.component.ts:
+    4  import { CommonModule } from '@angular/common';
+    5  
+    6: @Component({
+    7    selector: '.field.date',
+    8    standalone: true,
+
+~/kd-tetra/tetra/app/field-email/field-email.component.ts:
+    4  import { CommonModule } from '@angular/common';
+    5  
+    6: @Component({
+    7    selector: '.field.email',
+    8    standalone: true,
+
+~/kd-tetra/tetra/app/field-file/field-file.component.ts:
+    6  import { Observable, Subject, EMPTY, throwError, finalize } from "rxjs";
+    7  
+    8: @Component({
+    9    selector: '.field.file',
+   10    standalone: true,
+
+~/kd-tetra/tetra/app/field-file-updated/field-file.component.ts:
+    6  import { Observable, Subject, EMPTY, throwError, finalize } from "rxjs";
+    7  
+    8: @Component({
+    9    selector: '.field.file',
+   10    standalone: true,
+
+~/kd-tetra/tetra/app/field-number/field-number.component.ts:
+    4  import { CommonModule } from '@angular/common';
+    5  
+    6: @Component({
+    7      standalone: true,
+    8      selector: '.field.number',
+
+~/kd-tetra/tetra/app/field-password/field-password.component.ts:
+    4  import { TetraFieldComponent } from '../field/field.component';
+    5  
+    6: @Component({
+    7      selector: '.field.password',
+    8      imports: [CommonModule, FormsModule],
+
+~/kd-tetra/tetra/app/field-phone/field-phone.component.ts:
+    4  import { CommonModule } from '@angular/common';
+    5  
+    6: @Component({
+    7    selector: '.field.phone',
+    8    standalone: true,
+
+~/kd-tetra/tetra/app/field-text/field-text.component.ts:
+    4  import { CommonModule } from '@angular/common';
+    5  
+    6: @Component({
+    7      standalone: true,
+    8      selector: '.field.text',
+
+~/kd-tetra/tetra/app/field-textarea/field-textarea.component.ts:
+    5  import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
+    6  
+    7: @Component({
+    8    selector: '.field.textarea',
+    9    standalone: true,
+
+~/kd-tetra/tetra/app/field-wysiwyg/field-wysiwyg.component.ts:
+    5  import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
+    6  
+    7: @Component({
+    8    selector: '.field.wysiwyg',
+    9    standalone: true,
+
+~/kd-tetra/tetra/app/filter-block/filter-block.component.ts:
+    1  import { Component } from '@angular/core';
+    2  
+    3: @Component({
+    4    selector: 'div.filter-block',
+    5    standalone: true,
+
+~/kd-tetra/tetra/app/filtered-list/filtered-list.component.ts:
+    4  import { TetraSpinnerComponent } from '../spinner/spinner.component';
+    5  
+    6: @Component({
+    7      selector: '.filtered-list',
+    8      imports: [CommonModule, FormsModule, TetraSpinnerComponent],
+
+~/kd-tetra/tetra/app/install/install.page.ts:
+    6  import { FieldPasswordComponent } from '@tetra/field-password/field-password.component';
+    7  
+    8: @Component({
+    9    standalone: true,
+   10    imports: [CommonModule, FieldTextComponent, FieldPasswordComponent],
+
+~/kd-tetra/tetra/app/login-form/login-form.component.ts:
+    6  
+    7  import { User } from '@tetra/user';
+    8: @Component({
+    9      standalone: true,
+   10      selector: '.login-form',
+
+~/kd-tetra/tetra/app/messages/messages.component.ts:
+    3  import { CommonModule } from '@angular/common';
+    4  
+    5: @Component({
+    6    selector: '.app-messages',
+    7    standalone: true,
+
+~/kd-tetra/tetra/app/page/page.component.ts:
+   10  
+   11  
+   12: @Component({
+   13      standalone: true,
+   14      selector: 'app-page',
+
+~/kd-tetra/tetra/app/pages/admin/config/config.page.ts:
+    8  import { SectionCollapseComponent } from '@tetra/section-collapse/section-collapse.component';
+    9  
+   10: @Component({
+   11      standalone: true,
+   12      selector: "AdminConfigPage",
+
+~/kd-tetra/tetra/app/pages/admin/config/menu/menu.page.ts:
+    6  
+    7  
+    8: @Component({
+    9      standalone: true,
+   10      selector: "AdminConfigMenuPage",
+
+~/kd-tetra/tetra/app/pages/admin/dashboard/dashboard.page.ts:
+    4  
+    5  
+    6: @Component({
+    7      standalone: true,
+    8      selector: "AdminDashboardPage",
+
+~/kd-tetra/tetra/app/pages/error/401/401.page.ts:
+    5  import { User } from '@tetra/user';
+    6  
+    7: @Component({
+    8    selector: "Error401Page",
+    9    standalone: true,
+
+~/kd-tetra/tetra/app/pages/error/404/404.page.ts:
+    5  import { User } from '@tetra/user';
+    6  
+    7: @Component({
+    8    standalone: true,
+    9      selector: "Error404Page",
+
+~/kd-tetra/tetra/app/pages/login/login.page.ts:
+    6  import { User } from '@tetra/user';
+    7  
+    8: @Component({
+    9      standalone: true,
+   10      selector: "LoginPage",
+
+~/kd-tetra/tetra/app/popup/popup.component.ts:
+    2  import { CommonModule } from '@angular/common';
+    3  
+    4: @Component({
+    5      standalone: true,
+    6      selector: '.popup',
+
+~/kd-tetra/tetra/app/section-collapse/section-collapse.component.ts:
+    2  import { CommonModule } from '@angular/common';
+    3  
+    4: @Component({
+    5      standalone: true,
+    6      selector: 'section.collapse',
+
+~/kd-tetra/tetra/app/spinner/spinner.component.ts:
+    1  import { Component } from '@angular/core';
+    2  
+    3: @Component({
+    4      standalone: true,
+    5      selector: 'i.spinner',
+
+~/kd-tetra/tetra/app/user-menu/user-menu.component.ts:
+    5  import { TetraButtonComponent } from '@tetra/button/button.component';
+    6  
+    7: @Component({
+    8      standalone: true,
+    9      selector: '.user-menu',
+
+99 matches across 50 files
+
+
+Searching 132 files for "\@Component\(\{" (regex, case sensitive)
+
+~/kd-tetra/pages/about/about.page.ts:
+    3  import { TetraPage } from '@tetra/page/page.component';
+    4  
+    5: @Component({
+    6    selector: "AboutPage",
+    7    standalone: true,
+
+~/kd-tetra/pages/admin/users/users.page.ts:
+    8  import { ListItemComponent } from '@app/list-item/list-item.component';
+    9  
+   10: @Component({
+   11    selector: "UsersPage",
+   12    standalone: true,
+
+~/kd-tetra/pages/course/course.page.ts:
+   11  import { Course } from '@app/course';
+   12  
+   13: @Component({
+   14    selector: "CoursePage",
+   15    standalone: true,
+
+~/kd-tetra/pages/course-player/course-player.page.ts:
+   11  import { Course } from '@app/course';
+   12  
+   13: @Component({
+   14    selector: "CoursePlayerPage",
+   15    standalone: true,
+
+~/kd-tetra/pages/courses/courses.page.ts:
+   10  import { Course } from '@app/course';
+   11  
+   12: @Component({
+   13    selector: "CoursePage",
+   14    standalone: true,
+
+~/kd-tetra/pages/enrollments/enrollments.page.ts:
+   10  import { Course } from '@app/course';
+   11  
+   12: @Component({
+   13    selector: "EnrollmentsPage",
+   14    standalone: true,
+
+~/kd-tetra/pages/home/home.page.ts:
+    4  
+    5  
+    6: @Component({
+    7    selector: "HomePage",
+    8    standalone: true,
+
+~/kd-tetra/pages/logout/logout.page.ts:
+    4  import { TetraPage } from '@tetra/page/page.component';
+    5  
+    6: @Component({
+    7    selector: "LogoutPage",
+    8    standalone: true,
+
+~/kd-tetra/src/app/app.component.ts:
+   10  import { TetraButtonComponent } from '@tetra/button/button.component';
+   11  
+   12: @Component({
+   13    selector: '.app-root',
+   14    standalone: true,
+
+~/kd-tetra/src/app/list-item/list-item.component.ts:
+    2  import { CommonModule } from '@angular/common';
+    3  
+    4: @Component({
+    5    selector: '.list-item',
+    6    standalone: true,
+
+~/kd-tetra/src/app/scorm-player/scorm-player.component.ts:
+   17  import { kdxAgent } from '@app/kdxapi/agent';
+   18  
+   19: @Component({
+   20    selector: 'div.scorm-player',
+   21    standalone: true,
+
+~/kd-tetra/tetra/app/app.component.ts:
+    6  import { Title } from "@angular/platform-browser";
+    7  
+    8: @Component({
+    9      selector: 'tetra-app-root',
+   10      templateUrl: './app.component.html',
+
+~/kd-tetra/tetra/app/app-menu/app-menu.component.ts:
+    4  import { CoreService } from '@tetra/core.service';
+    5  
+    6: @Component({
+    7      selector: 'nav.app-menu',
+    8      imports: [CommonModule],
+
+~/kd-tetra/tetra/app/breadcrumbs/breadcrumbs.component.ts:
+    3  import { AppService } from '@tetra/app.service';
+    4  
+    5: @Component({
+    6      selector: 'nav.breadcrumbs',
+    7      imports: [CommonModule],
+
+~/kd-tetra/tetra/app/button/button.component.ts:
+    2  import { CommonModule } from '@angular/common';
+    3  
+    4: @Component({
+    5      standalone: true,
+    6      selector: 'button',
+
+~/kd-tetra/tetra/app/edit-menu-item/edit-menu-item.component.ts:
+    4  import { TetraPopupComponent } from '@tetra/popup/popup.component';
+    5  
+    6: @Component({
+    7    standalone: true,
+    8    selector: '.edit-menu-item',
+
+~/kd-tetra/tetra/app/field/field.component.ts:
+    3  import { CommonModule } from '@angular/common';
+    4  
+    5: @Component({
+    6      imports: [CommonModule, FormsModule],
+    7      templateUrl: './field.component.html',
+
+~/kd-tetra/tetra/app/field-checkbox/field-checkbox.component.ts:
+    4  import { CommonModule } from '@angular/common';
+    5  
+    6: @Component({
+    7    selector: '.field.checkbox',
+    8    standalone: true,
+
+~/kd-tetra/tetra/app/field-color/field-color.component.ts:
+    5  import { ColorPickerModule } from 'ngx-color-picker'; // https://www.npmjs.com/package/ngx-color-picker
+    6  
+    7: @Component({
+    8    selector: '.field.color',
+    9    standalone: true,
+
+~/kd-tetra/tetra/app/field-date/field-date.component.ts:
+    4  import { CommonModule } from '@angular/common';
+    5  
+    6: @Component({
+    7    selector: '.field.date',
+    8    standalone: true,
+
+~/kd-tetra/tetra/app/field-email/field-email.component.ts:
+    4  import { CommonModule } from '@angular/common';
+    5  
+    6: @Component({
+    7    selector: '.field.email',
+    8    standalone: true,
+
+~/kd-tetra/tetra/app/field-file/field-file.component.ts:
+    6  import { Observable, Subject, EMPTY, throwError, finalize } from "rxjs";
+    7  
+    8: @Component({
+    9    selector: '.field.file',
+   10    standalone: true,
+
+~/kd-tetra/tetra/app/field-file-updated/field-file.component.ts:
+    6  import { Observable, Subject, EMPTY, throwError, finalize } from "rxjs";
+    7  
+    8: @Component({
+    9    selector: '.field.file',
+   10    standalone: true,
+
+~/kd-tetra/tetra/app/field-number/field-number.component.ts:
+    4  import { CommonModule } from '@angular/common';
+    5  
+    6: @Component({
+    7      standalone: true,
+    8      selector: '.field.number',
+
+~/kd-tetra/tetra/app/field-password/field-password.component.ts:
+    4  import { TetraFieldComponent } from '../field/field.component';
+    5  
+    6: @Component({
+    7      selector: '.field.password',
+    8      imports: [CommonModule, FormsModule],
+
+~/kd-tetra/tetra/app/field-phone/field-phone.component.ts:
+    4  import { CommonModule } from '@angular/common';
+    5  
+    6: @Component({
+    7    selector: '.field.phone',
+    8    standalone: true,
+
+~/kd-tetra/tetra/app/field-text/field-text.component.ts:
+    4  import { CommonModule } from '@angular/common';
+    5  
+    6: @Component({
+    7      standalone: true,
+    8      selector: '.field.text',
+
+~/kd-tetra/tetra/app/field-textarea/field-textarea.component.ts:
+    5  import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
+    6  
+    7: @Component({
+    8    selector: '.field.textarea',
+    9    standalone: true,
+
+~/kd-tetra/tetra/app/field-wysiwyg/field-wysiwyg.component.ts:
+    5  import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
+    6  
+    7: @Component({
+    8    selector: '.field.wysiwyg',
+    9    standalone: true,
+
+~/kd-tetra/tetra/app/filter-block/filter-block.component.ts:
+    1  import { Component } from '@angular/core';
+    2  
+    3: @Component({
+    4    selector: 'div.filter-block',
+    5    standalone: true,
+
+~/kd-tetra/tetra/app/filtered-list/filtered-list.component.ts:
+    4  import { TetraSpinnerComponent } from '../spinner/spinner.component';
+    5  
+    6: @Component({
+    7      selector: '.filtered-list',
+    8      imports: [CommonModule, FormsModule, TetraSpinnerComponent],
+
+~/kd-tetra/tetra/app/install/install.page.ts:
+    6  import { FieldPasswordComponent } from '@tetra/field-password/field-password.component';
+    7  
+    8: @Component({
+    9    standalone: true,
+   10    imports: [CommonModule, FieldTextComponent, FieldPasswordComponent],
+
+~/kd-tetra/tetra/app/login-form/login-form.component.ts:
+    6  
+    7  import { User } from '@tetra/user';
+    8: @Component({
+    9      standalone: true,
+   10      selector: '.login-form',
+
+~/kd-tetra/tetra/app/messages/messages.component.ts:
+    3  import { CommonModule } from '@angular/common';
+    4  
+    5: @Component({
+    6    selector: '.app-messages',
+    7    standalone: true,
+
+~/kd-tetra/tetra/app/page/page.component.ts:
+   10  
+   11  
+   12: @Component({
+   13      standalone: true,
+   14      selector: 'app-page',
+
+~/kd-tetra/tetra/app/pages/admin/config/config.page.ts:
+    8  import { SectionCollapseComponent } from '@tetra/section-collapse/section-collapse.component';
+    9  
+   10: @Component({
+   11      standalone: true,
+   12      selector: "AdminConfigPage",
+
+~/kd-tetra/tetra/app/pages/admin/config/menu/menu.page.ts:
+    6  
+    7  
+    8: @Component({
+    9      standalone: true,
+   10      selector: "AdminConfigMenuPage",
+
+~/kd-tetra/tetra/app/pages/admin/dashboard/dashboard.page.ts:
+    4  
+    5  
+    6: @Component({
+    7      standalone: true,
+    8      selector: "AdminDashboardPage",
+
+~/kd-tetra/tetra/app/pages/error/401/401.page.ts:
+    5  import { User } from '@tetra/user';
+    6  
+    7: @Component({
+    8    selector: "Error401Page",
+    9    standalone: true,
+
+~/kd-tetra/tetra/app/pages/error/404/404.page.ts:
+    5  import { User } from '@tetra/user';
+    6  
+    7: @Component({
+    8    standalone: true,
+    9      selector: "Error404Page",
+
+~/kd-tetra/tetra/app/pages/login/login.page.ts:
+    6  import { User } from '@tetra/user';
+    7  
+    8: @Component({
+    9      standalone: true,
+   10      selector: "LoginPage",
+
+~/kd-tetra/tetra/app/popup/popup.component.ts:
+    2  import { CommonModule } from '@angular/common';
+    3  
+    4: @Component({
+    5      standalone: true,
+    6      selector: '.popup',
+
+~/kd-tetra/tetra/app/section-collapse/section-collapse.component.ts:
+    2  import { CommonModule } from '@angular/common';
+    3  
+    4: @Component({
+    5      standalone: true,
+    6      selector: 'section.collapse',
+
+~/kd-tetra/tetra/app/spinner/spinner.component.ts:
+    1  import { Component } from '@angular/core';
+    2  
+    3: @Component({
+    4      standalone: true,
+    5      selector: 'i.spinner',
+
+~/kd-tetra/tetra/app/user-menu/user-menu.component.ts:
+    5  import { TetraButtonComponent } from '@tetra/button/button.component';
+    6  
+    7: @Component({
+    8      standalone: true,
+    9      selector: '.user-menu',
+
+45 matches across 45 files

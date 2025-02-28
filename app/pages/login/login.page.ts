@@ -6,11 +6,11 @@ import { TetraLoginForm } from '@tetra/login-form/login-form.component';
 import { User } from '@tetra/user';
 
 @Component({
-  selector: "LoginPage",
-  standalone: true,
-  imports: [ CommonModule, TetraLoginForm],
-  templateUrl: './login.page.html',
-  styleUrl: './login.page.scss',
+		standalone: true,
+    selector: "LoginPage",
+    imports: [CommonModule, TetraLoginForm],
+    templateUrl: './login.page.html',
+    styleUrl: './login.page.scss'
 })
 
 export class LoginPage extends TetraPage {

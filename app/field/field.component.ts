@@ -3,10 +3,10 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  standalone: true,
-  imports: [ CommonModule, FormsModule ],
-  templateUrl: './field.component.html',
-  styleUrl: './field.component.scss'
+		standalone: true,
+    imports: [CommonModule, FormsModule],
+    templateUrl: './field.component.html',
+    styleUrl: './field.component.scss'
 })
 export class TetraFieldComponent implements OnInit {
   @Input() label: string = '';

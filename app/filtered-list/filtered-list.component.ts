@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { TetraSpinnerComponent } from '../spinner/spinner.component';
 
 @Component({
-  selector: '.filtered-list',
-  standalone: true,
-  imports: [CommonModule, FormsModule, TetraSpinnerComponent],
-  templateUrl: './filtered-list.component.html',
-  styleUrl: './filtered-list.component.scss'
+		standalone: true,
+    selector: '.filtered-list',
+    imports: [CommonModule, FormsModule, TetraSpinnerComponent],
+    templateUrl: './filtered-list.component.html',
+    styleUrl: './filtered-list.component.scss'
 })
 export class TetraFilteredListComponent implements OnInit {
   loaded: boolean = false;

@@ -1,13 +1,12 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TetraFieldTextComponent } from '@tetra/field-text/field-text.component';
-import { TetraFieldNumberComponent } from '@tetra/field-number/field-number.component';
 import { TetraPopupComponent } from '@tetra/popup/popup.component';
 
 @Component({
+	standalone: true,
   selector: '.edit-menu-item',
-  standalone: true,
-  imports: [ CommonModule, TetraFieldTextComponent, TetraFieldNumberComponent, TetraPopupComponent ],
+  imports: [CommonModule, TetraFieldTextComponent, TetraPopupComponent],
   templateUrl: './edit-menu-item.component.html',
   styleUrl: './edit-menu-item.component.scss'
 })

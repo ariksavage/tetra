@@ -6,7 +6,7 @@ import { FieldTextComponent } from '@tetra/field-text/field-text.component';
 import { FieldPasswordComponent } from '@tetra/field-password/field-password.component';
 
 @Component({
-  standalone: true,
+		standalone: true,“
   imports: [CommonModule, FieldTextComponent, FieldPasswordComponent],
   templateUrl: './install.page.html',
   styleUrl: './install.page.scss'

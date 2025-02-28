@@ -1,5 +1,7 @@
 // Load variables, mixins from parent app
-@import '../styles/_global';
+@use '../styles/_global';
+@use "../styles/variables";
+
 :root {
   --primary: #ff00a4; // apti-pink
   --primary-text: #000;
@@ -28,7 +30,7 @@ body {
 }
 
 %screen-sm-only {
-  @media screen and (min-width: #{$screen-sm}) {
+  @media screen and (min-width: #{variables.$screen-sm}) {
     display: none;
   }
 }

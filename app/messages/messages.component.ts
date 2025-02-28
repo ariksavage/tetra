@@ -3,6 +3,7 @@ import { MessageService } from '../message.service';
 import { CommonModule } from '@angular/common';
 
 @Component({
+		standalone: true,
   selector: '.app-messages',
   standalone: true,
   imports: [CommonModule],

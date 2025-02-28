@@ -6,11 +6,11 @@ import { UserService } from '@tetra/user.service';
 
 import { User } from '@tetra/user';
 @Component({
-  selector: '.login-form',
-  standalone: true,
-  imports: [ CommonModule, TetraFieldTextComponent, TetraFieldPasswordComponent ],
-  templateUrl: './login-form.component.html',
-  styleUrl: './login-form.component.scss'
+		standalone: true,
+    selector: '.login-form',
+    imports: [CommonModule, TetraFieldTextComponent, TetraFieldPasswordComponent],
+    templateUrl: './login-form.component.html',
+    styleUrl: './login-form.component.scss'
 })
 export class TetraLoginForm {
   username: string = '';
