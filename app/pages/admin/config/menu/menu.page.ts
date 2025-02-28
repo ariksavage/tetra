@@ -6,11 +6,11 @@ import { TetraEditMenuItemComponent } from '@tetra/edit-menu-item/edit-menu-item
 
 
 @Component({
-  selector: "AdminConfigMenuPage",
-  standalone: true,
-  imports: [ CommonModule, TetraEditMenuItemComponent],
-  templateUrl: './menu.page.html',
-  styleUrl: './menu.page.scss',
+		standalone: true,
+    selector: "AdminConfigMenuPage",
+    imports: [CommonModule, TetraEditMenuItemComponent],
+    templateUrl: './menu.page.html',
+    styleUrl: './menu.page.scss'
 })
 
 export class AdminConfigMenuPage extends TetraPage {

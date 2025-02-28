@@ -10,11 +10,11 @@ import { User } from '@tetra/user';
 
 
 @Component({
-  selector: 'app-page',
-  standalone: true,
-  imports: [],
-  templateUrl: './page.component.html',
-  styleUrl: './page.component.scss'
+		standalone: true,
+    selector: 'app-page',
+    imports: [],
+    templateUrl: './page.component.html',
+    styleUrl: './page.component.scss'
 })
 export class TetraPage {
   public title: string = 'Page';

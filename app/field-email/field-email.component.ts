@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @Component({
+		standalone: true,
   selector: '.field.email',
   standalone: true,
   imports: [ CommonModule, FormsModule ],

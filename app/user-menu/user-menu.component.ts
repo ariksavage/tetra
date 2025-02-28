@@ -5,11 +5,11 @@ import { User } from '@tetra/user';
 import { TetraButtonComponent } from '@tetra/button/button.component';
 
 @Component({
-  selector: '.user-menu',
-  standalone: true,
-  imports: [CommonModule, TetraButtonComponent],
-  templateUrl: './user-menu.component.html',
-  styleUrl: './user-menu.component.scss'
+		standalone: true,
+    selector: '.user-menu',
+    imports: [CommonModule, TetraButtonComponent],
+    templateUrl: './user-menu.component.html',
+    styleUrl: './user-menu.component.scss'
 })
 export class TetraUserMenuComponent {
   user: User = new User();

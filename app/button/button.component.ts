@@ -2,11 +2,11 @@ import { Component, Input, HostBinding } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: 'button',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './button.component.html',
-  styleUrl: './button.component.scss'
+		standalone: true,
+    selector: 'button',
+    imports: [CommonModule],
+    templateUrl: './button.component.html',
+    styleUrl: './button.component.scss'
 })
 export class TetraButtonComponent {
   @Input() icon: string = '';

@@ -4,11 +4,11 @@ import { CommonModule } from '@angular/common';
 import { CoreService } from '@tetra/core.service';
 
 @Component({
-  selector: 'nav.app-menu',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './app-menu.component.html',
-  styleUrl: './app-menu.component.scss'
+		standalone: true,
+    selector: 'nav.app-menu',
+    imports: [CommonModule],
+    templateUrl: './app-menu.component.html',
+    styleUrl: './app-menu.component.scss'
 })
 export class TetraAppMenuComponent {
   routeConfig : Array<any> = [];

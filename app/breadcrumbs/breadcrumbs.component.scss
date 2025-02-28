@@ -1,4 +1,4 @@
-@import '../../../styles/_global';
+@use '../../../styles/_global';
 .breadcrumbs-list {
   list-style-type: none;
   margin: 0;
@@ -10,7 +10,7 @@
   margin: 0 0 1em;
 
   &::after {
-    content: $breadcrumb-separator;
+    content: #{global.$breadcrumb-separator};
     margin: 0 1ex;
   }
 }

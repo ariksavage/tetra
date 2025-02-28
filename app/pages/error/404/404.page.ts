@@ -5,11 +5,11 @@ import { TetraPage } from '@tetra/page/page.component';
 import { User } from '@tetra/user';
 
 @Component({
-  selector: "Error404Page",
-  standalone: true,
-  imports: [ CommonModule ],
-  templateUrl: './404.page.html',
-  styleUrl: './404.page.scss',
+		standalone: true,
+    selector: "Error404Page",
+    imports: [CommonModule],
+    templateUrl: './404.page.html',
+    styleUrl: './404.page.scss'
 })
 
 export class Error404Page extends TetraPage {

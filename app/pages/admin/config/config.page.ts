@@ -8,13 +8,14 @@ import { TetraButtonComponent } from '@tetra/button/button.component';
 import { SectionCollapseComponent } from '@tetra/section-collapse/section-collapse.component';
 
 @Component({
-  selector: "AdminConfigPage",
-  standalone: true,
-  imports: [
-    TetraButtonComponent,
-    CommonModule, TetraFieldNumberComponent, TetraFieldTextComponent, TetraButtonComponent, SectionCollapseComponent ],
-  templateUrl: './config.page.html',
-  styleUrl: './config.page.scss',
+		standalone: true,
+    selector: "AdminConfigPage",
+    imports: [
+        TetraButtonComponent,
+        CommonModule, TetraFieldNumberComponent, TetraFieldTextComponent, TetraButtonComponent, SectionCollapseComponent
+    ],
+    templateUrl: './config.page.html',
+    styleUrl: './config.page.scss'
 })
 
 export class AdminConfigPage extends TetraPage {

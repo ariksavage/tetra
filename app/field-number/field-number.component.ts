@@ -4,11 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: '.field.number',
-  standalone: true,
-  imports: [ CommonModule, FormsModule ],
-  templateUrl: './field-number.component.html',
-  styleUrl: './field-number.component.scss'
+		standalone: true,
+    selector: '.field.number',
+    imports: [CommonModule, FormsModule],
+    templateUrl: './field-number.component.html',
+    styleUrl: './field-number.component.scss'
 })
 export class TetraFieldNumberComponent extends TetraFieldComponent {
   override type = 'number';

@@ -2,11 +2,11 @@ import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
-  selector: '.popup',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './popup.component.html',
-  styleUrl: './popup.component.scss'
+		standalone: true,
+    selector: '.popup',
+    imports: [CommonModule],
+    templateUrl: './popup.component.html',
+    styleUrl: './popup.component.scss'
 })
 export class TetraPopupComponent {
   @Input() title: string = '';

@@ -5,6 +5,7 @@ import { TetraPage } from '@tetra/page/page.component';
 import { User } from '@tetra/user';
 
 @Component({
+		standalone: true,
   selector: "Error401Page",
   standalone: true,
   imports: [ CommonModule ],

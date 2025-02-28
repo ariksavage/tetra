@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { ColorPickerModule } from 'ngx-color-picker'; // https://www.npmjs.com/package/ngx-color-picker
 
 @Component({
+		standalone: true,
   selector: '.field.color',
   standalone: true,
   imports: [ CommonModule, FormsModule, ColorPickerModule ],
