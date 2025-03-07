@@ -39,9 +39,9 @@ class Base {
 
   /**
    * Item ID
-   * @var Integer
+   * @var Integer|String
    */
-  public int $id = 0;
+  public int|string $id = 0;
 
   /**
    * Date Created
