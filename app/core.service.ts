@@ -135,6 +135,10 @@ export class CoreService {
       return this.handleError(url, response.error)
     });
   }
+
+  getUrl(url: string) {
+    return this.http.get(url, this.getConfig()).toPromise();
+  }
   /**
    * http PATCH request
    *
@@ -172,6 +176,10 @@ export class CoreService {
     });
   }
 
+  postUrl(url: string, payload: any = {}) {
+    return this.http.post(url, payload, this.getConfig()).toPromise();
+  }
+
   /**
    * http PUT request
    *
@@ -189,6 +197,10 @@ export class CoreService {
     }, (response: any) => {
       return this.handleError(url, response.error)
     });
+  }
+
+  putUrl(url: string, payload: any) {
+    return this.http.put(url, payload, this.getConfig()).toPromise();
   }
 
   /**
