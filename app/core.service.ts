@@ -128,7 +128,6 @@ export class CoreService {
    */
   get(type: string, action: string = '', id: any = null, id2: any = null) {
     let url = this.url(type, action, id, id2);
-    console.log('GET', url);
     return this.http.get(url, this.getConfig()).toPromise().then((result: any) => {
       return this.handleResult(result, type);
     }, (response: any) => {
