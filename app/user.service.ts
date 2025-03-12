@@ -22,7 +22,14 @@ export class UserService {
   ) {}
 
   getUser(): Observable<User> {
+    console.log('get user');
+    const self = this;
     return this.user.asObservable();
+    if (this._user){
+      setTimeout(function(){
+        self.setUser(self._user);
+      }, 1000);
+    }
   }
 
   setUser(user: User) {

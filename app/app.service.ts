@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { Route, Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@angular/router';
 import { CoreService } from './core.service';
+import { UserService } from '@tetra/user.service';
 import { Title } from "@angular/platform-browser";
 
 @Injectable({
@@ -30,7 +31,7 @@ export class AppService {
   private error = new BehaviorSubject<any>({});
   replacements: Array<any> = [];
 
-  constructor(private router: Router, protected activeRoute: ActivatedRoute, protected title:Title, protected core: CoreService) {
+  constructor(private router: Router, protected activeRoute: ActivatedRoute, protected title:Title, protected core: CoreService, protected userService: UserService) {
     router.events.subscribe((val: any) => {
       if (val instanceof NavigationEnd) {
         this.mapBreadcrumbs();
@@ -87,6 +88,7 @@ export class AppService {
       if (data && data.app && data.app.config){
         this.setConfig(data.app.config);
       }
+      this.userService.loginByToken();
     });
   }
 
