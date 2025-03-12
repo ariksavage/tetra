@@ -53,7 +53,9 @@ class InsertQuery extends Query
   public function __construct(array $data)
   {
     parent::__construct('INSERT', '');
-    // unset($data['id']);
+    if (isset($data['id']) && !$data['id']){
+      unset($data['id']);
+    }
     $this->data = $data;
   }
 
