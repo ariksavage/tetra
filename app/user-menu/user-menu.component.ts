@@ -12,13 +12,15 @@ import { TetraButtonComponent } from '@tetra/button/button.component';
     styleUrl: './user-menu.component.scss'
 })
 export class TetraUserMenuComponent {
-  user: User = new User();
+  user?: User;
   open: boolean = false;
 
-  constructor(
-    private userService: UserService
-  ){
-   userService.getUser().subscribe((user: User) => this.user = user);
+  constructor(private userService: UserService) {
+    userService.getUser().subscribe((user: User | null) => {
+      if (user) {
+        this.user = user;
+      }
+    });
   }
 
   loggedIn() {

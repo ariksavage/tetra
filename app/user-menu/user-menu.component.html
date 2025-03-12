@@ -1,12 +1,13 @@
-
 <button class="toggle icon-only primary" [ngClass]="{'open': open}" (click)="toggle()" icon="user"  [iconStyle]="loggedIn() ? 'solid' : 'regular'"></button>
 <nav class="dropdown" [ngClass]="{'open': open}">
   <div class="dropdown-content">
-    <span class="logged-in" *ngIf="loggedIn()">Logged in as: {{user.name()}}</span>
-    <ul class="dropdown-list">
+    <span class="logged-in" *ngIf="loggedIn() && user">Logged in as: {{user.name()}}</span>
+    <ul class="dropdown-list" *ngIf="loggedIn() || !user">
       <li *ngIf="!loggedIn()" class="dropdown-item login">
         <a class="dropdown-link" href="/login">Log In</a>
       </li>
+    </ul>
+    <ul *ngIf="loggedIn() && user">
       <li *ngIf="loggedIn()" class="dropdown-item logout">
         <a class="dropdown-link" href="/logout" (click)="logout()">Logout</a>
       </li>
