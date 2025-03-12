@@ -24,7 +24,7 @@ export class AdminConfigMenuPage extends TetraPage {
 
   getMenu(rootPath: string = '') {
     const self = this;
-    return this.core.get('core', 'menu-tree', rootPath).then((data) => {
+    return this.core.get('app', 'menu-tree', rootPath).then((data) => {
       this.menu = data.menu;
     })
   }
