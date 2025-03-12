@@ -84,7 +84,9 @@ export class AppService {
 
   init() {
     return this.core.get('app', 'index').then((data: any) => {
-      this.setConfig(data.app.config);
+      if (data && data.app && data.app.config){
+        this.setConfig(data.app.config);
+      }
     });
   }
 
