@@ -49,35 +49,25 @@ export class Message {
     const elapsed = new Date().getTime() - this.date.getTime();
 
     if (elapsed < msMinute) {
-      n = Math.round(elapsed/1000);
+      n = Math.round(elapsed / msSecond);
       str = n + ' second';
-      str += n == 1 ? ' ago' : 's ago';
     } else if (elapsed < msHour) {
-      // return Math.round(elapsed/msMinute) + ' minutes ago';
-      n = Math.round(elapsed/msMinute);
+      n = Math.round(elapsed / msMinute);
       str = n + ' minute';
-      str += n == 1 ? ' ago' : 's ago';
     } else if (elapsed < msDay ) {
-      // return Math.round(elapsed/msHour ) + ' hours ago';
-      n = Math.round(elapsed/msHour);
+      n = Math.round(elapsed / msHour);
       str = n + ' hour';
-      str += n == 1 ? ' ago' : 's ago';
     } else if (elapsed < msMonth) {
-      // return 'approximately ' + Math.round(elapsed/msDay) + ' days ago';
-      n = Math.round(elapsed/msDay);
+      n = Math.round(elapsed / msDay);
       str = 'approximately' + n + ' day';
-      str += n == 1 ? ' ago' : 's ago';
     } else if (elapsed < msYear) {
-      // return 'approximately ' + Math.round(elapsed/msMonth) + ' months ago';
-      n = Math.round(elapsed/msMonth);
+      n = Math.round(elapsed / msMonth);
       str = 'approximately' + n + ' month';
-      str += n == 1 ? ' ago' : 's ago';
     } else {
-      // return 'approximately ' + Math.round(elapsed/msYear ) + ' years ago';
-      n = Math.round(elapsed/msYear);
+      n = Math.round(elapsed / msYear);
       str = 'approximately' + n + ' year';
-      str += n == 1 ? ' ago' : 's ago';
     }
+    str += n == 1 ? ' ago' : 's ago';
 
     return str;
   }
