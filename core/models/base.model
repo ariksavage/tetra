@@ -301,7 +301,7 @@ class Base {
         $this->update([$field => 0])->execute();
         $this->$field = 0;
       } else {
-        die("$field ($assetId) NOT Found");
+        return '';
       }
     }
     return '';

@@ -349,10 +349,18 @@ class Query
    * @param  string $direction  Direction in which the column will be sorted (ASC / DESC)
    * @return $this
    */
-  public function orderBy(string $column, string $direction = 'ASC')
+  public function orderBy(string $column, string $direction = 'ASC', bool $escape = true)
   {
-    $orderColumn = $this->escapeColumn($column);
-    $this->orderConditions[] = "{$orderColumn} {$direction}";
+    if ($escape){
+      $orderColumn = $this->escapeColumn($column);
+    } else {
+      $orderColumn = $column;
+    }
+    $condition = "{$orderColumn}";
+    if ($direction){
+      $condition .= " {$direction}";
+    }
+    $this->orderConditions[] = $condition;
     return $this;
   }
 

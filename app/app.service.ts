@@ -4,6 +4,7 @@ import { Route, Router, ActivatedRoute, NavigationEnd, NavigationStart } from '@
 import { CoreService } from './core.service';
 import { UserService } from '@tetra/user.service';
 import { Title } from "@angular/platform-browser";
+import { MessageService } from '@tetra/message.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,11 +32,18 @@ export class AppService {
   private error = new BehaviorSubject<any>({});
   replacements: Array<any> = [];
 
-  constructor(private router: Router, protected activeRoute: ActivatedRoute, protected title:Title, protected core: CoreService, protected userService: UserService) {
+  constructor(private router: Router, protected activeRoute: ActivatedRoute,
+  protected title:Title,
+  protected core: CoreService,
+  protected userService: UserService,
+  protected messages: MessageService) {
     router.events.subscribe((val: any) => {
       if (val instanceof NavigationEnd) {
         this.mapBreadcrumbs();
       }
+    });
+    messages.getMessage().subscribe((message: any) => {
+      // console.log('app message', message);
     });
   }
 

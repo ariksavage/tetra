@@ -69,6 +69,7 @@ if ($APIclass && class_exists($APIclass)) {
  * Call the API method as defined by the request type and action.
  */
 $fn = "$action$method";
+
 if (method_exists($api, $fn)) {
   if ($id && $id2) {
     $api->$fn($id, $id2);
