@@ -78,7 +78,7 @@ class SelectQuery extends \Core\Database\Query
   {
     $field = $this->escapeColumn($column);
     if ($alias) {
-      $field .= " AS $alias";
+      $field .= " AS `$alias`";
     }
     $this->fields[] = $field;
 

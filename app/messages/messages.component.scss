@@ -1,30 +1,97 @@
 @use '../../../styles/_global';
+
 :host {
-  &:empty {
-    display: none;
+  position: relative;
+  z-index: 20;
+}
+
+.messages-button {
+  position: relative;
+  border: none;
+  background: transparent;
+
+  &:hover,
+  &:focus {
+    color: var(--primary);
+  }
+
+  .badge {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background: red;
+    color: #fff;
+    border-radius: 1em;
+    font-size: 10px;
+    padding: .2em .5em;
   }
 }
+.drawer {
+  position: fixed;
+  z-index: 10;
+  right: 0;
+  top: 0;
+  background: var(--body);
+  width: 20vw;
+  transition: transform .3s;
+  height: 100vh;
+  border-left: 1px solid var(--border);
+  transform: translateX(100%);
+  overflow: auto;
+
+  &.open {
+    transform: translateX(0);
+    box-shadow: -2px 2px 6px rgba(0, 0, 0, .3);
+  }
+
+  .close {
+    margin: 10px;
+    border: none;
+    background: transparent;
+  }
+}
+
 .messages {
-  display: block;
-  list-style-type: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
+  list-style-type: none;
 }
 
 .message {
-  display: flex;
-  align-items: center;
-  border: 1px solid transparent;
-  background: var(--body, #fff);
+  position: relative;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 10px 10px 10px 30px;
+  margin-bottom: 10px;
 
+  .dismiss-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 10px;
+    border: none;
+    background: transparent;
+  }
 
-  &.error {
-    border-color: red;
-    color: red;
+  .message-text {
+    margin: 0;
+  }
+
+  .date {
+    font-size: .8em;
+    text-align: right;
+    margin: 0;
   }
 }
 
-.message-text {
-  flex: 1 0 auto;
-  padding: 0 1ex;
+.none {
+  margin: 0;
+  padding: 0 10px;
+}
+
+.dismiss-all {
+  float: right;
+  margin: 10px;
+  border: none;
+  background: transparent;
 }

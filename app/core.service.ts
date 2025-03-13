@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ErrorService } from '@tetra/error.service';
+import { MessageService } from '@tetra/message.service';
 import { Router } from '@angular/router';
 
 
@@ -12,6 +13,7 @@ export class CoreService {
   private authToken: string = '';
 
   constructor(
+    private messages: MessageService,
     private errorService: ErrorService,
     private http: HttpClient,
     private route: Router
@@ -22,19 +24,14 @@ export class CoreService {
   }
 
   /**
-   * Set messages, return data.
+   * Set message, return data.
    * @var Object result Response from Core
    */
   handleResult(result: any = null, key: string = '') {
     if (result) {
       if (result.message) {
-        let now = new Date();
-      let hours = now.getHours();
-      let a = hours > 12 ? 'pm' : 'am';
-      hours = hours > 12 ? hours - 12 : hours;
-      let h = hours.toString().padStart(2, '0');
-      let i = now.getMinutes().toString().padStart(2, '0');
-      let s = now.getSeconds().toString().padStart(2, '0');
+
+        this.messages.add(result.message, key);
         // console.log(`${h}:${i}:${s}${a}`, result.message);
       }
       if (result.data) {
