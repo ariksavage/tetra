@@ -1,8 +1,10 @@
 import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ErrorService } from '@tetra/error.service';
 import { MessageService } from '@tetra/message.service';
 import { Router } from '@angular/router';
+import { saveAs } from 'file-saver';
 
 
 @Injectable({
@@ -79,11 +81,12 @@ export class CoreService {
    * Set headers for http requests
    */
   getConfig() {
+    // const config: any = {};
     const headers = new HttpHeaders();
     if (this.authToken) {
       headers.set('Authorization', `Bearer ${this.authToken}`);
     }
-    // headers.set('responseType',  'application/json');
+    headers.set('responseType',  'application/json');
     return { headers };
   }
 
@@ -218,6 +221,12 @@ export class CoreService {
     });
   }
 
+  // downloadFilePOST(url: string, payload: any): Observable<any> {
+  //   const config = this.getConfig();
+  //   config.headers.set('responseType', 'blob');
+  //   return this.http.get(url, config);
+  // }
+
   /**
    * http GET request and handle file download
    *
@@ -228,37 +237,70 @@ export class CoreService {
    *
    * @return Promise Downloads the file and resolves the filename
    */
-  // download(type: string, action: string, id: any = null, id2: any = null) {
-  //   let url = this.url(type, action, id, id2);
-  //   const headers = new HttpHeaders().set('Authorization', 'Bearer ' + this.authToken);
-  //   const config = this.getConfig();
-  //   return this.http.get(url, { headers: config.headers, observe: 'response', responseType: 'blob' })
-  //   .toPromise().then(
-  //     (response: any) => {
-  //       const contentDispositionHeader = response.headers.get('Content-Disposition');
-  //       if (contentDispositionHeader !== null && typeof contentDispositionHeader == 'string') {
-  //         // Get filename from the response headers
+  download(type: string, action: string, id: any = null, id2: any = null) {
+    let url = this.url(type, action, id, id2);
+    // const headers = new HttpHeaders().set('Authorization', 'Bearer ' + this.authToken);
+    const config = this.getConfig();
+    return this.http.get(url, { headers: config.headers, observe: 'response', responseType: 'blob' })
+    .toPromise().then(
+      (response: any) => {
+        const contentDispositionHeader = response.headers.get('Content-Disposition');
+        if (contentDispositionHeader !== null && typeof contentDispositionHeader == 'string') {
+          // Get filename from the response headers
 
-  //         let fileName = 'download';
+          let fileName = 'download';
 
-  //         const matches = new RegExp('filename="([^"]+)"').exec(contentDispositionHeader);
-  //         if (matches && matches.length > 0){
-  //           fileName = matches[1];
-  //         }
+          const matches = new RegExp('filename="([^"]+)"').exec(contentDispositionHeader);
+          if (matches && matches.length > 0){
+            fileName = matches[1];
+          }
 
-  //         // Download the file
-  //         const file = new Blob([response.body]);
-  //         saveAs(file, fileName);
+          // Download the file
+          const file = new Blob([response.body]);
+          saveAs(file, fileName);
 
-  //         return fileName;
-  //       } else {
-  //         this.messages.error("Unable to download file");
-  //         return false;
-  //       }
-  //     },
-  //     (response: any) => {
-  //       return this.handleError(url, response.error);
-  //     }
-  //   );
-  // }
+          return fileName;
+        } else {
+          alert ("Unable to download file");
+          return false;
+        }
+      },
+      (response: any) => {
+        return this.handleError(url, response.error);
+      }
+    );
+  }
+
+  downloadPOST(type: string, action: string,payload: any, fileName: string) {
+    let url = this.url(type, action);
+    // const headers = new HttpHeaders().set('Authorization', 'Bearer ' + this.authToken);
+    const config = this.getConfig();
+    return this.http.post(url, payload, { headers: config.headers, observe: 'response', responseType: 'blob' })
+    .toPromise().then(
+      (response: any) => {
+        const contentDispositionHeader = response.headers.get('Content-Disposition');
+        if (contentDispositionHeader !== null && typeof contentDispositionHeader == 'string') {
+          // Get filename from the response headers
+
+
+          const matches = new RegExp('filename="([^"]+)"').exec(contentDispositionHeader);
+          if (matches && matches.length > 0){
+            fileName = matches[1];
+          }
+
+          // Download the file
+          const file = new Blob([response.body]);
+          saveAs(file, fileName);
+
+          return fileName;
+        } else {
+          alert ("Unable to download file");
+          return false;
+        }
+      },
+      (response: any) => {
+        return this.handleError(url, response.error);
+      }
+    );
+  }
 }
