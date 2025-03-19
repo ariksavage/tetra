@@ -2,5 +2,9 @@
 namespace Core;
 
 define('CORE_ROOT', __dir__);
-define('SERVER_ROOT', realpath(CORE_ROOT . '/../../'));
-define('CONFIG_PATH', __dir__ . '/../../config');
+$root = CORE_ROOT;
+while (!is_dir($root .'/config')) {
+	$root = realpath($root. '/..');
+}
+define('SERVER_ROOT', $root);
+define('CONFIG_PATH', $root . '/config');
