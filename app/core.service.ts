@@ -32,7 +32,6 @@ export class CoreService {
       if (result.message) {
 
         this.messages.add(result.message, key);
-        // console.log(`${h}:${i}:${s}${a}`, result.message);
       }
       if (result.data) {
         return result.data;
@@ -55,12 +54,15 @@ export class CoreService {
     if (error) {
       this.errorService.setError(error);
       console.error(url, error);
+
       switch(error.code) {
         case 401:
           this.route.navigateByUrl('/401');
+          return false;
           break;
         case 404:
           this.route.navigateByUrl('/404');
+          return false;
           break;
       }
     }
