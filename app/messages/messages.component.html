@@ -9,8 +9,9 @@
   <ul class="messages" *ngIf="count > 0">
     <li *ngFor="let message of list()" id="message-{{message.id}}" class="message" [ngClass]="message.type">
       <button class="dismiss-btn icon" (click)="remove(message.id)"><i class="fa-solid fa-times"></i></button>
-      <p class="message-text">{{message.text}}</p>
+      <p class="message-text" [innerHTML]="message.text"></p>
       <p class="date" [title]="message.dateStr()">{{message.since()}}</p>
     </li>
   </ul>
 </div>
+<div class="backdrop" (click)="open = false;" *ngIf="open"></div>
