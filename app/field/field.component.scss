@@ -17,6 +17,17 @@
     }
   }
 
+  &.block {
+    .label {
+      display: block;
+    }
+
+    .input {
+      display: block;
+      width: 100%;
+    }
+  }
+
   &.inline {
     .field,
     .label {

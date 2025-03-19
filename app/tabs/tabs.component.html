@@ -1,0 +1,5 @@
+<ul class="tab-list">
+  <li *ngFor="let section of sections" class="tab-item" [ngClass]="{'current': current == section}">
+    <button class="tab" (click)="set(section)">{{section}}</button>
+  </li>
+</ul>

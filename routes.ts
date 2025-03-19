@@ -5,6 +5,7 @@ import { AdminDashboardPage } from '@tetra/pages/admin/dashboard/dashboard.page'
 import { AdminConfigPage } from '@tetra/pages/admin/config/config.page';
 import { AdminConfigMenuPage } from '@tetra/pages/admin/config/menu/menu.page';
 import { Error404Page } from '@tetra/pages/error/404/404.page';
+import { Error401Page } from '@tetra/pages/error/401/401.page';
 
 const r : Routes = [
   { path: 'login', component:  LoginPage },
@@ -19,7 +20,8 @@ const r : Routes = [
       ]
     }
   ]},
-  { path: '404', title: 'Error 404', component: Error404Page }
+  { path: '404', title: 'Error 404: Not Found', component: Error404Page },
+  { path: '401', title: 'Error 401: Unauthorized', component: Error401Page }
 ];
 
 export const tetraRoutes: Routes = r;
