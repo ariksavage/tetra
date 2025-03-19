@@ -22,8 +22,10 @@ export class MessagesComponent {
     private cdRef:ChangeDetectorRef
   ) {
     messages.getMessage().subscribe((message: any) => {
+
       this._list.push(message);
       this.count++;
+      this.cdRef.detectChanges();
     })
   }
 

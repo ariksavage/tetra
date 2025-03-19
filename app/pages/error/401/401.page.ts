@@ -5,9 +5,8 @@ import { TetraPage } from '@tetra/page/page.component';
 import { User } from '@tetra/user';
 
 @Component({
-		standalone: true,
+	standalone: true,
   selector: "Error401Page",
-  standalone: true,
   imports: [ CommonModule ],
   templateUrl: './401.page.html',
   styleUrl: './401.page.scss',
@@ -29,6 +28,7 @@ export class Error401Page extends TetraPage {
   override onLoad() {
     const self = this;
     this.errorService.getError().subscribe((error: any) => {
+      console.log('401', error);
       this.error = error;
       if (error){
         this.app.setPageTitle('401 | ' + error.message);

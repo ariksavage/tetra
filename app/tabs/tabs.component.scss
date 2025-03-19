@@ -1,0 +1,28 @@
+:host {
+  margin: 10px 0;
+}
+.tab-list {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  list-style-type: none;
+  flex-wrap: wrap;
+}
+.tab-item {
+  margin: 0 1ex;
+  color: var(--primary);
+
+  &.current {
+    color: var(--default-text);
+    pointer-events: none;
+  }
+}
+
+.tab {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font-size: 1em;
+}
