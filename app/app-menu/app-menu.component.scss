@@ -39,7 +39,7 @@
   border-right: 1px solid var(--border);
 
   @include global.screen-sm-up {
-    padding: 10px 0;
+    padding: var(--space) 0;
     position: relative;
     max-width: 100%;
     border: none;
@@ -52,7 +52,7 @@
   position: relative;
   width: 100%;
   margin-top: 1em;
-  padding: 0 10px;
+  padding: 0 var(--space);
   background: var(--back);
   color: var(--fore);
   &:hover {

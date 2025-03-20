@@ -15,7 +15,7 @@
 
 header {
   grid-area: header;
-  padding: 10px 10px 5px;
+  padding: var(--space) var(--space) calc(var(--space) / 2);
   box-sizing: border-box;
   border-bottom: 1px solid var(--border);
 }
@@ -46,7 +46,7 @@ main {
 
 footer {
   grid-area: footer;
-  padding: 5px 10px;
+  padding: calc(var(--space) / 2) var(--space);
   border-top: 1px solid var(--border);
   width: 100%;
   box-sizing: border-box;

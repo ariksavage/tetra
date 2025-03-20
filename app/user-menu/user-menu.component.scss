@@ -39,7 +39,7 @@
   background: var(--body);
   text-align: right;
   max-width: 300px;
-  padding: 10px;
+  padding: var(--space);
 }
 .dropdown-list {
   margin: 1em 0 0;
