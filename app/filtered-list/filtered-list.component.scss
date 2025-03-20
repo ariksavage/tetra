@@ -14,7 +14,7 @@
   display: grid;
   grid-template-columns: 3fr auto;
   grid-template-rows: auto 1fr;
-  grid-gap: 20px 10px;
+  grid-gap: calc( 2 * var(--space))  var(--space);
   grid-template-areas:
     'summary pagination'
     'items filters';
@@ -85,7 +85,7 @@
 .items-per-page {
   display: flex;
   justify-content: flex-end;
-  margin: 0 0 10px;
+  margin: 0 0 var(--space);
   select {
     display: block;
     width: auto;

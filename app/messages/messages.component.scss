@@ -45,7 +45,7 @@
   }
 
   .close {
-    margin: 10px;
+    margin: var(--space);
     border: none;
     background: transparent;
   }
@@ -61,14 +61,14 @@
   position: relative;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  padding: 10px 10px 10px 30px;
-  margin-bottom: 10px;
+  padding: var(--space) var(--space) var(--space) calc( 3 * var(--space));
+  margin-bottom: var(--space);
 
   .dismiss-btn {
     position: absolute;
     top: 0;
     left: 0;
-    padding: 10px;
+    padding: var(--space);
     border: none;
     background: transparent;
   }
@@ -86,12 +86,12 @@
 
 .none {
   margin: 0;
-  padding: 0 10px;
+  padding: 0 var(--space);
 }
 
 .dismiss-all {
   float: right;
-  margin: 10px;
+  margin: var(--space);
   border: none;
   background: transparent;
 }

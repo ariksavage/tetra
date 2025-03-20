@@ -4,14 +4,14 @@
 <div class="popup-window" *ngIf="open">
   <div class="popup-header">
     <button class="close-btn" (click)="toggle()"><i class="fa-solid fa-times"></i></button>
-    <p>{{title}}</p>
+    <h2 class="popup-title">{{title}}</h2>
     <ng-content select="[header]"></ng-content>
   </div>
   <div class="popup-content">
     <ng-content select="[content]"></ng-content>
   </div>
   <div class="popup-footer">
-    <ng-content select="footer"></ng-content>
+    <ng-content select="[footer]"></ng-content>
   </div>
 </div>
 <div class="popup-backdrop" *ngIf="open" (click)="toggle()"></div>

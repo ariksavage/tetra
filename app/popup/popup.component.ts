@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -10,8 +10,13 @@ import { CommonModule } from '@angular/common';
 })
 export class TetraPopupComponent {
   @Input() title: string = '';
-  open: boolean = false;
+  @Input() open: boolean = false;
+  @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
   toggle() {
     this.open = !this.open;
+
+    if (!this.open) {
+      this.onClose.emit();
+    }
   }
 }
