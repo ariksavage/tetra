@@ -1,4 +1,4 @@
-<button class="toggle icon-only primary" [ngClass]="{'open': open}" (click)="toggle()" icon="user"  [iconStyle]="loggedIn() ? 'solid' : 'regular'"></button>
+<button class="toggle btn icon" [ngClass]="{'open': open}" (click)="toggle()"><i class="icon fa-user"  [ngClass]="{'fa-solid': loggedIn(), 'fa-regular': !loggedIn()}"></i></button>
 <nav class="dropdown" [ngClass]="{'open': open}">
   <div class="dropdown-content">
     <span class="logged-in" *ngIf="loggedIn() && user">Logged in as: {{user.name()}}</span>

@@ -1,10 +1,10 @@
-<button (click)="toggle()" class="messages-button">
-  <i class="fa-solid fa-bell"></i>
+<button (click)="toggle()" class="messages-button btn icon">
+  <i class="fa-solid fa-bell" [ngClass]="{'fa-solid': count > 0, 'fa-regular': count < 1}"></i>
   <span class="badge" *ngIf="count > 0">{{count}}</span>
 </button>
 <div class="drawer" [ngClass]="{'open': open}">
   <button class="close" (click)="toggle()"><i class="fa-solid fa-arrow-right"></i></button>
-  <button class="dismiss-all" (click)="clearList()">Dismiss all</button>
+  <button class="dismiss-all" (click)="clearList()" *ngIf="count > 1">Dismiss all</button>
   <p class="none" *ngIf="count == 0">No messages.</p>
   <ul class="messages" *ngIf="count > 0">
     <li *ngFor="let message of list()" id="message-{{message.id}}" class="message" [ngClass]="message.type">
