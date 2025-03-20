@@ -7,13 +7,6 @@
 
 .messages-button {
   position: relative;
-  border: none;
-  background: transparent;
-
-  &:hover,
-  &:focus {
-    color: var(--primary);
-  }
 
   .badge {
     position: absolute;
