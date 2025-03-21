@@ -4,8 +4,8 @@ require_once(__dir__ . '/bootstrap.php');
 require_once(SERVER_ROOT . '/vendor/autoload.php');
 $pluginsDir = realpath(SERVER_ROOT . '/plugins');
 
-if (file_exists($pluginDir . '/loader.php')) {
-  require_once($pluginDir.'/loader.php');
+if (file_exists($pluginsDir . '/loader.php')) {
+  require_once($pluginsDir.'/loader.php');
 }
 
 // All back end time is used / stored in UTC.
