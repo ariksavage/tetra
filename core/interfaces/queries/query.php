@@ -168,7 +168,7 @@ class Query
    */
   public function where($column, $comp, $value = NULL)
   {
-    
+
     $last = end($this->whereConditions);
     if ($last && $last !== 'AND' && $last !== 'OR' && $last !== '(') {
       die($last . PHP_EOL . $this . PHP_EOL . 'Where conditions must be joined with AND or OR. found: "' . $last . '"');
@@ -349,15 +349,15 @@ class Query
    * @param  string $direction  Direction in which the column will be sorted (ASC / DESC)
    * @return $this
    */
-  public function orderBy(string $column, string $direction = 'ASC', bool $escape = true)
+  public function orderBy(string $column, string $direction = 'ASC', bool $escape = TRUE)
   {
-    if ($escape){
+    if ($escape) {
       $orderColumn = $this->escapeColumn($column);
     } else {
       $orderColumn = $column;
     }
     $condition = "{$orderColumn}";
-    if ($direction){
+    if ($direction) {
       $condition .= " {$direction}";
     }
     $this->orderConditions[] = $condition;
@@ -467,7 +467,7 @@ class Query
    *
    * @return mysqli_result|bool  Returns false on failure.
    *                             For successful queries which produce a result set: returns a mysqli_result object.
-   *                             For other successful queries: returns true.
+   *                             For other successful queries: returns TRUE.
    */
   public function execute(): mixed
   {

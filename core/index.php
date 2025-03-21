@@ -2,6 +2,11 @@
 namespace Core;
 require_once(__dir__ . '/bootstrap.php');
 require_once(SERVER_ROOT . '/vendor/autoload.php');
+$pluginsDir = realpath(SERVER_ROOT . '/plugins');
+
+if (file_exists($pluginDir . '/loader.php')) {
+  require_once($pluginDir.'/loader.php');
+}
 
 // All back end time is used / stored in UTC.
 // On the front end, it can be converted to local time.
@@ -40,7 +45,7 @@ if (file_exists(CORE_ROOT . "/api/$type.api")) {
 /**
  * If a corresponding $type plugin exists, load it first.
  */
-$pluginsDir = realpath(SERVER_ROOT . '/plugins');
+
 if (is_dir($pluginsDir)) {
   $pluginDir = $pluginsDir . "/{$type}";
   if (is_dir($pluginDir)) {

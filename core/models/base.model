@@ -203,7 +203,7 @@ class Base {
           case "integer":
           case "double":
           case "string":
-            if ($value){
+            if ($value) {
               $data[$prop] = $value;
             } else {
               $data[$prop] = NULL;
@@ -211,7 +211,7 @@ class Base {
             break;
           case "array":
           case "object":
-            if (!is_string($value)){
+            if (!is_string($value)) {
               $data[$prop] = json_encode($value);
             }
             break;
@@ -289,12 +289,12 @@ class Base {
     return $this;
   }
 
-  protected function getAssetURI(string $field, bool $deleteOrphan = false)
+  protected function getAssetURI(string $field, bool $deleteOrphan = FALSE)
   {
     $assetId = $this->$field;
     if ($assetId) {
-      $asset = $this->select()->from('assets')->where('id', '=', $assetId)->execute(true);
-      if ($asset && $asset->uri && is_file($asset->uri)){
+      $asset = $this->select()->from('assets')->where('id', '=', $assetId)->execute(TRUE);
+      if ($asset && $asset->uri && is_file($asset->uri)) {
         return $asset->uri;
       } else if ($deleteOrphan) {
         $this->$field = 0;
@@ -321,7 +321,7 @@ class Base {
 
   protected function hiddenProps()
   {
-    return Array();
+    return array();
   }
 
   /**
@@ -330,7 +330,7 @@ class Base {
   public function toString()
   {
     $data = $this;
-    foreach($this->hiddenProps() as $prop) {
+    foreach ($this->hiddenProps() as $prop) {
       unset($data->$prop);
     }
     $json = json_encode($data);

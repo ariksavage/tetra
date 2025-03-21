@@ -73,7 +73,7 @@ class UpdateQuery extends Query
     }
 
     $str = "{$this->method} `{$this->table}` SET";
-    
+
     $i = 0;
     foreach ($this->data as $column => $value) {
       $column = $this->escapeColumn($column);
@@ -84,7 +84,7 @@ class UpdateQuery extends Query
       $str .= " $column = $value";
       $i++;
     }
-    
+
     $str .= $this->whereString();
     return $str;
   }
