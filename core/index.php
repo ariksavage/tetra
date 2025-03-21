@@ -1,6 +1,7 @@
 <?php
 namespace Core;
 require_once(__dir__ . '/bootstrap.php');
+require_once(SERVER_ROOT . '/vendor/autoload.php');
 
 // All back end time is used / stored in UTC.
 // On the front end, it can be converted to local time.

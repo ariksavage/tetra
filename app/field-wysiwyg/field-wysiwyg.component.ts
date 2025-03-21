@@ -1,25 +1,22 @@
 import { Component, ViewChild } from '@angular/core';
-import { FieldComponent } from '../field/field.component';
+import { TetraFieldComponent } from '@tetra/field/field.component';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { EditorComponent, TINYMCE_SCRIPT_SRC } from '@tinymce/tinymce-angular';
+import { EditorComponent } from '@tinymce/tinymce-angular';
 
 @Component({
-		standalone: true,
+	standalone: true,
   selector: '.field.wysiwyg',
-  standalone: true,
   imports: [ CommonModule, FormsModule, EditorComponent],
-  providers: [
-    { provide: TINYMCE_SCRIPT_SRC, useValue: 'tinymce/tinymce.min.js' }
-  ],
   templateUrl: './field-wysiwyg.component.html',
   styleUrl: '../field/field.component.scss'
 })
-export class FieldWYSIWYGComponent extends FieldComponent {
+export class FieldWYSIWYGComponent extends TetraFieldComponent {
   @ViewChild('area') area: any;
   heightBounce: any = null;
+  apiKey: string = "9pv8noesa604gu64o61wkaos9ce0rkp4qmg3iwhcd8e6mt0y";
   init: EditorComponent['init'] = {
-    apiKey: '1bm2nxqqyrs1zzd3bt0a47r8356jalk7qwjhss0t36r7rpkv',
+    min_height: 200,
     plugins: 'anchor autolink autoresize autosave code emoticons fullscreen help image importcss insertdatetime link lists media preview save searchreplace table wordcount',
     toolbar: 'undo redo | format removeformat | styles | bold italic underline | link hr | forecolor backcolor | alignleft aligncenter alignright alignjustify | outdent indent | code',
   };
