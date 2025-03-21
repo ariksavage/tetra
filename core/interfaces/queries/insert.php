@@ -75,6 +75,7 @@ class InsertQuery extends Query
   public function updateOnDuplicate()
   {
     $this->_updateOnDuplicate = TRUE;
+    return $this;
   }
 
   /**

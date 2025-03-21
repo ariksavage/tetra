@@ -1,0 +1,127 @@
+.drawer-title {
+  margin: 0 0 .5em;
+}
+
+.drawer-content-inner {
+  padding: var(--space);
+}
+
+.drawer-content {
+  position: fixed;
+  background: var(--body);
+  z-index: 200;
+  display: none;
+
+
+  &.transition {
+    display: block;
+  }
+
+  &.top {
+    top: 0;
+    left: 0;
+    width: 100vw;
+    box-sizing: border-box;
+    transform: translateY(-100%);
+    transition: transform .5s;
+
+    .drawer-close {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+
+    &.open {
+      transform: translateY(0);
+    }
+
+    .drawer-content-inner {
+      max-width: 1200px;
+      margin: auto;
+    }
+  }
+
+  &.right {
+    top: 0;
+    right: 0;
+    height: 100vh;
+    max-width: 30vw;
+    box-sizing: border-box;
+    transform: translateX(100%);
+    transition: transform .5s;
+
+    .drawer-close {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    &.open {
+      transform: translateY(0);
+    }
+
+    .drawer-content-inner {
+      height: 100%;
+      padding-top: 2em;
+    }
+  }
+
+  &.bottom {
+    bottom: 0;
+    left: 0;
+    width: 100vw;
+    box-sizing: border-box;
+    transform: translateY(100%);
+    transition: transform .5s;
+
+    .drawer-close {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
+    &.open {
+      transform: translateY(0);
+    }
+
+    .drawer-content-inner {
+      max-width: 1200px;
+      margin: auto;
+    }
+  }
+
+  &.left {
+    top: 0;
+    left: 0;
+    height: 100vh;
+    max-width: 30vw;
+    box-sizing: border-box;
+    transform: translateX(-100%);
+    transition: transform .5s;
+
+    .drawer-close {
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+
+    &.open {
+      transform: translateY(0);
+    }
+
+    .drawer-content-inner {
+      height: 100%;
+      padding-top: 2em;
+    }
+  }
+}
+.backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 19;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, .1);
+  backdrop-filter: blur(1px);
+}

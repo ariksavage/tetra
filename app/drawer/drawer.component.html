@@ -1,0 +1,13 @@
+<button class="drawer-toggle btn icon" title="toggle {{title}}" (click)="toggle()">
+  <i class="icon" [ngClass]="icon"></i>
+</button>
+<div class="drawer-content" [ngClass]="contentClass()">
+  <div class="drawer-content-inner">
+    <h2 class="drawer-title">{{title}}</h2>
+    <button class="drawer-close btn icon" (click)="toggle()">
+      <i class="icon fa-solid" [ngClass]="closeBtnIcon()"></i>
+    </button>
+    <ng-content></ng-content>
+  </div>
+</div>
+<div class="backdrop" *ngIf="open" (click)="toggle()"></div>

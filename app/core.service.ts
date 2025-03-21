@@ -223,12 +223,6 @@ export class CoreService {
     });
   }
 
-  // downloadFilePOST(url: string, payload: any): Observable<any> {
-  //   const config = this.getConfig();
-  //   config.headers.set('responseType', 'blob');
-  //   return this.http.get(url, config);
-  // }
-
   /**
    * http GET request and handle file download
    *
@@ -241,7 +235,6 @@ export class CoreService {
    */
   download(type: string, action: string, id: any = null, id2: any = null) {
     let url = this.url(type, action, id, id2);
-    // const headers = new HttpHeaders().set('Authorization', 'Bearer ' + this.authToken);
     const config = this.getConfig();
     return this.http.get(url, { headers: config.headers, observe: 'response', responseType: 'blob' })
     .toPromise().then(
@@ -251,16 +244,13 @@ export class CoreService {
           // Get filename from the response headers
 
           let fileName = 'download';
-
           const matches = new RegExp('filename="([^"]+)"').exec(contentDispositionHeader);
           if (matches && matches.length > 0){
             fileName = matches[1];
           }
-
           // Download the file
           const file = new Blob([response.body]);
           saveAs(file, fileName);
-
           return fileName;
         } else {
           alert ("Unable to download file");
@@ -275,7 +265,6 @@ export class CoreService {
 
   downloadPOST(type: string, action: string,payload: any, fileName: string) {
     let url = this.url(type, action);
-    // const headers = new HttpHeaders().set('Authorization', 'Bearer ' + this.authToken);
     const config = this.getConfig();
     return this.http.post(url, payload, { headers: config.headers, observe: 'response', responseType: 'blob' })
     .toPromise().then(

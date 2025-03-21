@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -8,8 +8,9 @@ import { CommonModule } from '@angular/common';
     templateUrl: './section-collapse.component.html',
     styleUrl: './section-collapse.component.scss'
 })
-export class SectionCollapseComponent {
+export class TetraSectionCollapseComponent {
   @Input() open: boolean = false;
+  @Output() openChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   @Input() title: string = '';
 
   toggle() {
