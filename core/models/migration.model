@@ -124,7 +124,7 @@ class Migration extends Base {
 
   /**
    * Test whether this migration is already complete.
-   * ie return true if a column has already been created
+   * ie return TRUE if a column has already been created
    *
    * Overridden by each migration
    *
@@ -529,11 +529,12 @@ class Migration extends Base {
     return $this->raw($query)->executeInsert();
   }
 
-  public function getPermissionId($dimension, $action) {
+  public function getPermissionId($dimension, $action)
+  {
     $permission = $this->select()->from('user_permissions')
     ->where('dimension', '=', $dimension)
     ->and('action', '=', "'$action'")
-    ->execute(true);
+    ->execute(TRUE);
     if ($permission) {
       return $permission->id;
     } else {
@@ -546,7 +547,8 @@ class Migration extends Base {
     $query = "SELECT * FROM `user_role_permissions_assignments` WHERE";
     $roleSubQ = "SELECT `id` FROM `user_roles` WHERE `key`='$role'";
     $query .= " `role_id` IN ($roleSubQ)";
-    $permissionSubQ = "SELECT `id` FROM `user_permissions` WHERE `action` IN('*', '$action') AND `dimension` = '$dimension'";
+    $permissionSubQ = "SELECT `id` FROM `user_permissions`
+    WHERE `action` IN('*', '$action') AND `dimension` = '$dimension'";
     $query .= " AND permission_id IN ($permissionSubQ)";
     $results = $this->raw($query)->executeSelect(FALSE);
     return count($results) > 0;
@@ -575,10 +577,10 @@ class Migration extends Base {
     echo PHP_EOL;
     echo PHP_EOL;
     $results = $this->raw("SHOW COLUMNS FROM {$tableName}")->execute();
-    while($column = $results->fetch_object()) {
+    while ($column = $results->fetch_object()) {
       $label = preg_replace('/_/', ' ', $column->Field);
       $label = trim(ucfirst($label));
-      switch(TRUE) {
+      switch (TRUE) {
         case stristr($column->Type, 'tinyint'):
           $type = 'bool';
           $default = "FALSE";
@@ -600,7 +602,8 @@ class Migration extends Base {
           $default = "0";
           break;
         default:
-          var_dump($column);die();
+          var_dump($column);
+          die();
           break;
       }
       echo "/**" . PHP_EOL;
