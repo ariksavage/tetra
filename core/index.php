@@ -1,7 +1,11 @@
 <?php
 namespace Core;
 require_once(__dir__ . '/bootstrap.php');
-require_once(SERVER_ROOT . '/vendor/autoload.php');
+
+if (file_exists(SERVER_ROOT . '/vendor/autoload.php')) {
+  require_once(SERVER_ROOT . '/vendor/autoload.php');
+}
+
 $pluginsDir = realpath(SERVER_ROOT . '/plugins');
 
 if (file_exists($pluginsDir . '/loader.php')) {
