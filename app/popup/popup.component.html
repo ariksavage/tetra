@@ -1,7 +1,7 @@
 <button class="toggle-btn" (click)="toggle()" [title]="title">
   <ng-content select="[button]"></ng-content>
 </button>
-<div class="popup-window" *ngIf="open">
+<div #popupWindow [id]="id" class="popup-window" [ngClass]="{'show': open}">
   <div class="popup-header">
     <button class="close-btn" (click)="toggle()"><i class="fa-solid fa-times"></i></button>
     <h2 class="popup-title">{{title}}</h2>
@@ -14,4 +14,4 @@
     <ng-content select="[footer]"></ng-content>
   </div>
 </div>
-<div class="popup-backdrop" *ngIf="open" (click)="toggle()"></div>
+<div #popupBackDrop [id]="id + '-backdrop'" class="popup-backdrop" [ngClass]="{'show': open}" (click)="toggle()"></div>

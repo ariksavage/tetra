@@ -1,8 +1,8 @@
-<button class="drawer-toggle btn icon" title="toggle {{title}}" (click)="toggle()">
+<button class="drawer-toggle btn icon" title="{{open ? 'Hide' : 'Show'}} {{title}}" (click)="toggle()">
   <i class="icon" [ngClass]="icon"></i>
   <ng-content select="[button]"></ng-content>
 </button>
-<div class="drawer-content" [ngClass]="contentClass()">
+<div #drawerContent [id]="id" class="drawer-content" [ngClass]="contentClass()">
   <div class="drawer-content-inner">
     <h2 *ngIf="title" class="drawer-title">{{title}}</h2>
     <button class="drawer-close btn icon" (click)="toggle()">
@@ -11,4 +11,4 @@
     <ng-content select="[content]"></ng-content>
   </div>
 </div>
-<div class="backdrop" *ngIf="open" (click)="toggle()"></div>
+<div #drawerBackdrop [id]="id + '-backdrop'" class="backdrop" [ngClass]="{'show': open}" (click)="toggle()"></div>
