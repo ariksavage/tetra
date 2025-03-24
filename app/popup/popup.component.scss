@@ -11,18 +11,24 @@
   }
 }
 .popup-window {
+  display: none;
   background: var(--body);
+  min-width: 50vw;
+  min-height: 50vh;
   max-width: 80vw;
   max-height: 80vh;
-  display: flex;
   flex-direction: column;
   border: 1px solid var(--border);
   position: fixed;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 10;
+  z-index: 30;
   padding: 0 var(--space);
+
+  &.show {
+    display: block;
+  }
 }
 
 .popup-header {
@@ -70,6 +76,12 @@
   }
 }
 
-.popup-backdrop {
+.backdrop {
   @extend %backdrop;
+  display: none;
+  z-index: 29;
+
+  &.show {
+    display: block;
+  }
 }

@@ -1,6 +1,10 @@
+@use '../../../styles/_global';
+
+
 .drawer-toggle {
   position: relative;
 }
+
 .drawer-title {
   margin: 0 0 .5em;
 }
@@ -9,33 +13,29 @@
   padding: var(--space);
 }
 
+.drawer-close {
+  position: absolute;
+}
+
 .drawer-content {
-  position: fixed;
+  position: absolute;
   background: var(--body);
   z-index: 25;
   display: none;
   overflow: auto;
+  transition: transform .5s;
 
   &.transition {
     display: block;
   }
 
-  &.top {
-    top: 0;
+  &.top,
+  &.bottom {
     left: 0;
-    width: 100vw;
-    box-sizing: border-box;
-    transform: translateY(-100%);
-    transition: transform .5s;
+    width: 100%;
 
     .drawer-close {
-      position: absolute;
-      bottom: 0;
       right: 0;
-    }
-
-    &.open {
-      transform: translateY(0);
     }
 
     .drawer-content-inner {
@@ -44,19 +44,40 @@
     }
   }
 
+  &.left,
   &.right {
     top: 0;
-    right: 0;
-    height: 100vh;
+    height: 100%;
     min-width: 20vw;
     max-width: 30vw;
-    box-sizing: border-box;
-    transform: translateX(100%);
-    transition: transform .5s;
+    .drawer-content-inner {
+      margin-bottom: 20vh;
+    }
+    .drawer-close {
+      top: 0;
+    }
+  }
+
+  &.top {
+    top: 0;
+    transform: translateY(-100%);
 
     .drawer-close {
-      position: absolute;
-      top: 0;
+      bottom: 0;
+    }
+
+    &.open {
+      transform: translateY(0);
+    }
+  }
+
+  &.right {
+    right: 0;
+    transform: translateX(100%);
+
+
+
+    .drawer-close {
       left: 0;
     }
 
@@ -72,61 +93,38 @@
 
   &.bottom {
     bottom: 0;
-    left: 0;
-    width: 100vw;
-    box-sizing: border-box;
     transform: translateY(100%);
-    transition: transform .5s;
-
-    .drawer-close {
-      position: absolute;
-      top: 0;
-      right: 0;
-    }
 
     &.open {
       transform: translateY(0);
     }
 
-    .drawer-content-inner {
-      max-width: 1200px;
-      margin: auto;
+    .drawer-close {
+      position: absolute;
+      top: 0;
     }
   }
 
   &.left {
-    top: 0;
     left: 0;
-    height: 100vh;
-    min-width: 20vw;
-    max-width: 30vw;
-    box-sizing: border-box;
     transform: translateX(-100%);
-    transition: transform .5s;
 
     .drawer-close {
-      position: absolute;
-      top: 0;
       right: 0;
     }
 
     &.open {
       transform: translateY(0);
     }
-
-    .drawer-content-inner {
-      height: 100%;
-      padding-top: 2em;
-    }
   }
 }
+
 .backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 20;
-  width: 100vw;
-  height: 100vh;
-  background: rgba(0, 0, 0, .1);
-  backdrop-filter: blur(1px);
+  @extend %backdrop;
+  display: none;
+  z-index: 24;
+
+  &.show {
+    display: block;
+  }
 }
