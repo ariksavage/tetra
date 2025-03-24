@@ -12,7 +12,7 @@ import { User } from '@tetra/user';
     styleUrl: './404.page.scss'
 })
 
-export class Error404Page extends TetraPage {
+export class TetraError404Page extends TetraPage {
 
   override title = 'Error: 404';
   override requiresLogin = false;

@@ -12,7 +12,7 @@ import { User } from '@tetra/user';
   styleUrl: './401.page.scss',
 })
 
-export class Error401Page extends TetraPage {
+export class TetraError401Page extends TetraPage {
 
   override title = 'Error: 401';
   override requiresLogin = false;
@@ -30,7 +30,7 @@ export class Error401Page extends TetraPage {
     this.errorService.getError().subscribe((error: any) => {
       console.log('401', error);
       this.error = error;
-      if (error){
+      if (error && error.message){
         this.app.setPageTitle('401 | ' + error.message);
       } else {
         this.app.setPageTitle('Error 401');
