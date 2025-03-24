@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -12,6 +12,7 @@ export class TetraDrawerComponent {
   @Input() title: string = '';
   @Input() icon: string = '';
   @Input() position: string = 'bottom';
+  @Output() onToggle: EventEmitter<any> = new EventEmitter<any>();
   open: boolean = false;
   transition: boolean = false;
 
@@ -21,11 +22,13 @@ export class TetraDrawerComponent {
       this.open = false;
       setTimeout(function() {
         self.transition = false;
+        self.onToggle.emit();
       }, 500);
     } else {
       this.transition = true;
       setTimeout(function() {
         self.open = true;
+        self.onToggle.emit();
       }, 100);
     }
   }

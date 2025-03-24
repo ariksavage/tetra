@@ -8,7 +8,7 @@
 }
 .toggle {
   position: relative;
-  z-index: 10;
+  z-index: 2;
   &.open {
     &::before {
       content: '';
