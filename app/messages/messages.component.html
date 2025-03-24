@@ -1,17 +1,14 @@
-<button (click)="toggle()" class="messages-button btn icon">
-  <i class="fa-solid fa-bell" [ngClass]="{'fa-solid': count > 0, 'fa-regular': count < 1}"></i>
-  <span class="badge" *ngIf="count > 0">{{count}}</span>
-</button>
-<div class="drawer" [ngClass]="{'open': open}">
-  <button class="close" (click)="toggle()"><i class="fa-solid fa-arrow-right"></i></button>
-  <button class="dismiss-all" (click)="clearList()" *ngIf="count > 1">Dismiss all</button>
-  <p class="none" *ngIf="count == 0">No messages.</p>
-  <ul class="messages" *ngIf="count > 0">
-    <li *ngFor="let message of list()" id="message-{{message.id}}" class="message" [ngClass]="message.type">
-      <button class="dismiss-btn icon" (click)="remove(message.id)"><i class="fa-solid fa-times"></i></button>
-      <p class="message-text" [innerHTML]="message.text"></p>
-      <p class="date" [title]="message.dateStr()">{{message.since()}}</p>
-    </li>
-  </ul>
+<div #messagesDrawer class="messages drawer" position="right" title="Messages" [icon]="icon()" (onToggle)="detectChanges()">
+  <span button class="badge" *ngIf="count > 0">{{count}}</span>
+  <div content class="messages-inner">
+    <button class="dismiss-all" (click)="clearList()" *ngIf="count > 1">Dismiss all</button>
+    <p class="none" *ngIf="count == 0">No messages.</p>
+    <ul class="messages" *ngIf="count > 0">
+      <li *ngFor="let message of list()" id="message-{{message.id}}" class="message" [ngClass]="message.type">
+        <button class="dismiss-btn icon" (click)="remove(message.id)"><i class="fa-solid fa-times"></i></button>
+        <p class="message-text" [innerHTML]="message.text"></p>
+        <p class="date" [title]="message.dateStr()">{{message.since()}}</p>
+      </li>
+    </ul>
+  </div>
 </div>
-<div class="backdrop" (click)="open = false;" *ngIf="open"></div>

@@ -1,47 +1,18 @@
 @use '../../../styles/_global';
 
 :host {
-  position: relative;
-  z-index: 20;
+  --drawer-width: 20vw;
 }
 
-.messages-button {
-  position: relative;
-
-  .badge {
-    position: absolute;
-    right: 0;
-    top: 100%;
-    background: red;
-    color: #fff;
-    border-radius: 1em;
-    font-size: 10px;
-    padding: .2em .5em;
-  }
-}
-.drawer {
-  position: fixed;
-  z-index: 10;
-  right: 0;
-  top: 0;
-  background: var(--body);
-  width: 20vw;
-  transition: transform .3s;
-  height: 100vh;
-  border-left: 1px solid var(--border);
-  transform: translateX(100%);
-  overflow: auto;
-
-  &.open {
-    transform: translateX(0);
-    box-shadow: -2px 2px 6px rgba(0, 0, 0, .3);
-  }
-
-  .close {
-    margin: var(--space);
-    border: none;
-    background: transparent;
-  }
+.badge {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background: red;
+  color: #fff;
+  border-radius: 1em;
+  font-size: 10px;
+  padding: .2em .5em;
 }
 
 .messages {
@@ -89,13 +60,3 @@
   background: transparent;
 }
 
-.backdrop {
-  background: rgba(0, 0, 0, .1);
-  backdrop-filter: blur(2px);
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 100vh;
-  width: 100vw;
-  z-index: 2;
-}
