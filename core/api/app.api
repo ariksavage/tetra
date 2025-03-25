@@ -49,8 +49,7 @@ class App extends Base {
       }
       $data->config->$key = $value;
     }
-    // $data->menu = $this->menuTree();
-    $this->success('app', $data, 'Application loaded');
+    $this->success('app', $data);
   }
 
   /**
