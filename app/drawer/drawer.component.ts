@@ -1,10 +1,11 @@
 import { Component, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TetraButtonComponent } from '@tetra/button/button.component';
 
 @Component({
   selector: 'div.drawer',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TetraButtonComponent],
   templateUrl: './drawer.component.html',
   styleUrl: './drawer.component.scss'
 })

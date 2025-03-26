@@ -2,11 +2,12 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserService } from '@tetra/user.service';
 import { User } from '@tetra/user';
+import { TetraButtonComponent } from '@tetra/button/button.component';
 
 @Component({
 		standalone: true,
     selector: '.user-menu',
-    imports: [CommonModule],
+    imports: [CommonModule, TetraButtonComponent],
     templateUrl: './user-menu.component.html',
     styleUrl: './user-menu.component.scss'
 })
