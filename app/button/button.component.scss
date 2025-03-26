@@ -8,82 +8,104 @@
     transform: rotate(360deg);
   }
 }
-:host {
-  font-size: 1em;
-  cursor: pointer;
-  padding: 1ex 1em;
-  min-height: 36px;
-  min-width: 36px;
-  --fore: var(--default-text);
-  --back: var(--body);
-  transition: background .5s, color .5s, border-color .5s;
 
+:host {
+  --fore: var(--btn-primary-text);
+  --back: var(--btn-primary);
+  display: inline-flex;
+  width: auto;
+  align-items: center;
+  border-radius: 0;
+  padding: .4em 1ex;
   background: var(--back);
-  color: var(--fore);
   border: 1px solid var(--fore);
+  color: var(--fore);
+  margin: 0 1ex;
+  text-decoration: none;
+  transition: all .2s;
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
 
   &:hover,
   &:focus-visible {
     background: var(--fore);
+    border-color: var(--back);
     color: var(--back);
-    border: 1px solid var(--fore);
+  }
+  &.small {
+    font-size: .9em;
+  }
+
+  &.secondary {
+    --fore: var(--btn-secondary-text);
+    --back: var(--btn-secondary);
   }
 
   &.outline {
-    background-color: var(--body);
-    border-color: var(--back);
-    color: var(--back);
+    border-color: var(--fore);
+    background: transparent;
+    color: var(--fore);
 
     &:hover,
     &:focus-visible {
-      color: var(--fore);
-      background-color: var(--back);
+      background: var(--fore);
+      color: var(--back);
     }
   }
 
-  &.icon-only {
-    font-size: 1em;
+  &.icon {
+    border: 1px solid transparent;
     background: transparent;
-    border: none;
+    color: var(--fore);
+    position: relative;
     height: 2em;
     width: 2em;
-    padding: 0;
-    position: relative;
-    border: 1px solid transparent;
-    --back: var(--fore);
 
     &:hover,
     &:focus-visible {
-      border-color: var(--back);
       color: var(--back);
+      background: var(--fore);
     }
 
-    .icon {
+    .icon,
+    .fa-regular,
+    .fa-solid {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
     }
   }
-
-  &.primary {
-    --back: var(--primary);
-    --fore: var(--primary-text);
-  }
-
-  &.secondary {
-    --back: var(--secondary);
-    --fore: var(--secondary-text);
-  }
-
-
 }
 
-.icon {
-  font-size: 1em;
-  margin-right: 1em;
+// .icon {
+//   &.before {
+//     margin-right: 1ex;
+//   }
+
+//   &.after {
+//     margin-left: 1ex;
+//   }
+// }
+
+.button-content {
+  margin: 0 1ex;
+
+  &:empty {
+    display: none;
+  }
+
+  &:first-child {
+    margin-left: 0;
+  }
 
   &:last-child {
-    margin: 0;
+    margin-right: 0;
   }
 }

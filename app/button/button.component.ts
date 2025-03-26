@@ -1,23 +1,18 @@
-import { Component, Input, HostBinding } from '@angular/core';
+import { Component, Input, HostBinding, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 @Component({
 		standalone: true,
-    selector: 'button',
+    selector: 'button, .btn',
     imports: [CommonModule],
     templateUrl: './button.component.html',
     styleUrl: './button.component.scss'
 })
 export class TetraButtonComponent {
-  @Input() icon: string = '';
-  @Input() iconStyle: string = 'solid';
+  @Input() iBefore: string = '';
+  @Input() iAfter: string = '';
   @Input() text: string = '';
-  // @Input() title: string = '';
-  // @HostBinding('attr.aria-label') getLabel() {return this.title;}
   @HostBinding('attr.aria-label')
+  @HostBinding('attr.title')
   @Input() title: string = '';
-
-  iconClass() {
-    return 'fa-' + this.icon + ' fa-' + this.iconStyle;
-  }
 }

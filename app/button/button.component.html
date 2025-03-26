@@ -1,2 +1,6 @@
-<i class="icon" [ngClass]="iconClass()" *ngIf="icon"></i>
-<span *ngIf="text">{{text}}</span>
+<i class="icon before" [ngClass]="iBefore" *ngIf="iBefore"></i>
+
+<span #content class="button-content">
+  <ng-content></ng-content>
+</span>
+<i class="icon after" [ngClass]="iAfter" *ngIf="iAfter"></i>
