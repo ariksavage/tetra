@@ -84,7 +84,7 @@ class Migration extends Base {
    */
   protected function echoLine(string $text, bool $overwrite = FALSE, string $char = '-', int $max = 120)
   {
-    $n = intval(exec('tput cols'));
+    $n = intval(exec('tput cols')) ?? 80;
     $n = min($n, $max);
     $x = $n - strlen($this->name) - strlen($text);
     if ($overwrite) {
