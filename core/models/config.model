@@ -61,11 +61,14 @@ class Config extends Base {
    * @param object|null $data  Data to be mapped onto this item
    * @param array       $flags Additional parameters.
    *
-   * @return            $this
+  rint->id);
+    // $blueprint->created_by = intval($blueprint->created_by);
+    // $blueprint->modified_by = intval($blueprint->modified_by);
+    // $blueprint->finalized = $blueprint->finalized == '1'; * @return            $this
    */
   public function __construct(object|null $data = NULL, array $flags = [])
   {
-    parent::__construct('Config', 'config', $data, $flags = []);
+    parent::__construct('Config', 'config', $data, $flags);
     return $this;
   }
 
