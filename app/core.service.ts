@@ -191,9 +191,9 @@ export class CoreService {
    *
    * @return Promise After handling messages, returns a promise that will resolve data sent back by the API
    */
-  put(type: string, action: string, id: any = null, id2: any = null) {
+  put(type: string, action: string, id: any = null, id2: any = null, payload: any) {
     let url = this.url(type, action, id, id2);
-    return this.http.put(url, null, this.getConfig()).toPromise().then((result: any) => {
+    return this.http.put(url, payload, this.getConfig()).toPromise().then((result: any) => {
       return this.handleResult(result, type);
     }, (response: any) => {
       return this.handleError(url, response.error)

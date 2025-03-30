@@ -92,6 +92,18 @@ class Base {
       }
       $this->mapData($data);
     }
+    if (!$this->created_by && isset($_SESSION['user'])) {
+      $this->created_by =$_SESSION['user']->id;
+    }
+    if (!$this->date_created) {
+      $this->date_created = strtotime('now');
+    }
+    if (!$this->modified_by && isset($_SESSION['user'])) {
+      $this->modified_by = $_SESSION['user']->id;
+    }
+    if (!$this->date_modified) {
+      $this->date_modified = strtotime('now');
+    }
     return $this;
   }
 
