@@ -47,6 +47,15 @@ export class AppService {
     });
   }
 
+  addBreadcrumbParent(title: string, path: string) {
+    // console.log('add breadcrumb', this._breadcrumbs);
+    this._breadcrumbs.push({
+      title,
+      path
+    });
+    this.breadcrumbs.next(this._breadcrumbs);
+  }
+
   mapBreadcrumbs() {
     const routerConfig: any = {};
     for (let a=0;a<this.router.config.length; a++) {

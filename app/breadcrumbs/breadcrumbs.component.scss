@@ -1,7 +1,8 @@
-@use '../../../styles/_global';
+@import '../../../styles/_global';
+
 .breadcrumbs-list {
   list-style-type: none;
-  margin: 0;
+  margin: 1em 1em 0;
   padding: 0;
 }
 
@@ -9,8 +10,18 @@
   display: inline-block;
   margin: 0 0 1em;
 
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover,
+    &:focus-visible {
+      text-decoration: underline;
+    }
+  }
+
   &::after {
-    content: #{global.$breadcrumb-separator};
+    content: '>';
     margin: 0 1ex;
   }
 }
