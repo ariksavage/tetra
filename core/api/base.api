@@ -156,13 +156,13 @@ class Base {
    *
    * - Specific APIs may have additional parameters.
    */
-  public function listGET()
+  public function listGET($flags = [])
   {
     $this->reqPermission('VIEW');
     $page = $this->getValue('page', 1, 'integer');
     $per = $this->getValue('per', 20, 'integer');
     $query = $this->listQuery($page, $per);
-    $list = $this->paginatedResults($query, $page, $per);
+    $list = $this->paginatedResults($query, $page, $per, '', $flags);
     if (count($list)) {
       $this->success($this->plural, $list);
     } else {
@@ -201,13 +201,14 @@ class Base {
       \Core\Database\selectQuery $query,
       int $page,
       int $perPage,
-      string $model = ''
+      string $model = '',
+      array $flags = []
   ) {
     $total = $query->getTotal();
     if (!$model && $this->model) {
       $model = $this->model;
     }
-    $results = $query->execute(FALSE, $model);
+    $results = $query->execute(FALSE, $model, $flags);
     $pagination = (object) array(
       'current_results' => count($results),
       'total_results' => $total
@@ -233,10 +234,10 @@ class Base {
    *
    * @return $this->model      Model
    */
-  protected function getById(int $id)
+  protected function getById(int $id, $flags = [])
   {
     $model = new $this->model();
-    $model->byId($id);
+    $model->byId($id, $flags);
     return $model;
   }
 
@@ -247,7 +248,7 @@ class Base {
    *
    * @return $this->model       Model
    */
-  public function idGET($id)
+  public function idGET(int $id)
   {
     $this->reqPermission('VIEW');
     $model = $this->getById($id);
@@ -280,6 +281,10 @@ class Base {
     $search = $this->getValue('search');
     if ($search) {
       $query->andGroup();
+      $searchColumns  = $this->searchColumns();
+      if (!count($searchColumns)) {
+        $this->error("searchColumns() not configured.");
+      }
       foreach ($this->searchColumns() as $k => $column) {
         if ($k > 0) {
           $query->or($column, 'CONTAINS', $search);

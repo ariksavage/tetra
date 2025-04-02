@@ -163,8 +163,11 @@ trait Common {
     }
     return $str;
   }
-  protected function timestamp(string $date = 'now') {
-    return date('Y-m-d h:i:s', strtotime($date));
+  protected function timestamp(string|int $date = 'now') {
+    if (is_string($date)) {
+      $date = strtotime($date);
+    }
+    return date('Y-m-d h:i:s', $date);
   }
 
   public function baseUrl(){

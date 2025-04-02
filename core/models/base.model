@@ -67,6 +67,8 @@ class Base {
    */
   public int $modified_by = 0;
 
+  public Array $tags = [];
+
   /**
    * Construct the model
    *
@@ -86,24 +88,26 @@ class Base {
     $this->table = $table;
     $this->itemLabel = $itemLabel;
     $schema = $this->describeTable();
+    $this->defaults();
     if ($data) {
       if (isset($data->id)) {
         $this->byId($data->id);
       }
+      $data = $this->preLoad($data);
       $this->mapData($data);
     }
-    if (!$this->created_by && isset($_SESSION['user'])) {
-      $this->created_by =$_SESSION['user']->id;
+    $this->postLoad($flags);
+    return $this;
+  }
+
+  protected function defaults() {
+    if (isset($_SESSION['user'])){
+      $userId = $this->getCurrentUser()->id;
+      $this->created_by = $userId;
+      $this->modified_by = $userId;
     }
-    if (!$this->date_created) {
-      $this->date_created = strtotime('now');
-    }
-    if (!$this->modified_by && isset($_SESSION['user'])) {
-      $this->modified_by = $_SESSION['user']->id;
-    }
-    if (!$this->date_modified) {
-      $this->date_modified = strtotime('now');
-    }
+    $this->date_created = \strtotime('now');
+    $this->date_modified = \strtotime('now');
     return $this;
   }
 
@@ -124,16 +128,38 @@ class Base {
   }
 
   /**
+   * Clean data before mapping.
+   * @param  object $data [description]
+   * @return [type]       [description]
+   */
+  protected function preLoad($data)
+  {
+    return $data;
+  }
+
+  /**
+   * Get additional related data based on provided flags
+   * @param  array  $flags [description]
+   * @return [type]        [description]
+   */
+  protected function postLoad(array $flags = []) {
+    if (in_array('WITH_TAGS', $flags)) {
+      $this->getTags();
+    }
+  }
+
+  /**
    * Populate this object by using its ID to fetch data
    *
    * @param Integer $id Item's database ID.
    *
    * @return $this
    */
-  public function byId(int $id)
+  public function byId(int $id, array $flags = [])
   {
     if ($data = $this->getDataById($id)) {
       $this->mapData($data);
+      $this->postLoad($flags);
       return $this;
     }
   }
@@ -150,7 +176,8 @@ class Base {
   {
     foreach ($data as $prop => $value) {
       if (property_exists($this, $prop)) {
-        switch (gettype($this->$prop)) {
+        $type = gettype($this->$prop);
+        switch ($type) {
           case "boolean":
             $this->$prop = !!$value;
             break;
@@ -169,7 +196,16 @@ class Base {
             break;
           case "array":
           case "object":
-            $this->$prop = json_decode($value);
+            if (is_string($value)){
+              $this->$prop = \json_decode($value);
+            } else {
+              $this->$prop = $value;
+            }
+            break;
+          case 'null':
+          case 'NULL':
+          case null:
+            $this->$prop = null;
             break;
           default:
             echo "$prop => $value";
@@ -201,15 +237,18 @@ class Base {
   {
     $currentUser = $this->getCurrentUser();
     $this->modified_by = intval($currentUser->id);
+
     $data = $this->toArray();
     unset($data['date_created']);
     unset($data['date_modified']);
+
     unset($data['id']);
     foreach ($data as $prop => $value) {
       if (property_exists($this, $prop)) {
-        switch (gettype($this->$prop)) {
+        $type = gettype($this->$prop);
+
+        switch ($type) {
           case "boolean":
-            // $this->$prop = !!$value;
             $data[$prop] = $value ? 1 : 0;
             break;
           case "integer":
@@ -226,6 +265,11 @@ class Base {
             if (!is_string($value)) {
               $data[$prop] = json_encode($value);
             }
+            break;
+          case 'null':
+          case 'NULL':
+          case null:
+            $data[$prop] = null;
             break;
           default:
             echo "$prop => $value";
@@ -247,19 +291,13 @@ class Base {
   {
     $currentUser = $this->getCurrentUser();
     $this->modified_by = intval($currentUser->id);
-
-    if (!isset($this->id) || !$this->id) { // This has an ID, update it.
+    $data = $this->prepareSave();
+    if (!isset($this->id) || !$this->id) { // This has no ID, create new
       $this->created_by = intval($currentUser->id);
-      $data = $this->prepareSave();
-      $this->id = $this->insert($data)->execute();
-    } else { // NO ID, create new.
-      $data = $this->prepareSave();
 
-      $original = (array) $this->getDataById($this->id);
-      $diff = array_diff($data, $original);
-      if ($diff) {
-        $this->update($diff)->where('id', '=', $this->id)->execute();
-      }
+      $this->id = $this->insert($data)->execute();
+    } else { // Update existing
+      $this->update($data)->where('id', '=', $this->id)->execute();
     }
     return $this->postSave();
   }
@@ -334,6 +372,33 @@ class Base {
   protected function hiddenProps()
   {
     return array();
+  }
+
+  public function getTags($type = null)
+  {
+    if (!$type) {
+      $type = $this->table;
+    }
+    $tagsQuery = $this->select(['`tags`.*'])->from('tag_assignments')
+    ->leftJoin('tags', 'tag_id', 'id')
+    ->where('`tag_assignments`.`entity_type`', '=', $type)
+    ->and('`tag_assignments`.`entity_id`', '=', $this->id);
+    $this->tags = $tagsQuery->execute();
+    foreach($this->tags as &$tag) {
+      $tag->id = intval($tag->id);
+      $tag->tenant_id = intval($tag->tenant_id);
+    }
+  }
+
+// date_last_published 1743336733 30 March 2025 12:12:13 PM
+// course_start_date   1743445633 31 March 2025 06:27:13 PM
+  protected function prepareTimestampValue($key, &$data) {
+    if ($data[$key]){
+      $time = strtotime($data[$key]);
+      $data[$key] = $this->timestamp($data[$key]);
+    } else {
+      unset($data[$key]);
+    }
   }
 
   /**
