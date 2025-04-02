@@ -1,0 +1,38 @@
+@use '../field/field.component';
+
+.select {
+  position: relative;
+
+  .filter {
+    width: 100%;
+  }
+
+  .options {
+    position: absolute;
+    top: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0 1ex;
+    list-style-type: none;
+    max-height: 7em;
+    overflow: auto;
+    border: 1px solid var(--border);
+    background: var(--body);
+  }
+
+  .option {
+    padding: 0 1ex;
+    margin: .5em 0 0;
+    border: none;
+    background: transparent;
+    font-size: 1em;
+    width: 100%;
+    text-align: left;
+
+    &:hover {
+      background: var(--primary);
+      color: var(--primary-text);
+      cursor:pointer;
+    }
+  }
+}
