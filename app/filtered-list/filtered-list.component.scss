@@ -46,6 +46,10 @@
   button {
     border: none;
     background: transparent;
+
+    &[disabled] {
+      pointer-events: none;
+    }
   }
 }
 
