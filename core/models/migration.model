@@ -383,7 +383,8 @@ class Migration extends Base {
       string $type = '',
       string $null = '',
       mixed  $default = '',
-      string $comment = ''
+      string $comment = '',
+      string $extra = ''
   ) {
     $column = $this->getColumn($tableName, $columnName);
 
@@ -418,6 +419,9 @@ class Migration extends Base {
 
     if ($comment) {
       $query .= " COMMENT '{$comment}'";
+    }
+    if ($extra) {
+      $query .= " {$extra}";
     }
 
     return $this->raw($query)->execute();
