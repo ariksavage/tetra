@@ -49,9 +49,9 @@ export class MessagesComponent {
     });
   }
 
-  remove(id: string) {
+  remove(messageId: string) {
     this._list = this._list.filter((message: any) => {
-      return message.id !== id;
+      return message.messageId !== messageId;
     })
     this.count = this._list.length;
   }

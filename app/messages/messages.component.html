@@ -4,10 +4,10 @@
     <button class="dismiss-all" (click)="clearList()" *ngIf="count > 1">Dismiss all</button>
     <p class="none" *ngIf="count == 0">No messages.</p>
     <ul class="messages" *ngIf="count > 0">
-      <li *ngFor="let message of list()" id="message-{{message.id}}" class="message" [ngClass]="message.type">
-        <button class="dismiss-btn icon" (click)="remove(message.id)"><i class="fa-solid fa-times"></i></button>
+      <li *ngFor="let message of list()" id="message-{{message.messageId}}" class="message" [ngClass]="message.type">
+        <button class="dismiss-btn icon" (click)="remove(message.messageId)"><i class="fa-solid fa-times"></i></button>
         <p class="message-text" [innerHTML]="message.text"></p>
-        <p class="date" [title]="message.dateStr()">{{message.since()}}</p>
+        <p class="date" [title]="message.dateStr()">{{message.messageAge()}}</p>
       </li>
     </ul>
   </div>

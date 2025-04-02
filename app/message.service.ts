@@ -29,7 +29,7 @@ export class MessageService {
   add(text: string, type: string = '') {
     const message = new Message(text, type);
     this.setMessage(message);
-    return message.id;
+    return message.messageId;
   }
 
   /**
