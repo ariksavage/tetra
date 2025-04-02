@@ -18,7 +18,7 @@
   border-radius: 0;
   padding: .4em 1ex;
   background: var(--back);
-  border: 1px solid var(--fore);
+  border: 1px solid var(--back);
   color: var(--fore);
   margin: 0 1ex;
   text-decoration: none;
@@ -59,7 +59,7 @@
     }
   }
 
-  &.icon {
+  &.icon-only {
     border: 1px solid transparent;
     background: transparent;
     color: var(--fore);
@@ -82,17 +82,36 @@
       transform: translate(-50%, -50%);
     }
   }
+
+  &.success,
+  &.republish {
+    --fore: var(--success-text);
+    --back: var(--success);
+  }
+
+  &.info,
+  &.copy {
+    --fore: var(--info-text);
+    --back: var(--info);
+  }
+
+  &.danger,
+  &.delete {
+    --fore: var(--danger-text);
+    --back: var(--danger);
+  }
+
+  &.error,
+  &.archive {
+    --fore: var(--error-text);
+    --back: var(--error);
+  }
+
+  &.cancel {
+    --fore: var(--neutral-text);
+    --back: var(--neutral);
+  }
 }
-
-// .icon {
-//   &.before {
-//     margin-right: 1ex;
-//   }
-
-//   &.after {
-//     margin-left: 1ex;
-//   }
-// }
 
 .button-content {
   margin: 0 1ex;
