@@ -6,7 +6,7 @@ import { User } from '@tetra/user';
 
 @Component({
 		standalone: true,
-    selector: "Error404Page",
+    selector: "TetraError404Page",
     imports: [CommonModule],
     templateUrl: './404.page.html',
     styleUrl: './404.page.scss'
