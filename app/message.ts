@@ -1,13 +1,16 @@
-export class Message {
+import { Model } from '@tetra/model';
+
+export class Message extends Model{
   public text: string = '';
   public type: string = '';
-  public id: string = '';
+  public messageId: string = '';
   public date: Date = new Date();
 
   constructor(text: string, type: string = '') {
+    super({});
     this.text = text;
     this.type = type;
-    this.id = this.makeId(16);
+    this.messageId = this.makeId(16);
   }
 
   /**
@@ -36,39 +39,7 @@ export class Message {
     return `${h}:${i}:${s}${a}`;
   }
 
-  since() {
-    let str = '';
-    let n = 0;
-    const msSecond = 1000;
-    const msMinute = 60 * msSecond;
-    const msHour = 60 * msMinute;
-    const msDay = 24 * msHour;
-    const msMonth = 30 * msDay;
-    const msYear = 365 * msDay;
-
-    const elapsed = new Date().getTime() - this.date.getTime();
-
-    if (elapsed < msMinute) {
-      n = Math.round(elapsed / msSecond);
-      str = n + ' second';
-    } else if (elapsed < msHour) {
-      n = Math.round(elapsed / msMinute);
-      str = n + ' minute';
-    } else if (elapsed < msDay ) {
-      n = Math.round(elapsed / msHour);
-      str = n + ' hour';
-    } else if (elapsed < msMonth) {
-      n = Math.round(elapsed / msDay);
-      str = 'approximately' + n + ' day';
-    } else if (elapsed < msYear) {
-      n = Math.round(elapsed / msMonth);
-      str = 'approximately' + n + ' month';
-    } else {
-      n = Math.round(elapsed / msYear);
-      str = 'approximately' + n + ' year';
-    }
-    str += n == 1 ? ' ago' : 's ago';
-
-    return str;
+  messageAge() {
+    return this.since(this.date);
   }
 }
