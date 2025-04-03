@@ -1,0 +1,47 @@
+<?php
+/**
+ * Courses API
+ *
+ * Manage courses
+ *
+ * Handle entity tags
+ *
+ * PHP version 8.4
+ *
+ * @category   API
+ * @package    Core
+ * @author     Eric Savage <eric@hiapti.com>
+ * @version    1.0
+ * @since      2025-04-01
+ */
+namespace Core\API;
+
+/**
+ * Class Tags
+ *
+ * Handles all tags-related operations
+ */
+class Tags extends Base {
+
+  /**
+   * Class constructor
+   *
+   * Initializes the Courses API, requires 'courses' permission, and loads the required model.
+   */
+  public function __construct()
+  {
+    $this->requirePermission('tags');
+    require_once(CORE_ROOT . '/models/tag.model');
+    parent::__construct('tags', '\Core\Models\Tag', 'Tags', 'Tag');
+  }
+
+  public function newPOST()
+  {
+    require_once(CORE_ROOT . '/models/tag.model');
+    $label = $this->postValue('label', '', 'string');
+    $tag = new \Core\Models\Tag();
+    $tag->label = $label;
+    $tag->save();
+    $this->success('tag', $tag, "Tag \"$label\" created");
+  }
+}

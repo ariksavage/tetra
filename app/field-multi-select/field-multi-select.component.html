@@ -1,11 +1,12 @@
 
 <ul class="existing">
-  <li *ngFor="let item of model; let i = index" (click)="remove(i)">{{titleFunc(item)}}</li>
-<label *ngIf="label">{{label}}</label>
+  <li><label class="label" [for]="id() + '-filter'" *ngIf="label">{{label}}</label></li>
+  <li *ngFor="let item of model; let i = index"><button class="item" (click)="remove(i)">{{titleFunc(item)}}</button></li>
+</ul>
 <div class="select">
-  <input class="filter" [(ngModel)]="filter"/>
-  <ul class="options">
-    <li class="option new" *ngIf="!matchItem()"><button class="option new" (click)="new()">{{filter}} (Create new)</button></li>
-    <li *ngFor="let item of filteredItems()"><button class="option" (click)="add(item)">{{titleFunc(item)}}</button></li>
+  <input [id]="id() + '-filter'" class="filter" [(ngModel)]="filter" [placeholder]="placeholder" (focus)="onFocus()" (blur)="onBlur()"/>
+  <ul class="options" *ngIf="focus">
+    <li class="option new" *ngIf="!matchItem()"><button class="option new" (click)="new()" (focus)="onFocus()" (blur)="onBlur()">{{filter}} (Create new)</button></li>
+    <li *ngFor="let item of filteredItems()"><button class="option" (click)="add(item)" (focus)="onFocus()" (blur)="onBlur()">{{titleFunc(item)}}</button></li>
   </ul>
 </div>
