@@ -84,8 +84,11 @@ class Migration extends Base {
    */
   protected function echoLine(string $text, bool $overwrite = FALSE, string $char = '-', int $max = 120)
   {
-    // $n = intval(exec('tput cols')) ?? 80;
     $n = 80;
+    if (intval(exec('tput cols'))) {
+      $n = intval(exec('tput cols'));
+    }
+    // $n = 80;
     $n = min($n, $max);
     $x = $n - strlen($this->name) - strlen($text);
     if ($overwrite) {
@@ -343,6 +346,11 @@ class Migration extends Base {
       $query .= " AFTER `{$after}`";
     }
     return $this->raw($query)->execute();
+  }
+
+  protected function removeColumn(string $tableName, string $columnName)
+  {
+    return $this->raw("ALTER TABLE {$tableName} DROP COLUMN {$columnName};")->execute();
   }
 
   protected function renameColumn(string $tableName, string $old, string $new): bool

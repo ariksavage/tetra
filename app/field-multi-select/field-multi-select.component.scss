@@ -1,5 +1,18 @@
 @use '../field/field.component';
 
+.existing {
+  display: flex;
+  flex-wrap: wrap;
+  list-style-type: none;
+  margin: 0 0 1em;
+  padding: 0;
+
+  .item {
+    @extend %tag;
+    display: inline-block;
+    margin-left: 1ex;
+  }
+}
 .select {
   position: relative;
 
@@ -9,15 +22,16 @@
 
   .options {
     position: absolute;
+    overflow: hidden;
     top: 100%;
     width: 100%;
     margin: 0;
     padding: 0 1ex;
     list-style-type: none;
-    max-height: 7em;
     overflow: auto;
-    border: 1px solid var(--border);
     background: var(--body);
+    max-height: 7em;
+    border: 1px solid var(--border);
   }
 
   .option {
@@ -29,7 +43,8 @@
     width: 100%;
     text-align: left;
 
-    &:hover {
+    &:hover,
+    &:focus-visible {
       background: var(--primary);
       color: var(--primary-text);
       cursor:pointer;

@@ -376,6 +376,7 @@ class Base {
 
   public function getTags($type = null)
   {
+    require_once(CORE_ROOT . '/models/tag.model');
     if (!$type) {
       $type = $this->table;
     }
@@ -383,11 +384,52 @@ class Base {
     ->leftJoin('tags', 'tag_id', 'id')
     ->where('`tag_assignments`.`entity_type`', '=', $type)
     ->and('`tag_assignments`.`entity_id`', '=', $this->id);
-    $this->tags = $tagsQuery->execute();
+    $this->tags = $tagsQuery->execute(FALSE, '\Core\Models\Tag');
     foreach($this->tags as &$tag) {
       $tag->id = intval($tag->id);
       $tag->tenant_id = intval($tag->tenant_id);
     }
+  }
+
+  protected function saveTags() {
+    $userId = $this->getCurrentUser()->id;
+    // Get existing tags
+    $assignments = $this->select()
+      ->from('tag_assignments')
+      ->where('entity_type', '=', $this->table)
+      ->and('entity_id', '=', $this->id)
+      ->execute();
+
+    $oldIDs = array_map(function($item){return intval($item->tag_id);}, $assignments);
+    $newIDs = array_map(function($tag){return intval($tag->id);}, $this->tags);
+    // get tags to add
+    $addIDs = array_diff($newIDs, $oldIDs);
+    // get tags to remove
+    $delIDs = array_diff($oldIDs, $newIDs);
+
+    // Delete tags
+    if ($delIDs) {
+      $this->deleteQuery('tag_assignments')
+      ->where('tag_id', 'IN', $delIDs)
+      ->execute();
+    }
+
+    // Add new tags
+    if ($addIDs) {
+      foreach($addIDs as $tagID) {
+        $data = Array(
+          'entity_type' => $this->table,
+          'entity_id' => $this->id,
+          'tenant_id' => $this->tenant_id,
+          'tag_id' => $tagID,
+          'created_by' => $userId,
+          'modified_by' => $userId
+        );
+        $this->insert($data, 'tag_assignments')->execute();
+      }
+    }
+
+    unset($this->tags);
   }
 
 // date_last_published 1743336733 30 March 2025 12:12:13 PM
