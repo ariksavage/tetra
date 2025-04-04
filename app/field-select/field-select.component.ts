@@ -12,4 +12,22 @@ import { CommonModule } from '@angular/common';
 })
 export class TetraFieldSelectComponent extends TetraFieldComponent {
   @Input() options: any = null;
+  @Input() labelFunc: any = null;
+  @Input() valueFunc: any = null;
+
+  itemLabel(item: any) {
+    if (this.labelFunc) {
+      return this.labelFunc(item);
+    } else {
+      return item;
+    }
+  }
+
+  itemValue(item: any) {
+    if (this.valueFunc) {
+      return this.valueFunc(item);
+    } else {
+      return item;
+    }
+  }
 }

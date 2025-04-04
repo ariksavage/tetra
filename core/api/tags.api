@@ -37,11 +37,24 @@ class Tags extends Base {
 
   public function newPOST()
   {
-    require_once(CORE_ROOT . '/models/tag.model');
     $label = $this->postValue('label', '', 'string');
     $tag = new \Core\Models\Tag();
     $tag->label = $label;
     $tag->save();
     $this->success('tag', $tag, "Tag \"$label\" created");
+  }
+
+  public function typeGET(string $type) {
+    $tags = $this->select(['`tags`.*'])
+      ->from('tag_assignments')
+      ->leftJoin('tags', 'tag_id', 'id')
+      ->where('entity_type', '=', $type)
+      ->groupBy('`tag_assignments`.`tag_id`')
+      ->orderBy('`tags`.`label`')
+      ->execute(false, '\Core\Models\Tag');
+      $this->success('tags', $tags);
+//       select tags.* from tag_assignments
+// left join tags on tags.id = tag_assignments.tag_id
+// where entity_type = 'assets' group by tag_id order by tags.label
   }
 }

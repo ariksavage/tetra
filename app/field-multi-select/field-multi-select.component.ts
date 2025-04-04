@@ -15,6 +15,7 @@ export class TetraFieldMultiSelectComponent {
   @Input() placeholder: string = '';
   @Input() model: any = null;
   @Output() modelChange: EventEmitter<any> = new EventEmitter<any>();
+  @Output() afterChange: EventEmitter<any> = new EventEmitter<any>();
   @Input() items: Array<any> = [];
   @Input() titleFunc: any = null;
   @Input() newFunc: any = null;
@@ -67,9 +68,11 @@ export class TetraFieldMultiSelectComponent {
 
   add(item: any){
     this.model.push(item);
+    this.afterChange.emit(this.model);
   }
   remove(i: number) {
     this.model.splice(i, 1);
+    this.afterChange.emit(this.model);
   }
 
   new() {
