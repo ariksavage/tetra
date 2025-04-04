@@ -292,6 +292,10 @@ class Base {
       }
       $query->endGroup();
     }
+    if ($orderBy = $this->getValue('orderBy', 'ASC', 'string')) {
+      $orderDir = $this->getValue('orderDir', 'ASC', 'string');
+      $query->orderBy($orderBy, $orderDir);
+    }
     $query->paginate($page, $per);
     return $query;
   }

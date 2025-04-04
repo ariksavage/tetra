@@ -137,6 +137,19 @@ export class CoreService {
     });
   }
 
+  getParams(type: string, action: string, params: any) {
+    action += '?';
+    let i = 0;
+    for (let key in params) {
+      if (i > 0){
+        action += '&';
+      }
+      action += `${encodeURI(key)}=${encodeURI((params as any)[key])}`;
+      i++;
+    }
+    return this.get(type, action);
+  }
+
   getUrl(url: string) {
     return this.http.get(url, this.getConfig()).toPromise();
   }
