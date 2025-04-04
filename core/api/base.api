@@ -292,7 +292,7 @@ class Base {
       }
       $query->endGroup();
     }
-    if ($orderBy = $this->getValue('orderBy', 'ASC', 'string')) {
+    if ($orderBy = $this->getValue('orderBy', '', 'string')) {
       $orderDir = $this->getValue('orderDir', 'ASC', 'string');
       $query->orderBy($orderBy, $orderDir);
     }
@@ -373,6 +373,9 @@ class Base {
       $value = $_GET[$key];
     }
     switch ($type) {
+      case 'array':
+        $value = explode(',', $value);
+        break;
       case 'integer':
         $value = intval($value);
         break;

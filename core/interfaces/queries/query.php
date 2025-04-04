@@ -119,7 +119,7 @@ class Query
     } else if (is_object($value) || is_array($value)) {
       $value = json_encode($value);
       return '"' . $this->conn->real_escape_string($value) . '"';
-    } else if ($value && stristr($value, '()')) {
+    } else if (in_array($value, ['current_timestamp()'])) {
       return $value;
     } else if (($value || $value === '') && is_string($value)) {
       if (!$this->conn) {
