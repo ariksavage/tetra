@@ -82,7 +82,7 @@ class Base {
   public function __construct(
       string $itemLabel,
       string $table,
-      object|null $data = NULL,
+      object|NULL $data = NULL,
       array $flags = []
   ) {
     $this->table = $table;
@@ -243,6 +243,10 @@ class Base {
     unset($data['date_modified']);
 
     unset($data['id']);
+    if (isset($data['tags'])) {
+      $this->saveTags();
+      unset($data['tags']);
+    }
     foreach ($data as $prop => $value) {
       if (property_exists($this, $prop)) {
         $type = gettype($this->$prop);
