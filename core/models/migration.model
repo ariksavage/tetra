@@ -511,7 +511,7 @@ class Migration extends Base {
     ->where('dimension', '=', $dimension)
     ->and('action', '=', $action)
     ->execute(FALSE);
-    return count($permission) > 0;
+    return $permission && count($permission) > 0;
   }
 
   public function createPermission($dimension, $action, $title = '', $description = ''): int
@@ -522,7 +522,15 @@ class Migration extends Base {
       $title = ucwords($action) . ' '. ucwords($dimensionName);
     }
     if (!$description) {
-      $description = "User is allowed to " . strtolower($action) . ' ' . $dimensionName;
+      if (stristr($action, '*')){
+        $description = "User has full access to {$dimensionName}";
+      } else {
+        $actionLower = strtolower($action);
+        $description = "User is allowed to {$actionLower} {$dimensionName}";
+      }
+    }
+    if ($action == '*'){
+      $action = "'*'";
     }
     $permission = array(
       'dimension' => $dimension,
