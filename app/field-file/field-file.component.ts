@@ -6,9 +6,8 @@ import { HttpClient, HttpHeaders, HttpEventType } from '@angular/common/http';
 import { Observable, Subject, EMPTY, throwError, finalize } from "rxjs";
 
 @Component({
-		standalone: true,
+	standalone: true,
   selector: '.field.file',
-  standalone: true,
   imports: [ CommonModule, FormsModule ],
   templateUrl: './field-file.component.html',
   styleUrl: './field-file.component.scss'

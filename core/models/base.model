@@ -146,6 +146,11 @@ class Base {
     if (in_array('WITH_TAGS', $flags)) {
       $this->getTags();
     }
+    $this->validate();
+  }
+
+  protected function validate() {
+    return $this;
   }
 
   /**
@@ -196,8 +201,8 @@ class Base {
             break;
           case "array":
           case "object":
-            if (is_string($value)){
-              $this->$prop = \json_decode($value);
+            if (is_string($value) && json_decode($value)){
+              $this->$prop = json_decode($value);
             } else {
               $this->$prop = $value;
             }
