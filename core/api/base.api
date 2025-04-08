@@ -170,6 +170,12 @@ class Base {
     }
   }
 
+  protected function byId(int $id){
+    $model = new $this->model();
+    $model->byId($id);
+    return $model;
+  }
+
   /**
    * Delete the item with the given $id.
    *
@@ -180,8 +186,7 @@ class Base {
   public function deleteDELETE(int $id)
   {
     $this->reqPermission('DELETE');
-    $model = new $this->model();
-    $model->byId($id);
+    $model = $this->byId($id);
     if ($model->delete()) {
       $this->successMsg("Deleted {$this->singular} $id");
     }

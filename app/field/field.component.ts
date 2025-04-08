@@ -12,7 +12,7 @@ export class TetraFieldComponent implements OnInit {
   @Input() label: string = '';
   @Input() model: any = null;
   @Input() placeholder: string = '';
-  @Output() modelChange = new EventEmitter<string>();
+  @Output() modelChange: EventEmitter<any> = new EventEmitter<any>();
   @Output() afterChange = new EventEmitter<boolean>();
   type: string = 'text';
   error: string = '';
@@ -39,6 +39,7 @@ export class TetraFieldComponent implements OnInit {
     const self = this;
     clearTimeout(this.updateDebounce);
     this.updateDebounce = setTimeout(function() {
+      console.log('update');
       self.touched = true;
       self.modelChange.emit(self.model);
       self.afterChange.emit(true);
