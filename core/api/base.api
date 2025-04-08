@@ -192,6 +192,14 @@ class Base {
     }
   }
 
+  protected function listGetResults($query, $model = '', $flags = []) {
+    if (!$model && $this->model) {
+      $model = $this->model;
+    }
+    $results = $query->execute(FALSE, $model, $flags);
+    return $results;
+  }
+
   /**
    * Get results from a query, along with pagination information.
    *
@@ -210,10 +218,8 @@ class Base {
       array $flags = []
   ) {
     $total = $query->getTotal();
-    if (!$model && $this->model) {
-      $model = $this->model;
-    }
-    $results = $query->execute(FALSE, $model, $flags);
+
+    $results = $this->listGetResults($query, $model, $flags);
     $pagination = (object) array(
       'current_results' => count($results),
       'total_results' => $total
@@ -379,7 +385,9 @@ class Base {
     }
     switch ($type) {
       case 'array':
-        $value = explode(',', $value);
+        if (is_string($value)){
+          $value = explode(',', $value);
+        }
         break;
       case 'integer':
         $value = intval($value);
