@@ -1,4 +1,5 @@
 <label class="label" [attr.for]="id()" *ngIf="label">{{label}}</label>
+{{file|json}}
 <input type="file" class="file-input"
        (change)="onFileSelected($event)" #fileUpload>
 <p class="error" *ngIf="error">{{error}}</p>
