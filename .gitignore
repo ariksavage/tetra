@@ -4,6 +4,8 @@ src/**/*.js
 src/**/*.js.map
 src/**/*.d.ts
 
+public
+
 # IDEs
 .idea/
 jsconfig.json
