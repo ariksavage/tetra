@@ -11,10 +11,12 @@ import { CommonModule } from '@angular/common';
 export class TetraPopupComponent {
   @Input() title: string = '';
   @Input() open: boolean = false;
+  @Output() openChange: EventEmitter<boolean> = new EventEmitter<boolean>();
   id: string = '';
   @Output() onClose: EventEmitter<any> = new EventEmitter<any>();
   @ViewChild('popupWindow') popupWindow: ElementRef = {} as ElementRef;
   @ViewChild('popupBackDrop') backdrop: ElementRef = {} as ElementRef;
+  @Input() button: boolean = true;
 
   ngOnInit(){
     this.id = 'popup-';
@@ -46,7 +48,7 @@ export class TetraPopupComponent {
 
   toggle() {
     this.open = !this.open;
-
+    this.openChange.emit(this.open);
     if (!this.open) {
       this.onClose.emit();
     }
