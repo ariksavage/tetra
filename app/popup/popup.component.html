@@ -1,4 +1,4 @@
-<button class="toggle-btn" (click)="toggle()" [title]="title">
+<button *ngIf="button" class="toggle-btn" (click)="toggle()" [title]="title">
   <ng-content select="[button]"></ng-content>
 </button>
 <div #popupWindow [id]="id" class="popup-window" [ngClass]="{'show': open}">

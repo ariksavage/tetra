@@ -1,3 +1,10 @@
-<input class="input" [(colorPicker)]="model" [style.background]="model" [attr.id]="id()" (colorPickerCancel)="onBlur($event)" (colorPickerSelect)="onFocus($event)" (colorPickerChange)="onChange($event)" (keydown)="onKeyDown($event)"/>
-<label class="label" [attr.for]="id()" *ngIf="label">{{label}}: <span class="value">{{model || 'none'}}</span></label>
+<label class="label">{{label}}</label>
+<div class="input">
+  <div class="color-picker" [ngClass]="{'none': !model}"  [style.background]="model" (change)="onChange($event)">
+    <input class="picker" type="color" [(ngModel)]="model" [attr.id]="id()" (change)="onChange($event)"/>
+  </div>
+  <input class="hex" placeholder="#FFFFFF" type="text" [(ngModel)]="model"  [attr.id]="id()" (keydown)="onKeyDown($event)"/>
+</div>
+
+
 <p class="error" *ngIf="error">{{error}}</p>
