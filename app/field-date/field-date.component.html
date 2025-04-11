@@ -1,5 +1,5 @@
 <span class="label" *ngIf="label">{{label}}</span>
-<select class="month" [(ngModel)]="month" (change)="update()">
+<select *ngIf="model" class="month" [(ngModel)]="month" (change)="update()">
   <option value="1">January</option>
   <option value="2">February</option>
   <option value="3">March</option>
@@ -13,6 +13,5 @@
   <option value="11">November</option>
   <option value="12">December</option>
 </select>
-
-<input class="date" type="number" [(ngModel)]="date" (change)="update()" />
-<input class="year" type="number" [(ngModel)]="year" (change)="update()" />
+<input *ngIf="month" class="date" type="number" [(ngModel)]="date" (change)="update()" min="1" [max]="daysInMonth()"/>
+<input *ngIf="date" class="year" type="number" [(ngModel)]="year" (change)="update()" />
