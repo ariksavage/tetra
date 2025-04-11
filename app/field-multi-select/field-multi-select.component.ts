@@ -18,13 +18,19 @@ export class TetraFieldMultiSelectComponent {
   @Output() afterChange: EventEmitter<any> = new EventEmitter<any>();
   @Input() items: Array<any> = [];
   @Input() titleFunc: any = null;
+  @Input() valueFunc: any = null;
   @Input() newFunc: any = null;
   filter: string = '';
   focus: boolean = false;
   blurTO: any = null;
+  @Input() allowNew: boolean = true;
 
   id(){
     return 'multi-select-' + this.label.toLowerCase();
+  }
+
+  value(item: any) {
+    return item;
   }
 
   filteredItems() {
@@ -34,13 +40,12 @@ export class TetraFieldMultiSelectComponent {
         include = false;
       } else {
         this.model.forEach((modelItem: any) => {
-          if (this.titleFunc(modelItem) == this.titleFunc(item)){
+          if (this.value(modelItem) == this.value(item)){
             include = false;
           }
         })
       }
       return include;
-      // return !this.model.includes(x) && (!this.filter || this.titleFunc(x).indexOf(this.filter) > -1);
     }).sort((a: any, b: any) => {
       return this.titleFunc(a).localeCompare(this.titleFunc(b));
     });
@@ -55,7 +60,6 @@ export class TetraFieldMultiSelectComponent {
   }
 
   onFocus() {
-
     clearTimeout(this.blurTO);
     this.focus = true;
   }
@@ -67,7 +71,7 @@ export class TetraFieldMultiSelectComponent {
   }
 
   add(item: any){
-    this.model.push(item);
+    this.model.push(this.value(item));
     this.afterChange.emit(this.model);
   }
   remove(i: number) {

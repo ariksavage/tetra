@@ -87,4 +87,9 @@ export class Model {
 
     return str;
   }
+
+  preSave() {
+    let copy = JSON.parse(JSON.stringify(this));
+    return copy;
+  }
 }
