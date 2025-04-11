@@ -43,12 +43,10 @@ export class AppService {
       }
     });
     messages.getMessage().subscribe((message: any) => {
-      // console.log('app message', message);
     });
   }
 
   addBreadcrumbParent(title: string, path: string) {
-    // console.log('add breadcrumb', this._breadcrumbs);
     this._breadcrumbs.push({
       title,
       path

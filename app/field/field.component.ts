@@ -39,7 +39,6 @@ export class TetraFieldComponent implements OnInit {
     const self = this;
     clearTimeout(this.updateDebounce);
     this.updateDebounce = setTimeout(function() {
-      console.log('update');
       self.touched = true;
       self.modelChange.emit(self.model);
       self.afterChange.emit(true);
