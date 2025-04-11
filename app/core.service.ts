@@ -147,7 +147,6 @@ export class CoreService {
       action += `${encodeURI(key)}=${encodeURI((params as any)[key])}`;
       i++;
     }
-    console.log('action', action);
     return this.get(type, action);
   }
 

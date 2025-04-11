@@ -84,13 +84,13 @@ export class TetraPage {
     this.setStyles();
   }
 
-  getParam(key: string){
+  getParam(key: string, type: string = 'number'){
     let value = this.routeParams.get(key);
 
-    if (!isNaN(value)){
-      return value;
-    } else {
+    if (type == 'number'){
       return parseInt(value);
+    } else {
+      return value;
     }
   }
 
