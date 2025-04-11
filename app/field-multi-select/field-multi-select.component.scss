@@ -1,5 +1,10 @@
 @use '../field/field.component';
 
+.label {
+  display: block;
+  margin: 0 1ex .5em 0;
+}
+
 .existing {
   display: flex;
   flex-wrap: wrap;
