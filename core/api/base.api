@@ -277,6 +277,33 @@ class Base {
     return [];
   }
 
+  protected function searchQuery(&$query, $columns = [])
+  {
+    $search = $this->getValue('search');
+    if ($search) {
+      $query->andGroup();
+      $searchColumns  = $columns ? $columns : $this->searchColumns();
+      if (!count($searchColumns)) {
+        $this->error("searchColumns() not configured.");
+      }
+      foreach ($this->searchColumns() as $k => $column) {
+        if ($k > 0) {
+          $query->or($column, 'CONTAINS', $search);
+        }
+      }
+      $query->endGroup();
+    }
+    return $query;
+  }
+
+  protected function orderQuery(&$query) {
+    if ($orderBy = $this->getValue('orderBy', '', 'string')) {
+      $orderDir = $this->getValue('orderDir', 'ASC', 'string');
+      $query->orderBy($orderBy, $orderDir);
+    }
+    return $query;
+  }
+
   /**
    * Build a query to list items.
    * May be expanded by specific APIs
@@ -289,24 +316,8 @@ class Base {
   protected function listQuery(int $page = 1, int $per = 20): \Core\Database\selectQuery
   {
     $query = $this->select()->from($this->table);
-    $search = $this->getValue('search');
-    if ($search) {
-      $query->andGroup();
-      $searchColumns  = $this->searchColumns();
-      if (!count($searchColumns)) {
-        $this->error("searchColumns() not configured.");
-      }
-      foreach ($this->searchColumns() as $k => $column) {
-        if ($k > 0) {
-          $query->or($column, 'CONTAINS', $search);
-        }
-      }
-      $query->endGroup();
-    }
-    if ($orderBy = $this->getValue('orderBy', '', 'string')) {
-      $orderDir = $this->getValue('orderDir', 'ASC', 'string');
-      $query->orderBy($orderBy, $orderDir);
-    }
+    $this->searchQuery($query);
+    $this->orderQuery($query);
     $query->paginate($page, $per);
     return $query;
   }
@@ -388,6 +399,9 @@ class Base {
         if (is_string($value)){
           $value = explode(',', $value);
         }
+        break;
+      case 'boolean':
+        $value = $value == 1;
         break;
       case 'integer':
         $value = intval($value);

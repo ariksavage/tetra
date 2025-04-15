@@ -16,6 +16,10 @@
     @extend %tag;
     display: inline-block;
     margin-left: 1ex;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 18ex;
   }
 }
 .select {
@@ -33,6 +37,7 @@
     width: 100%;
     margin: 0;
     padding: 0 1ex;
+    z-index: 20;
     list-style-type: none;
     overflow: auto;
     background: var(--body);
@@ -40,20 +45,31 @@
     border: 1px solid var(--border);
   }
 
+  &.up {
+    .options {
+      bottom: 100%;
+      top: unset;
+    }
+  }
+
   .option {
     padding: 0 1ex;
     margin: .5em 0 0;
-    border: none;
-    background: transparent;
-    font-size: 1em;
-    width: 100%;
-    text-align: left;
 
-    &:hover,
-    &:focus-visible {
-      background: var(--primary);
-      color: var(--primary-text);
-      cursor:pointer;
+
+    button {
+      border: none;
+      background: transparent;
+      font-size: 1em;
+      width: 100%;
+      text-align: left;
+
+      &:hover,
+      &:focus-visible {
+        background: var(--primary);
+        color: var(--primary-text);
+        cursor:pointer;
+      }
     }
   }
 }

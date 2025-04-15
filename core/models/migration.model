@@ -348,6 +348,59 @@ class Migration extends Base {
     return $this->raw($query)->execute();
   }
 
+  protected function addDateCreated(string $tableName)
+  {
+    return $this->addColumn(
+      $tableName,
+      'date_created',
+      'timestamp',
+      FALSE,
+      'current_timestamp()',
+      '',
+      'tenant_id'
+    );
+  }
+
+  protected function addCreatedBy(string $tableName)
+  {
+    return $this->addColumn(
+      $tableName,
+      'created_by',
+      'INT(11)',
+      FALSE,
+      '0',
+      '',
+      'date_created'
+    );
+  }
+
+  protected function addDateModified(string $tableName)
+  {
+    return $this->addColumn(
+      $tableName,
+      'date_modified',
+      'timestamp',
+      FALSE,
+      'current_timestamp()',
+      '',
+      'created_by',
+      'on update CURRENT_TIMESTAMP'
+    );
+  }
+
+  protected function addModifiedBy(string $tableName)
+  {
+    return $this->addColumn(
+      $tableName,
+      'modified_by',
+      'INT(11)',
+      FALSE,
+      '0',
+      '',
+      'date_modified'
+    );
+  }
+
   protected function removeColumn(string $tableName, string $columnName)
   {
     return $this->raw("ALTER TABLE {$tableName} DROP COLUMN {$columnName};")->execute();
@@ -506,11 +559,14 @@ class Migration extends Base {
 
   public function permissionExists(string $dimension, string $action = ''): bool
   {
-    $permission = $this->select()
+    if ($action == '*'){
+      $action = "'*'";
+    }
+    $query =$this->select()
     ->from('user_permissions')
     ->where('dimension', '=', $dimension)
-    ->and('action', '=', $action)
-    ->execute(FALSE);
+    ->and('action', '=', $action);
+    $permission = $query->execute(FALSE);
     return $permission && count($permission) > 0;
   }
 

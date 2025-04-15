@@ -1,0 +1,4 @@
+<label class="label">{{label}}</label>
+<ul class="options">
+  <li class="option" *ngFor="let option of options"><label (click)="set(option)"><input type="radio" [name]="label" [value]="itemValue(option)" [(ngModel)]="model">{{itemLabel(option)}}</label></li>
+</ul>

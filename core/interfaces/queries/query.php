@@ -114,6 +114,8 @@ class Query
       return 0;
     } else if ($value === TRUE) {
       return 1;
+    } else if ($value === '0'){
+      return 0;
     } else if (($value || $value === 0 ) && is_numeric($value)) {
       return $value;
     } else if (is_object($value) || is_array($value)) {

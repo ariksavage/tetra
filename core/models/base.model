@@ -146,7 +146,7 @@ class Base {
     if (in_array('WITH_TAGS', $flags)) {
       $this->getTags();
     }
-    $this->validate();
+    return $this;
   }
 
   protected function validate() {
