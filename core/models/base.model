@@ -285,6 +285,9 @@ class Base {
             die("unhandled type: " . gettype($this->$prop));
             break;
         }
+        if (stristr($prop, 'date') && $value > 86400) {
+          $data[$prop] = $this->timestamp($value);
+        }
       }
     }
     if (!isset($data['created_by']) || !$data['created_by'] ) {
