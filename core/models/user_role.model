@@ -27,7 +27,7 @@ class UserRole extends Base {
    * Shorthand string for this role
    * @var String
    */
-  public string $title = '';
+  public string $label = '';
 
   /**
    * Shorthand string for this role

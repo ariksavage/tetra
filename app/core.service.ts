@@ -137,21 +137,26 @@ export class CoreService {
     });
   }
 
-  getParams(type: string, action: string, params: any) {
-    action += '?';
+  getParams(params: any, type: string, action: string = '', id: any = null, id2: any = null) {
+    let url = this.url(type, action, id, id2);
+    url += '?';
     let i = 0;
     for (let key in params) {
       if (i > 0){
-        action += '&';
+        url += '&';
       }
-      action += `${encodeURI(key)}=${encodeURI((params as any)[key])}`;
+      url += `${encodeURI(key)}=${encodeURI((params as any)[key])}`;
       i++;
     }
-    return this.get(type, action);
+    return this.getUrl(url);
   }
 
   getUrl(url: string) {
-    return this.http.get(url, this.getConfig()).toPromise();
+    return this.http.get(url, this.getConfig()).toPromise().then((result: any) => {
+      return this.handleResult(result, url);
+    }, (response: any) => {
+      return this.handleError(url, response.error)
+    });
   }
   /**
    * http PATCH request

@@ -19,17 +19,9 @@
   background: var(--back);
   border: 1px solid var(--back);
   color: var(--fore);
-  margin: 0 1ex;
   text-decoration: none;
   transition: all .2s;
-
-  &:first-child {
-    margin-left: 0;
-  }
-
-  &:last-child {
-    margin-right: 0;
-  }
+  font-size: 1em;
 
   &:hover,
   &:focus-visible {
@@ -110,6 +102,23 @@
     --fore: var(--neutral-text);
     --back: var(--neutral);
   }
+
+  &.warning,
+  &.reset {
+    --fore: var(--warning-text);
+    --back: var(--warning);
+  }
+
+  &.emboss {
+    color: rgba(0, 0, 0, .6);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--back);
+      background: transparent;
+      border: none;
+    }
+  }
 }
 
 .button-content {
@@ -126,4 +135,7 @@
   &:last-child {
     margin-right: 0;
   }
+}
+.icon {
+  font-size: 1em;
 }

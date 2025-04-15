@@ -73,7 +73,14 @@ $core = new \Core\API\Users();
 $core->idGET($id);
 ?>
 ```
+### Conventions
+ Keeping common naming conventions will make this code more easily readable, and aid in abstraction.
+#### Database
+- Assignment table names will follow the convestion of `{subject}_{target}_assignments`. 
+    For example: `user_group_assignments`
+    Users are assigned to groups. Even in this case where it is a many-to-many relationship, so groups are also assigned to users, we assume the more basic element: the user is the subject of this action.
 
+- `Label` vs `title`. Label is the more general term, and a `label` may be used in multiple contexts, not just as the title of an object. Because of this, we will use `label` as the universal column name representing the names/titles/labels of objects.
 ### APIs
 An API is a class which contains methods to handle HTTP requests. All responses, success and error, will be returned as raw JSON to be consumed by the Angular front end.
 
