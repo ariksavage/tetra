@@ -170,7 +170,8 @@ class Base {
     }
   }
 
-  protected function byId(int $id){
+  protected function byId(int $id)
+  {
     $model = new $this->model();
     $model->byId($id);
     return $model;
@@ -192,7 +193,8 @@ class Base {
     }
   }
 
-  protected function listGetResults($query, $model = '', $flags = []) {
+  protected function listGetResults($query, $model = '', $flags = [])
+  {
     if (!$model && $this->model) {
       $model = $this->model;
     }
@@ -296,7 +298,8 @@ class Base {
     return $query;
   }
 
-  protected function orderQuery(&$query) {
+  protected function orderQuery(&$query)
+  {
     if ($orderBy = $this->getValue('orderBy', '', 'string')) {
       $orderDir = $this->getValue('orderDir', 'ASC', 'string');
       $query->orderBy($orderBy, $orderDir);
@@ -396,7 +399,7 @@ class Base {
     }
     switch ($type) {
       case 'array':
-        if (is_string($value)){
+        if (is_string($value)) {
           $value = explode(',', $value);
         }
         break;

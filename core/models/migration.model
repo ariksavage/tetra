@@ -559,7 +559,7 @@ class Migration extends Base {
 
   public function permissionExists(string $dimension, string $action = ''): bool
   {
-    if ($action == '*'){
+    if ($action == '*') {
       $action = "'*'";
     }
     $query =$this->select()
@@ -578,14 +578,14 @@ class Migration extends Base {
       $title = ucwords($action) . ' '. ucwords($dimensionName);
     }
     if (!$description) {
-      if (stristr($action, '*')){
+      if (stristr($action, '*')) {
         $description = "User has full access to {$dimensionName}";
       } else {
         $actionLower = strtolower($action);
         $description = "User is allowed to {$actionLower} {$dimensionName}";
       }
     }
-    if ($action == '*'){
+    if ($action == '*') {
       $action = "'*'";
     }
     $permission = array(
