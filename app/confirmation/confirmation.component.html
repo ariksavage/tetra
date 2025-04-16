@@ -1,0 +1,13 @@
+<div class="dialog">
+  <div class="header">
+    <h2 class="title" *ngIf="title">{{title}}</h2>
+  </div>
+  <div class="body">
+    <ng-content></ng-content>
+  </div>
+  <div class="footer">
+    <button class="cancel" (click)="cancelAction()">{{cancelText}}</button>
+    <button class="confirm primary" (click)="confirmAction()">{{confirmText}}</button>
+  </div>
+</div>
+<div class="backdrop"></div>
