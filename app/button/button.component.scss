@@ -75,7 +75,8 @@
   }
 
   &.success,
-  &.republish {
+  &.republish,
+  &.add {
     --fore: var(--success-text);
     --back: var(--success);
   }

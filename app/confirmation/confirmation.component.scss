@@ -1,0 +1,36 @@
+@use '../../../styles/_global';
+.dialog{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 21;
+  display: flex;
+  flex-direction: column;
+  max-width: 50vw;
+  max-height: 50vh;
+  background: var(--body);
+  border: 1px solid var(--border);
+  padding: var(--space);
+}
+
+.header {
+  padding: var(--space) var(--space) 0;
+}
+.title {
+  margin: 0;
+  text-align: center;
+}
+.body {
+  padding: var(--space);
+}
+.footer {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  padding: 0 var(--space) var(--space);
+}
+
+.backdrop {
+  @extend %backdrop;
+}
