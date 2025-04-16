@@ -74,7 +74,7 @@ class Base {
    *
    * @param string      itemLabel Singular name for this item, eg "User"
    * @param string      $table    Database table where this item is stored, eg "users"
-   * @param object|null $data     Data to be mapped onto this item
+   * @param object|NULL $data     Data to be mapped onto this item
    * @param array       $flags    Additional parameters.
    *
    * @return            $this
@@ -100,8 +100,9 @@ class Base {
     return $this;
   }
 
-  protected function defaults() {
-    if (isset($_SESSION['user'])){
+  protected function defaults()
+  {
+    if (isset($_SESSION['user'])) {
       $userId = $this->getCurrentUser()->id;
       $this->created_by = $userId;
       $this->modified_by = $userId;
@@ -142,14 +143,16 @@ class Base {
    * @param  array  $flags [description]
    * @return [type]        [description]
    */
-  protected function postLoad(array $flags = []) {
+  protected function postLoad(array $flags = [])
+  {
     if (in_array('WITH_TAGS', $flags)) {
       $this->getTags();
     }
     return $this;
   }
 
-  protected function validate() {
+  protected function validate()
+  {
     return $this;
   }
 
@@ -201,16 +204,16 @@ class Base {
             break;
           case "array":
           case "object":
-            if (is_string($value) && json_decode($value)){
+            if (is_string($value) && json_decode($value)) {
               $this->$prop = json_decode($value);
             } else {
               $this->$prop = $value;
             }
             break;
-          case 'null':
           case 'NULL':
-          case null:
-            $this->$prop = null;
+          case 'null':
+          case NULL:
+            $this->$prop = NULL;
             break;
           default:
             echo "$prop => $value";
@@ -275,10 +278,10 @@ class Base {
               $data[$prop] = json_encode($value);
             }
             break;
-          case 'null':
           case 'NULL':
-          case null:
-            $data[$prop] = null;
+          case 'NULL':
+          case NULL:
+            $data[$prop] = NULL;
             break;
           default:
             echo "$prop => $value";
@@ -386,7 +389,7 @@ class Base {
     return array();
   }
 
-  public function getTags($type = null)
+  public function getTags($type = NULL)
   {
     require_once(CORE_ROOT . '/models/tag.model');
     if (!$type) {
@@ -397,13 +400,14 @@ class Base {
     ->where('`tag_assignments`.`entity_type`', '=', $type)
     ->and('`tag_assignments`.`entity_id`', '=', $this->id);
     $this->tags = $tagsQuery->execute(FALSE, '\Core\Models\Tag');
-    foreach($this->tags as &$tag) {
+    foreach ($this->tags as &$tag) {
       $tag->id = intval($tag->id);
       $tag->tenant_id = intval($tag->tenant_id);
     }
   }
 
-  protected function saveTags() {
+  protected function saveTags()
+  {
     $userId = $this->getCurrentUser()->id;
     // Get existing tags
     $assignments = $this->select()
@@ -412,8 +416,12 @@ class Base {
       ->and('entity_id', '=', $this->id)
       ->execute();
 
-    $oldIDs = array_map(function($item){return intval($item->tag_id);}, $assignments);
-    $newIDs = array_map(function($tag){return intval($tag->id);}, $this->tags);
+    $oldIDs = array_map(function ($item) {
+      return intval($item->tag_id);
+    }, $assignments);
+    $newIDs = array_map(function ($tag) {
+      return intval($tag->id);
+    }, $this->tags);
     // get tags to add
     $addIDs = array_diff($newIDs, $oldIDs);
     // get tags to remove
@@ -428,8 +436,8 @@ class Base {
 
     // Add new tags
     if ($addIDs) {
-      foreach($addIDs as $tagID) {
-        $data = Array(
+      foreach ($addIDs as $tagID) {
+        $data = array(
           'entity_type' => $this->table,
           'entity_id' => $this->id,
           'tenant_id' => $this->tenant_id,
@@ -444,10 +452,9 @@ class Base {
     unset($this->tags);
   }
 
-// date_last_published 1743336733 30 March 2025 12:12:13 PM
-// course_start_date   1743445633 31 March 2025 06:27:13 PM
-  protected function prepareTimestampValue($key, &$data) {
-    if ($data[$key]){
+  protected function prepareTimestampValue($key, &$data)
+  {
+    if ($data[$key]) {
       $time = strtotime($data[$key]);
       $data[$key] = $this->timestamp($data[$key]);
     } else {
