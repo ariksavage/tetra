@@ -39,6 +39,8 @@ main {
   width: 100%;
   overflow: hidden;
   position: relative;
+  display: flex;
+  flex-direction: column;
 }
 
 .page-title {
