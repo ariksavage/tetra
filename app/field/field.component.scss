@@ -6,6 +6,24 @@
   max-width: 100%;
   box-sizing: border-box;
 
+  &.filter {
+    border: 1px solid #000;
+
+    .label {
+      display: block;
+      margin: 0;
+      background: #000;
+      color: #fff;
+      margin-bottom: .5em;
+      padding: 0 1ex;
+    }
+
+    .input {
+      display: block;
+      width: 100%;
+    }
+  }
+
   &.full {
     .input {
       display:inline-block;

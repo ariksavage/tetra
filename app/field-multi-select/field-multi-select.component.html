@@ -1,5 +1,5 @@
 <label class="label" [for]="id() + '-filter'" *ngIf="label">{{label}}</label>
-<ul class="existing">
+<ul *ngIf="model.length" class="existing">
   <li *ngFor="let item of model; let i = index"><button class="item" (click)="remove(i)" [title]="titleFunc(item)">{{titleFunc(item)}}</button></li>
 </ul>
 <div #select class="select">
