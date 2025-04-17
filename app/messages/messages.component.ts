@@ -46,6 +46,7 @@ export class MessagesComponent {
 
   handleToast(message: any) {
     this.toastMessage = message;
+    this.toastClass = 'up';
     this.cdRef.detectChanges();
     setTimeout(() => {
       this.toastClass = 'transition';
