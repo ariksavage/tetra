@@ -1,4 +1,4 @@
-import { Component, HostBinding } from '@angular/core';
+import { Component, HostBinding, ElementRef, ViewChild } from '@angular/core';
 import { UserService } from '@tetra/user.service';
 import { User } from '@tetra/user';
 import { CoreService } from '@tetra/core.service';
@@ -22,14 +22,16 @@ export class TetraAppComponent {
   user: User|null = null;
   copyright: string = '';
   @HostBinding('class') bodyClass = '';
+  @ViewChild('appRoot') appRoot: ElementRef = {} as ElementRef;
 
   constructor(
     protected appService: AppService,
     protected userService: UserService,
     protected core: CoreService,
-    protected titleService:Title,
+    protected titleService:Title
   ) {
     const self = this;
+    // let element: ElementRef = this.app; //['components'][0].location;
     appService.getConfig().subscribe((config: any) => {
       self.config = config;
       self.titleService.setTitle(config.name);
@@ -59,6 +61,5 @@ export class TetraAppComponent {
   setBodyClass(bodyClass: string) {
     bodyClass = bodyClass.toLowerCase();
     bodyClass = bodyClass.replace(/[^a-z\-]+/g,"-");
-    // this.bodyClass = bodyClass;
   }
 }

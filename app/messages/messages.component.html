@@ -12,3 +12,8 @@
     </ul>
   </div>
 </div>
+
+<div class="toast message" *ngIf="toastMessage" [ngClass]="toastClass">
+  <button class="dismiss-btn icon" (click)="dismissToast(toastMessage.messageId)"><i class="fa-solid fa-times"></i></button>
+  <p class="toastMessage-text" [innerHTML]="toastMessage.text"></p>
+</div>
