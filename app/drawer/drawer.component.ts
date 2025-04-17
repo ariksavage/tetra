@@ -47,10 +47,6 @@ export class TetraDrawerComponent {
     return result;
   }
 
-  // id() {
-  //   return this._id;
-  // }
-
   toggle() {
     const self = this;
     if (this.open) {
