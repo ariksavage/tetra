@@ -46,7 +46,7 @@ export class UserService {
     }
 
     if (!this.token) {
-      return new Promise((resolve, reject) => {reject('no token found')});
+      return new Promise((resolve, reject) => {resolve('no token found')});
     }
     this.core.setAuth(this.token);
 
