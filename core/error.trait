@@ -15,6 +15,7 @@ trait Error {
    */
   public function error($message, $code = 500, $type = null, $data = null)
   {
+    global $errorReporting;
     $error = new \stdClass();
     $error->message = $message;
     $error->code = $code;
@@ -38,6 +39,13 @@ trait Error {
     $e = new \Exception();
     $error->stack = explode("\n", $e->getTraceAsString());
     array_shift($error->stack);
+
+    if ($errorReporting && $code != 404){
+      // end($error->stack);
+      $errfile = '';
+      $errline = 0;
+      $errorReporting->handle($code, $message, $errfile, $errline);
+    }
 
     if (php_sapi_name() === 'cli') { // Command line response
       echo PHP_EOL . "{$error->code} ERROR {$error->type}" . PHP_EOL . $error->message . PHP_EOL;
