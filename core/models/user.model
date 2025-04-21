@@ -69,7 +69,12 @@ class User extends Base {
   /**
    * Roles
    */
-  public array $roles;
+  public array $roles = [];
+
+  public array $groups = [];
+
+  protected int $category_id = 0;
+  public ?object $category;
 
 
   /**
@@ -84,9 +89,49 @@ class User extends Base {
    */
   public function __construct(object|null $data = NULL, array $flags = [])
   {
-    parent::__construct('User', 'users', $data, $flags = []);
 
+    parent::__construct('User', 'users', $data, $flags);
     return $this;
+  }
+
+  /**
+   * Get additional related data based on provided flags
+   * @param  array  $flags [description]
+   * @return [type]        [description]
+   */
+  protected function postLoad(array $flags = [])
+  {
+    if (in_array('WITH_TAGS', $flags)) {
+      $this->getTags();
+    }
+    if (in_array('WITH_GROUPS', $flags)) {
+      $this->getGroups();
+    }
+    if (in_array('WITH_CATEGORY', $flags)) {
+      $this->getCategory();
+    }
+    if (in_array('WITH_ROLES', $flags)) {
+      $this->getRoles();
+    }
+    return $this;
+  }
+
+  public function getGroups()
+  {
+    $this->groups = $this->select(['`groups`.*'])->from('groups')
+      ->leftJoin('user_group_assignments', 'id', 'group_id')
+      ->where('`user_group_assignments`.`user_id`', '=', $this->id)
+      ->execute();
+  }
+
+  public function getCategory()
+  {
+    $query = $this->select()->from('user_categories')
+    ->where('id', '=', $this->category_id);
+    $category =  $query->execute(TRUE);
+    if ($category) {
+      $this->category = $category;
+    }
   }
 
 
@@ -116,6 +161,8 @@ class User extends Base {
 
     // Roles are added / removed in their oewn separate process
     unset($data['roles']);
+    unset($data['category']);
+    unset($data['groups']);
     return $data;
   }
 

@@ -19,78 +19,10 @@ mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
 $core = new \Core\API\App();
 
-$bugsnagConfig = CONFIG_PATH . '/bugsnag.config';
-$bugsnagCfg = (object) \yaml_parse_file($bugsnagConfig, 0);
-
-$bugsnag = \Bugsnag\Client::make($bugsnagCfg->apiKey);
-$bugsnag->setAppType($bugsnagCfg->appType);
-$bugsnag->setAppVersion($bugsnagCfg->appVersion);
-\Bugsnag\Handler::register($bugsnag);
-$bugsnag->setReleaseStage($bugsnagCfg->stage);
-
-// $bugsnag->notifyException(new \RuntimeException("Test PHP error"));
-
-$bugsnag->registerCallback(function ($report) {
-  global $core;
-  $user = $core->getCurrentUser();
-    if ($user) {
-      $report->setMetaData([
-          'account' => [
-              'id' => $user->id,
-              'name' => $user->name(),
-          ]
-      ]);
-    }
-});
-
-// error handler function
-function errorHandler($errno, $errstr, $errfile, $errline)
-{
-  global $bugsnag;
-    if (!(error_reporting() & $errno)) {
-        // This error code is not included in error_reporting, so let it fall
-        // through to the standard PHP error handler
-        return false;
-    }
-
-    // $errstr may need to be escaped:
-    $errstr = htmlspecialchars($errstr);
-    $exit = false;
-
-    switch ($errno) {
-      case E_USER_ERROR:
-        $err  = "<b>My ERROR</b> [$errno] $errstr<br />\n";
-        $err .= "  Fatal error on line $errline in file $errfile";
-        $err .= ", PHP " . PHP_VERSION . " (" . PHP_OS . ")<br />\n";
-        $err .= "Aborting...<br />\n";
-        echo $err;
-
-        $exit = 1;
-        break;
-
-      case E_USER_WARNING:
-        $err = "<b>My WARNING</b> [$errno] $errstr<br />\n";
-        break;
-
-      case E_USER_NOTICE:
-        $err = "<b>My NOTICE</b> [$errno] $errstr<br />\n";
-        break;
-
-      default:
-        $err = "Unknown error type: [$errno] $errstr<br />\n";
-        break;
-    }
-    echo $err;
-    $bugsnag->notifyException(new \Exception($err));
-    if ($exit) {
-      exit($exit);
-    }
-    /* Don't execute PHP internal error handler */
-    return true;
+if (file_exists($pluginsDir. '/error/errorReporting.php')) {
+  require_once($pluginsDir. '/error/errorReporting.php');
+  $errorReporting = new \Core\ErrorReporting();
 }
-
-// set to the user defined error handler
-$old_error_handler = set_error_handler('\Core\errorHandler');
 
 // Globals
 
@@ -152,7 +84,7 @@ if ($APIclass && class_exists($APIclass)) {
  * Call the API method as defined by the request type and action.
  */
 $fn = "$action$method";
-$bugsnag->leaveBreadcrumb('API Method ' . $fn);
+$errorReporting->breadcrumb('API Method ' . $fn);
 if (method_exists($api, $fn)) {
   if ($id && $id2) {
     $api->$fn($id, $id2);
