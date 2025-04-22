@@ -71,7 +71,7 @@ class User extends Base {
    */
   public array $roles = [];
 
-  public array $groups = [];
+  public array $user_groups = [];
 
   protected int $category_id = 0;
   public ?object $category;
@@ -118,7 +118,7 @@ class User extends Base {
 
   public function getGroups()
   {
-    $this->groups = $this->select(['`groups`.*'])->from('groups')
+    $this->user_groups = $this->select(['`groups`.*'])->from('groups')
       ->leftJoin('user_group_assignments', 'id', 'group_id')
       ->where('`user_group_assignments`.`user_id`', '=', $this->id)
       ->execute();
@@ -162,7 +162,7 @@ class User extends Base {
     // Roles are added / removed in their oewn separate process
     unset($data['roles']);
     unset($data['category']);
-    unset($data['groups']);
+    unset($data['user_groups']);
     return $data;
   }
 
