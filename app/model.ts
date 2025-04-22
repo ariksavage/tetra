@@ -9,18 +9,25 @@ export class Model {
 
   constructor(data: any) {
     if (data) {
+      data = this.parseDates(data);
       this.mapData(data);
-      // con
-      if (data.date_created) {
-        let created: number = parseInt(data.date_created.toString()) * 1000;
-        this.date_created = new Date(created);
-      }
-      if (data.date_modified){
-        let modified: number = parseInt(data.date_modified.toString()) * 1000;
-        this.date_modified = new Date(modified);
-      }
     }
   }
+
+  protected parseDates(data: any) {
+    if (data.date_created) {
+      let created: number = parseInt(data.date_created.toString()) * 1000;
+      this.date_created = new Date(created);
+      delete data.date_created;
+    }
+    if (data.date_modified){
+      let modified: number = parseInt(data.date_modified.toString()) * 1000;
+      this.date_modified = new Date(modified);
+      delete data.date_modified;
+    }
+    return data;
+  }
+
   protected toTitleCase(str: string) {
     return str.replace(
       /\w\S*/g,
