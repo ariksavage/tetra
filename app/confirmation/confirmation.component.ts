@@ -15,12 +15,10 @@ export class TetraConfirmationComponent {
   @Input() confirmText: string = 'Confirm';
   @Output() cancel: EventEmitter<any> = new EventEmitter<any>;
   @Output() confirm: EventEmitter<any> = new EventEmitter<any>;
-  cancelAction(){
-    console.log('cancel');
+  cancelAction() {
     this.cancel.emit(true);
   }
-  confirmAction(){
-    console.log('confirm');
+  confirmAction() {
     this.confirm.emit(true);
   }
 }
