@@ -1,31 +1,42 @@
 import { DateFormat } from '@tetra/date-format';
 
 export class Model {
-  id!: number;
-  date_created: Date = new Date();
-  created_by: number = 0;
-  date_modified: Date = new Date();
-  modified_by: number = 0;
+  public id!: number;
+  public date_created!: Date;
+  public created_by!: number;
+  public date_modified!: Date;
+  public modified_by!: number;
 
   constructor(data: any) {
     if (data) {
+      data = this.parseDatesDefault(data);
       data = this.parseDates(data);
       this.mapData(data);
     }
   }
 
-  protected parseDates(data: any) {
+  protected parseDatesDefault(data: any) {
     if (data.date_created) {
-      let created: number = parseInt(data.date_created.toString()) * 1000;
-      this.date_created = new Date(created);
+      this.date_created = this.parseDate(data.date_created);
       delete data.date_created;
     }
-    if (data.date_modified){
-      let modified: number = parseInt(data.date_modified.toString()) * 1000;
-      this.date_modified = new Date(modified);
+    if (data.date_modified) {
+      this.date_modified = this.parseDate(data.date_modified);
       delete data.date_modified;
     }
     return data;
+  }
+
+  protected parseDates(data: any) {
+    return data;
+  }
+
+  protected parseDate(value: number) {
+    var d =0;
+    if (value) {
+      d = value * 1000;
+    }
+    return new Date(d);
   }
 
   protected toTitleCase(str: string) {
@@ -35,6 +46,14 @@ export class Model {
         return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
       }
     );
+  }
+
+  protected publicUri(uri: string){
+    let updated = '';
+    if (uri) {
+      updated = '/public/' + uri.split('/public/')[1];
+    }
+    return updated;
   }
 
   protected formatDate(format: string, dateStr: string) {
