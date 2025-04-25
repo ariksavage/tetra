@@ -28,10 +28,12 @@ if (file_exists($pluginsDir. '/error/errorReporting.php')) {
 
 $method = $_SERVER['REQUEST_METHOD'];
 $type = $_GET['apitype'] ?? 'error';
+$type = $core->toCamelCase($type);
 unset($_GET['apitype']);
 $action = $_GET['action'] ?? 'index';
-unset($_GET['action']);
 $action = $core->toCamelCase($action);
+unset($_GET['action']);
+
 
 $id  = $_GET['id']  ?? NULL;
 unset($_GET['id']);
@@ -64,7 +66,7 @@ if (is_dir($pluginsDir)) {
 
       require_once $pluginAPIfile;
       $name = str_replace('.api', '', basename($pluginAPIfile));
-      $APIclass = __NAMESPACE__ . '\\API\\' . $name;
+      $APIclass = __NAMESPACE__ . '\\API\\' . ucfirst($name);
     }
   }
 } else {
