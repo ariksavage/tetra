@@ -16,7 +16,6 @@ export class TetraSecondaryNavComponent {
   ) {
     app.getSecondaryNav().subscribe((navItems: any) => {
       this.items = navItems;
-      console.log('items', this.items);
     })
   }
 
