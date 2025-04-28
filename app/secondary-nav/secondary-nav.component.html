@@ -1,0 +1,5 @@
+<ul *ngIf="items" class="nav-list">
+  <li *ngFor="let item of items" class="nav-item" [ngClass]="{'current': isCurrent(item)}">
+    <a class="nav-link"[href]="item.path">{{item.title}}</a>
+  </li>
+</ul>

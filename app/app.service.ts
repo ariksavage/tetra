@@ -26,6 +26,8 @@ export class AppService {
 
   private _breadcrumbs: Array<any> = [];
   private breadcrumbs = new BehaviorSubject<any>([]);
+  private _secondaryNav: Array<any> = [];
+  private secondaryNav = new BehaviorSubject<any>([]);
   private _config: any = {};
   private config = new BehaviorSubject<any>({});
   private _error: any = {};
@@ -56,7 +58,7 @@ export class AppService {
 
   mapBreadcrumbs() {
     const routerConfig: any = {};
-    for (let a=0;a<this.router.config.length; a++) {
+    for (let a=0; a<this.router.config.length; a++) {
       const route: any = this.router.config[a];
       if (typeof route.path == 'string' && route.path){
         const key: string = route.path.toString();
@@ -76,22 +78,47 @@ export class AppService {
     const crumbs: Array<any> = [];
     const urlSegments = window.location.pathname.split('/');
     urlSegments.pop();
-    for (let i=0;i<urlSegments.length; i++) {
+    let lastRoute = null;
+    let parentPath = '';
+    for (let i=0; i < urlSegments.length; i++) {
       let crumb = urlSegments[i];
       const crumbRoutes = routes.filter((item: any) => {
-        return item.path == crumb
+        return item.path == crumb || (item.path[0] == ':' && parseInt(crumb));
       });
+
       if (crumbRoutes.length){
         const crumbRoute: any = crumbRoutes[0];
+        if (crumbRoute.path[0] == ':' && parseInt(crumb)) {
+          crumbRoute.path = parseInt(crumb);
+        }
+        lastRoute = crumbRoute;
         lastPath += '/' + crumbRoute.path;
         crumbs.push({
           title: crumbRoute.title,
           path: lastPath
         });
+        parentPath = lastPath;
         routes = crumbRoute.children;
       }
     }
+    if (lastRoute.children) {
+      this.mapSecondaryNav(lastRoute.children, parentPath);
+    }
+    const last = crumbs[crumbs.length - 1];
     this.setBreadcrumbs(crumbs);
+  }
+
+  mapSecondaryNav(items: Array<any>, path: string) {
+    const navItems = items.filter(item => {
+      return item.title
+    }).map(item => {
+      return {
+        title: item.title,
+        path: path + '/' + item.path
+      }
+    });
+    this.setSecondaryNav(navItems);
+    console.log('nav items', navItems, path);
   }
 
   getConfig() {
@@ -155,5 +182,15 @@ export class AppService {
 
   getBreadcrumbs() {
     return this.breadcrumbs.asObservable();
+  }
+
+  setSecondaryNav(items: Array<any>){
+    console.log('set', items);
+    this._secondaryNav = items;
+    this.secondaryNav.next(this._secondaryNav);
+  }
+
+  getSecondaryNav() {
+    return this.secondaryNav.asObservable();
   }
 }
