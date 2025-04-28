@@ -4,13 +4,27 @@
   padding: 0;
   align-items: center;
   justify-content: space-between;
+
+  &:hover,
+  &:focus-within {
+    .nav-item {
+      &.current {
+        border: none;
+        // opacity: .8;
+        border-top: 2px solid var(--primary);
+        pointer-events: none;
+      }
+    }
+  }
 }
 
 .nav-item {
   list-style-type: none;
-  margin-right: 1ex;
+  margin-right: 1em;
 
-  &.current {
+  &.current,
+  &:hover,
+  &:focus-visible {
     border-bottom: 2px solid var(--primary);
   }
 }
