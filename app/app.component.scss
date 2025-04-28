@@ -43,6 +43,24 @@ main {
   display: flex;
   flex-direction: column;
 }
+.content-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+
+  .breadcrumbs {
+    flex: 0 1 auto;
+  }
+
+  .secondary-nav {
+    flex: 0 1 auto;
+  }
+
+  .page-title {
+    flex: 0 0 100%;
+  }
+}
 
 .page-title {
   margin: 0 0 .5em;
