@@ -118,7 +118,6 @@ export class AppService {
       }
     });
     this.setSecondaryNav(navItems);
-    console.log('nav items', navItems, path);
   }
 
   getConfig() {
@@ -184,8 +183,7 @@ export class AppService {
     return this.breadcrumbs.asObservable();
   }
 
-  setSecondaryNav(items: Array<any>){
-    console.log('set', items);
+  setSecondaryNav(items: Array<any>) {
     this._secondaryNav = items;
     this.secondaryNav.next(this._secondaryNav);
   }
