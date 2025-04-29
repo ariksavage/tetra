@@ -177,10 +177,10 @@ class Query
     }
     $column = $this->escapeColumn($column);
     switch (trim(strtolower($comp))) {
-      case 'is null':
+      case 'is NULL':
         $condition ="{$column} IS NULL";
         break;
-      case 'not null':
+      case 'not NULL':
         $condition ="{$column} IS NOT NULL";
         break;
       case 'not in query':
@@ -251,10 +251,10 @@ class Query
   private function parseMysqlExpression(string $expression): array
   {
     $result = [
-      'function' => null,
-      'table'    => null,
-      'column'   => null,
-      'alias'    => null,
+      'function' => NULL,
+      'table'    => NULL,
+      'column'   => NULL,
+      'alias'    => NULL,
     ];
 
     // Normalize whitespace and remove backticks
@@ -280,7 +280,7 @@ class Query
     }
 
     // Extract table and column
-    if (strpos($expr, '.') !== false) {
+    if (strpos($expr, '.') !== FALSE) {
       [$table, $column] = explode('.', $expr, 2);
       $result['table'] = $table;
       $result['column'] = $column;
@@ -299,18 +299,17 @@ class Query
   protected function escapeColumn(string $column): string
   {
     $components = $this->parseMysqlExpression($column);
-    // $result = [
-    //   'function' => null,
-    //   'table'    => null,
-    //   'column'   => null,
-    //   'alias'    => null,
-    // ];
+
     if ($components['column'] == '*') {
       return $components['table'] ? "`{$components['table']}`.*" : '*';
     }
-    $escaped = $components['table'] ? "`{$components['table']}`.`{$components['column']}`" : "`{$components['column']}`";
+    if ($components['table'] {
+      $escaped = "`{$components['table']}`.`{$components['column']}`";
+    } else {
+      $escaped = "`{$components['column']}`";
+    }
 
-    if ($components['function']){
+    if ($components['function']) {
       $escaped = "{$components['function']}({$escaped})";
     }
     if ($components['alias']) {
@@ -520,7 +519,7 @@ class Query
    *  - Open a connection to the DB
    *  - DB runs the query
    *
-   * @return mysqli_result|bool  Returns false on failure.
+   * @return mysqli_result|bool  Returns FALSE on failure.
    *                             For successful queries which produce a result set: returns a mysqli_result object.
    *                             For other successful queries: returns TRUE.
    */
