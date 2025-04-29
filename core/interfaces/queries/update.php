@@ -98,6 +98,7 @@ class UpdateQuery extends Query
   {
     $result = parent::execute();
     $updated = $this->conn->affected_rows;
+    $this->conn->close();
     return $updated;
   }
 }

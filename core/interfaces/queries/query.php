@@ -177,10 +177,10 @@ class Query
     }
     $column = $this->escapeColumn($column);
     switch (trim(strtolower($comp))) {
-      case 'is NULL':
+      case 'is null':
         $condition ="{$column} IS NULL";
         break;
-      case 'not NULL':
+      case 'not null':
         $condition ="{$column} IS NOT NULL";
         break;
       case 'not in query':
@@ -303,7 +303,7 @@ class Query
     if ($components['column'] == '*') {
       return $components['table'] ? "`{$components['table']}`.*" : '*';
     }
-    if ($components['table'] {
+    if ($components['table']) {
       $escaped = "`{$components['table']}`.`{$components['column']}`";
     } else {
       $escaped = "`{$components['column']}`";
@@ -529,6 +529,7 @@ class Query
     if (!$this->conn) {
       $this->connect();
     }
-    return $this->conn->query($q);
+    $result = $this->conn->query($q);
+    return $result;
   }
 }

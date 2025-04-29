@@ -101,7 +101,7 @@ export class AppService {
         routes = crumbRoute.children;
       }
     }
-    if (lastRoute.children) {
+    if (lastRoute && lastRoute.children) {
       this.mapSecondaryNav(lastRoute.children, parentPath);
     }
     const last = crumbs[crumbs.length - 1];

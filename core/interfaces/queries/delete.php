@@ -49,4 +49,19 @@ class DeleteQuery extends Query
     }
     return $str;
   }
+   /**
+   * Execute the query
+   * @return int|bool Returns the insert_id if available
+   *                  Otherwise returns TRUE on success.
+   */
+  public function execute(): int|bool
+  {
+    if ($result = parent::execute()) {
+      $this->conn->close();
+      return $result;
+    } else {
+      $this->conn->close();
+      return FALSE;
+    }
+  }
 }
