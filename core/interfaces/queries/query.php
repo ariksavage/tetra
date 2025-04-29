@@ -293,7 +293,7 @@ class Query
 
   /**
    * Add backticks to a column name with or without the table name
-   * @param  string $column Original table and/or column name
+   * @param  string $column   Original table and/or column name
    * @return string           Table and/or column escaped with backticks.
    */
   protected function escapeColumn(string $column): string
