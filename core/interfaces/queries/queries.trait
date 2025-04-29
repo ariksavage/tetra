@@ -129,11 +129,11 @@ trait Queries {
 
         $type = $column->Type;
         unset($column->Type);
-        preg_match_all('/^([a-z\_]+)\(*([0-9]*)\)* *(.*)/m', $type, $type_matches, PREG_SET_ORDER, 0);
-        if (isset($type_matches[0])){
-          $column->type = $type_matches[0][1] ?? null;
-          $column->length = $type_matches[0][2] ?? null;
-          $column->unsigned = ($type_matches[0][3] ?? null) == 'unsigned';
+        preg_match_all('/^([a-z\_]+)\(*([0-9]*)\)* *(.*)/m', $type, $typeMatches, PREG_SET_ORDER, 0);
+        if (isset($typeMatches[0])){
+          $column->type = $typeMatches[0][1] ?? null;
+          $column->length = $typeMatches[0][2] ?? null;
+          $column->unsigned = ($typeMatches[0][3] ?? null) == 'unsigned';
         }
 
         $column->allowNull = $column->Null !== 'NO';
