@@ -248,22 +248,75 @@ class Query
     return $this;
   }
 
+  private function parseMysqlExpression(string $expression): array
+  {
+    $result = [
+      'function' => null,
+      'table'    => null,
+      'column'   => null,
+      'alias'    => null,
+    ];
+
+    // Normalize whitespace and remove backticks
+    $expr = preg_replace('/\s+/', ' ', trim($expression));
+    $expr = str_replace('`', '', $expr);
+
+    // Extract alias (AS or space-based)
+    if (preg_match('/\s+AS\s+(\w+)$/i', $expr, $matches)) {
+      $result['alias'] = $matches[1];
+      $expr = preg_replace('/\s+AS\s+\w+$/i', '', $expr);
+    } elseif (preg_match('/\s+(\w+)$/', $expr, $matches)) {
+      // Try to extract alias without AS (e.g., "table.column alias")
+      if (!preg_match('/[().]/', $matches[1])) { // avoid matching function calls
+        $result['alias'] = $matches[1];
+        $expr = preg_replace('/\s+\w+$/', '', $expr);
+      }
+    }
+
+    // Extract function (e.g., max(table.column))
+    if (preg_match('/^(\w+)\((.+)\)$/i', $expr, $matches)) {
+      $result['function'] = strtoupper($matches[1]);
+      $expr = $matches[2]; // inner part: table.column
+    }
+
+    // Extract table and column
+    if (strpos($expr, '.') !== false) {
+      [$table, $column] = explode('.', $expr, 2);
+      $result['table'] = $table;
+      $result['column'] = $column;
+    } else {
+      $result['column'] = $expr;
+    }
+
+    return $result;
+  }
+
   /**
    * Add backticks to a column name with or without the table name
-   * @param  string $original Original table and/or column name
+   * @param  string $column Original table and/or column name
    * @return string           Table and/or column escaped with backticks.
    */
-  protected function escapeColumn(string $original): string
+  protected function escapeColumn(string $column): string
   {
-    // wrap the table and/or column name in `backticks`
-    if (stristr($original, '.')) {
-      $column = '`' . str_replace('.', '`.`', $original) . '`';
-    } else {
-      $column = "`$original`";
+    $components = $this->parseMysqlExpression($column);
+    // $result = [
+    //   'function' => null,
+    //   'table'    => null,
+    //   'column'   => null,
+    //   'alias'    => null,
+    // ];
+    if ($components['column'] == '*') {
+      return $components['table'] ? "`{$components['table']}`.*" : '*';
     }
-    $column = str_replace('`*`', '*', $column);
-    $column = preg_replace('/``/m', '`', $column);
-    return $column;
+    $escaped = $components['table'] ? "`{$components['table']}`.`{$components['column']}`" : "`{$components['column']}`";
+
+    if ($components['function']){
+      $escaped = "{$components['function']}({$escaped})";
+    }
+    if ($components['alias']) {
+      $escaped .= " AS {$components['alias']}";
+    }
+    return $escaped;
   }
 
   /**
