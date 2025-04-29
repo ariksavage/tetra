@@ -7,8 +7,8 @@ require_once CORE_ROOT . '/models/migration.model';
 
 // look for migrations and run them if not manual
 
-$migrations_dir = SERVER_ROOT . '/migrations';
-$migrations = scandir($migrations_dir);
+$migrationsDir = SERVER_ROOT . '/migrations';
+$migrations = scandir($migrationsDir);
 
 $migrations = array_diff($migrations, ['.', '..', '.DS_Store']);
 asort($migrations);
@@ -16,6 +16,6 @@ asort($migrations);
 foreach ($migrations as $migration) {
   $name = preg_replace('/^[0-9]+-|\.migration/', '', $migration);
   $class = '\\Core\\Migrations\\' . $name;
-  require_once($migrations_dir . '/' . $migration);
+  require_once($migrationsDir . '/' . $migration);
   $migration = new $class();
 }
