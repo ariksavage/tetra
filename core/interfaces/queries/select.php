@@ -238,6 +238,7 @@ class SelectQuery extends \Core\Database\Query
       }
 
       $result->close();
+      $this->conn->close();
     }
     if ($single) {
       return reset($data);

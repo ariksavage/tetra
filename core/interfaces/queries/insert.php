@@ -116,11 +116,15 @@ class InsertQuery extends Query
   {
     if ($result = parent::execute()) {
       if ($this->conn->insert_id) {
-        return $this->conn->insert_id;
+        $id = $this->conn->insert_id;
+        $this->conn->close();
+        return $id;
       } else {
+        $this->conn->close();
         return TRUE;
       }
     }
+    $this->conn->close();
     return FALSE;
   }
 }
