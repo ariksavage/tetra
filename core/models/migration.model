@@ -488,6 +488,12 @@ class Migration extends Base {
     return $this->raw($query)->execute();
   }
 
+  protected function columnAllowsNull($tableName, $columnName)
+  {
+    $info = $this->getColumn($tableName, $columnName);
+    return $info->Null == 'YES';
+  }
+
   protected function columnAllowNull($tableName, $columnName)
   {
     return $this->updateColumn($tableName, $columnName, '', '', 'YES');
