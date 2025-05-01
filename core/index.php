@@ -86,7 +86,7 @@ if ($APIclass && class_exists($APIclass)) {
  * Call the API method as defined by the request type and action.
  */
 $fn = "$action$method";
-if (isset($errorReporting)){
+if (isset($errorReporting)) {
   $errorReporting->breadcrumb('API Method ' . $fn);
 }
 if (method_exists($api, $fn)) {
