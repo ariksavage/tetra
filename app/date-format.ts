@@ -3,7 +3,7 @@ export class DateFormat {
   format: string = 'YYYY-M-d'
   date: Date;
 
-  constructor(format: string, dateStr: string = '') {
+  constructor(format: string, dateStr: any = '') {
     this.format = format;
     this.dateStr = dateStr;
     if (this.dateStr){

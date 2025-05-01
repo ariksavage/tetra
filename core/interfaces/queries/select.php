@@ -105,9 +105,12 @@ class SelectQuery extends \Core\Database\Query
    * @param  string $tableCol Column in the new table to be matched to the current table
    * @return $this
    */
-  public function leftJoin(string $table, string $thisCol, string $tableCol)
+  public function leftJoin(string $table, string $thisCol, string $tableCol, string $thisTable = '')
   {
-    $this->joins[] = "LEFT JOIN `{$table}` ON `{$table}`.`{$tableCol}` = `{$this->table}`.`{$thisCol}`";
+    if (!$thisTable) {
+      $thisTable = $this->table;
+    }
+    $this->joins[] = "LEFT JOIN `{$table}` ON `{$table}`.`{$tableCol}` = `{$thisTable}`.`{$thisCol}`";
     return $this;
   }
 
