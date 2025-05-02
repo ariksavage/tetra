@@ -18,7 +18,7 @@ import { User } from '@tetra/user';
 })
 export class TetraPage {
   public title: string = 'Page';
-  protected user: User|null = null;
+  public currentUser: any = null;
   protected requiresLogin: boolean = true;
   protected pageConfig: any = {
     showHeader: true,
@@ -38,7 +38,7 @@ export class TetraPage {
   ) {
     userService.getUser().subscribe((user: User | null) => {
       if (user) {
-        this.user = user;
+        this.currentUser = user;
       }
     });
   }
@@ -48,7 +48,7 @@ export class TetraPage {
     let bodyClass = 'page-' + this.title;
     this.app.setBodyClass(bodyClass);
     this.userService.loginByToken().then((user: any)=> {
-      self.user = user;
+      self.currentUser = user;
       return self.load();
     }, (response: any) => {
       return self.load();
@@ -74,7 +74,7 @@ export class TetraPage {
   load() {
     this.app.setPageConfig(this.pageConfig);
     this.app.setPageTitle(this.title);
-    if (this.requiresLogin && !(this.user && this.user.id)) {
+    if (this.requiresLogin && !(this.currentUser && this.currentUser.id)) {
       this.userService.loginRedirect();
     }
     this.activeRoute.paramMap.subscribe((params) => {

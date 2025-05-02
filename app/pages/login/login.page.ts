@@ -24,7 +24,7 @@ export class LoginPage extends TetraPage {
 
   override onLoad() {
     const self = this;
-    if (this.user && this.user.id) {
+    if (this.currentUser && this.currentUser.id) {
       this.redirect();
     }
   }
