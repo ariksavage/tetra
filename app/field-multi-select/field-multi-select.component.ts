@@ -63,15 +63,14 @@ export class TetraFieldMultiSelectComponent {
   onFocus() {
     const el =  this.selecDiv.nativeElement;
     const y = el.getBoundingClientRect().y;
-    console.log('top', y);
     var body = document.body;
     var docEl = document.documentElement;
 
+    // Check if the element is roughly halfway down the page
+    // If so, add a class to open the dropdown up
     var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
     var t = scrollTop + (window.innerHeight *.4);
-    console.log(y, t);
     if (y >= t){
-      console.log('el', el);
       el.className += ' up';
     } else {
       el.className = el.className.replace(' up','').trim()
