@@ -164,11 +164,11 @@ class Base {
     $per = $this->getValue('per', 20, 'integer');
     $query = $this->listQuery($page, $per);
     $list = $this->paginatedResults($query, $page, $per, '', $flags);
-    if (count($list)) {
-      $this->success($this->plural, $list);
-    } else {
-      $this->error("No results found", 404, $this->plural);
-    }
+    // if (count($list)) {
+    $this->success($this->plural, $list);
+    // } else {
+    //   $this->error("No results found", 404, $this->plural);
+    // }
   }
 
   protected function byId(int $id)
@@ -452,13 +452,11 @@ class Base {
    */
   public function success(string $key = '', mixed $data = NULL, string $message = '')
   {
-    if ($data) {
-      if ($key) {
-        $key = strtolower($key);
-        $this->addData($key, $data);
-      } else {
-        $this->data = $data;
-      }
+    if ($key) {
+      $key = strtolower($key);
+      $this->addData($key, $data);
+    } else {
+      $this->data = $data;
     }
     $this->message = $message;
     http_response_code(intval(200));
