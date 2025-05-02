@@ -227,6 +227,34 @@ class User extends Base {
   }
 
   /**
+   * Deactivate this user, so they can no longer log in until they are re-activated
+   * @return bool TRUE if successful
+   */
+  public function deactivate(): bool
+  {
+    $this->status = 'deactivated';
+    if ($this->save()) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  /**
+   * Activate the user.
+   * @return bool TRUE if successful
+   */
+  public function activate(): bool
+  {
+    $this->status = 'active';
+    if ($this->save()) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  /**
    * Validate username and password.
    * if everything matches:
    * Start a new session for the user.
@@ -238,7 +266,7 @@ class User extends Base {
    */
   public function login(string $username, string $password)
   {
-    $this->byUsername($username);
+    $this->byUsername($username, TRUE);
     if ($this->testPassword($password)) {
       $expiresDays = $this->configValue('session_expires_days');
       return $this->startSession($expiresDays);
@@ -318,10 +346,13 @@ class User extends Base {
    *
    * @return User.
    */
-  public function byUsername(string $username)
+  public function byUsername(string $username, bool $active = FALSE)
   {
     $q = $this->select()
       ->where('username', '=', $username);
+    if ($active) {
+      $q->and('status', '=', 'active');
+    }
     $data = $q->execute(TRUE);
     if ($data) {
       $this->mapData($data);
