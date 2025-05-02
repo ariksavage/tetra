@@ -455,7 +455,7 @@ class Base {
     if ($key) {
       $key = strtolower($key);
       $this->addData($key, $data);
-    } else {
+    } else if ($data) {
       $this->data = $data;
     }
     $this->message = $message;
