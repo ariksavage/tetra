@@ -1,4 +1,9 @@
 @use '../../../styles/_global';
+
+:host {
+  width: 100%;
+}
+
 .pagination {
   list-style-type: none;
   margin: 0;
