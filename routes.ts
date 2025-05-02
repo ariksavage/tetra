@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 
 import { LoginPage } from '@tetra/pages/login/login.page';
+import { TetraPasswordResetPage } from '@tetra/pages/password-reset/password-reset.page';
 import { AdminDashboardPage } from '@tetra/pages/admin/dashboard/dashboard.page';
 import { AdminConfigPage } from '@tetra/pages/admin/config/config.page';
 import { AdminConfigMenuPage } from '@tetra/pages/admin/config/menu/menu.page';
@@ -9,6 +10,7 @@ import { TetraError401Page } from '@tetra/pages/error/401/401.page';
 
 const r : Routes = [
   { path: 'login', component:  LoginPage },
+  { path: 'password-reset/:token', component: TetraPasswordResetPage },
   { path: 'logout', redirectTo: '/', pathMatch: 'full' },
   { path: 'admin', title: 'Admin', children: [
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
