@@ -43,6 +43,22 @@ class Users extends Base {
     return $query;
   }
 
+  public function deactivatePUT(int $userId)
+  {
+    $user = $this->getById($userId);
+    if ($user->deactivate()) {
+      $this->successMsg('User: ' . $user->name() . ' has been deactivated');
+    }
+  }
+
+  public function activatePUT(int $userId)
+  {
+    $user = $this->getById($userId);
+    if ($user->activate()) {
+      $this->successMsg('User: ' . $user->name() . ' has been activated');
+    }
+  }
+
   /**
    * Assign roles to the given user.
    *

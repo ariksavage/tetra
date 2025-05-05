@@ -234,6 +234,7 @@ class User extends Base {
   {
     $this->status = 'deactivated';
     if ($this->save()) {
+      $this->endAllSessions();
       return TRUE;
     } else {
       return FALSE;

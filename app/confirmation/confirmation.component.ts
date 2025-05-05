@@ -1,11 +1,10 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { TetraButtonComponent } from '@tetra/button/button.component';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: '.confirmation',
   standalone: true,
-  imports: [CommonModule, TetraButtonComponent],
+  imports: [CommonModule],
   templateUrl: './confirmation.component.html',
   styleUrl: './confirmation.component.scss'
 })
