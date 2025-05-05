@@ -149,6 +149,38 @@ trait Common {
     return $user;
   }
 
+  public function sendEmail(string $to, string $subject, string $htmlMessage)
+  {
+    $boundary = uniqid("boundary_", true);
+    $plainText = strip_tags($htmlMessage);
+
+    // Always set content-type when sending HTML email
+    $headers  = "MIME-Version: 1.0" . "\r\n";
+
+    // Additional headers
+    $headers .= 'From: noreply@kd8.io' . "\r\n";
+    $headers .= 'Reply-To: noreply@kd8.io' . "\r\n";
+    $headers .= 'X-Mailer: PHP/' . phpversion() . "\r\n";
+    $headers .= "Content-Type: multipart/alternative; boundary=\"$boundary\"\r\n";
+
+    // Multipart body
+    $body  = "--$boundary\r\n";
+    $body .= "Content-Type: text/plain; charset=UTF-8\r\n\r\n";
+    $body .= $plainText . "\r\n";
+    $body .= "--$boundary\r\n";
+    $body .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
+    $body .= $htmlMessage . "\r\n";
+    $body .= "--$boundary--";
+
+    if (mail($to, $subject, $body, $headers)) {
+      // echo "HTML email sent successfully.";
+      return TRUE;
+    } else {
+      // echo "Failed to send HTML email.";
+      return FALSE;
+    }
+  }
+
   /**
   * Convert kebab case URL to prettier camelCase for functions
   * eg. course-enrollments => courseEnrollments

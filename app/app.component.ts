@@ -1,17 +1,12 @@
-import { Component, HostBinding, ElementRef, ViewChild } from '@angular/core';
+import { Directive, HostBinding, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { UserService } from '@tetra/user.service';
 import { User } from '@tetra/user';
 import { CoreService } from '@tetra/core.service';
 import { AppService } from '@tetra/app.service';
 import { Title } from "@angular/platform-browser";
 
-@Component({
-		standalone: true,
-    selector: 'tetra-app-root',
-    templateUrl: './app.component.html',
-    styleUrl: './app.component.scss'
-})
 
+@Directive()
 export class TetraAppComponent {
   config: any = {
     name: 'Application'
@@ -28,34 +23,39 @@ export class TetraAppComponent {
     protected appService: AppService,
     protected userService: UserService,
     protected core: CoreService,
-    protected titleService:Title
-  ) {
+    protected titleService:Title,
+    private cdRef: ChangeDetectorRef
+  ) {}
+
+  ngOnInit() {
     const self = this;
-    // let element: ElementRef = this.app; //['components'][0].location;
-    appService.getConfig().subscribe((config: any) => {
+    this.appService.getConfig().subscribe((config: any) => {
       self.config = config;
       self.titleService.setTitle(config.name);
     });
-    appService.getPageTitle().subscribe((title: string) => {
+    this.appService.getPageTitle().subscribe((title: string) => {
       self.pageTitle = title;
       self.setTitle();
     });
-    appService.getBodyClass().subscribe((bodyClass: string) => {
+    this.appService.getBodyClass().subscribe((bodyClass: string) => {
       self.setBodyClass(bodyClass);
     });
-    appService.getPageConfig().subscribe((config: any) => {
-      self.pageConfig = config;
+    this.appService.getPageConfig().subscribe((config: any) => {
+      if (config){
+        self.pageConfig = config;
+      }
     });
-    userService.getUser().subscribe((user: User | null) => {
+    this.userService.getUser().subscribe((user: User | null) => {
       if (user) {
         self.user = user;
       }
     });
-    appService.init();
+    this.appService.init();
   }
 
   setTitle() {
     this.titleService.setTitle(this.config.name + ' | ' + this.pageTitle);
+    this.cdRef.detectChanges();
   }
 
   setBodyClass(bodyClass: string) {

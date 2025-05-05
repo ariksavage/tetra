@@ -83,12 +83,11 @@ export class CoreService {
    * Set headers for http requests
    */
   getConfig() {
-    // const config: any = {};
-    const headers = new HttpHeaders();
+    let headers = new HttpHeaders();
     if (this.authToken) {
-      headers.set('Authorization', `Bearer ${this.authToken}`);
+      headers = headers.set('Authorization', `Bearer ${this.authToken}`);
     }
-    headers.set('responseType',  'application/json');
+    headers = headers.set('responseType',  'application/json');
     return { headers };
   }
 
