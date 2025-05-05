@@ -130,6 +130,20 @@ class Users extends Base {
     $this->success('message', 'A password reset link has been sent to your email address.');
   }
 
+  public function passwordResetPOST()
+  {
+    $currentUser = $this->getCurrentUser();
+    $password = $this->postValue('newPassword', '', 'string');
+    $password2 = $this->postValue('repeatNewPassword', '', 'string');
+    if ($password && $password2 && $password == $password2){
+      if ($currentUser->resetPassword($password, $password2)){
+        $this->success('message', "Password updated for {$currentUser->name()}");
+      }
+    }
+  }
+  // Bier9wj7 $2y$12$n4JeLr0ZwsNpLG.ITQYq1OVqZUM.FNX9XboIZNFp1V8ixrFs2Iu5K
+  // Bier9wj8
+
     /**
    * Saves a user to the database.
    *

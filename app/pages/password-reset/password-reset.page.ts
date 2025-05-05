@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { TetraPage } from '@tetra/page/page.component';
 
 import { User } from '@tetra/user';
+import { TetraFieldPasswordComponent } from '@tetra/field-password/field-password.component';
 
 @Component({
 		standalone: true,
     selector: "PasswordResetPage",
-    imports: [CommonModule],
+    imports: [CommonModule, TetraFieldPasswordComponent],
     templateUrl: './password-reset.page.html',
     styleUrl: './password-reset.page.scss'
 })
@@ -21,6 +22,9 @@ export class TetraPasswordResetPage extends TetraPage {
     showTitle: false
   };
   token: string = '';
+  newPassword: string = '';
+  repeatNewPassword: string = '';
+  resetSuccessMsg: string = '';
 
   override ngOnInit() {
     const self = this;
@@ -31,15 +35,24 @@ export class TetraPasswordResetPage extends TetraPage {
 
   override onLoad() {
     this.token = this.getParam('token', 'string');
-    // if (!this.token){
-    //   setTimeout(() => {
-    //     console.log('delay');
-    //     this.onLoad();
-    //   }, 200);
-    // } else {
       this.userService.loginByToken(this.token).then((data: any) => {
-        console.log('login by token', data);
+        this.app.setPageTitle("Reset password for " + this.currentUser.name());
       });
     // }
+  }
+
+  isValid(){
+    return this.userService.validatePassword(this.newPassword);
+  }
+  resetPassword() {
+    return this.userService.resetPassword(this.newPassword, this.repeatNewPassword).then((data: any) => {
+      this.newPassword = '';
+      this.repeatNewPassword = '';
+      this.resetSuccessMsg = data.message;
+    });
+  }
+
+  getRules() {
+    return this.userService.passwordRules;
   }
 }
