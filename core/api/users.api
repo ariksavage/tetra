@@ -106,7 +106,10 @@ class Users extends Base {
     $host = $this->getValue('host');
 
     $link = $user->passwordResetLink($host);
-    $this->success('password-reset', $link);
+    $this->data->link = $link;
+    $expiresDays = $this->configValue('password_reset_expires_days');
+    $this->data->text = "Copy the link below to send to the user. This link will expire in <strong>{$expiresDays}</strong> days.";
+    $this->success();
   }
 
   /**
