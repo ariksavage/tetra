@@ -68,6 +68,7 @@ export class UserService {
     const self = this;
     if (token){
       this.token = token;
+      self.cookies.delete('auth');
     } else {
       this.token = this.cookies.read('auth');
     }

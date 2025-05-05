@@ -35,6 +35,7 @@ export class TetraPasswordResetPage extends TetraPage {
   override onLoad() {
     this.token = this.getParam('token', 'string');
     this.userService.loginByToken(this.token).then((data: any) => {
+      console.log('data', data);
       if (this.currentUser.id){
         this.app.setPageTitle("Reset password for " + this.currentUser.name());
       } else {
