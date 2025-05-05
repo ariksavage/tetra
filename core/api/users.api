@@ -141,10 +141,8 @@ class Users extends Base {
       }
     }
   }
-  // Bier9wj7 $2y$12$n4JeLr0ZwsNpLG.ITQYq1OVqZUM.FNX9XboIZNFp1V8ixrFs2Iu5K
-  // Bier9wj8
 
-    /**
+  /**
    * Saves a user to the database.
    *
    * Overrides base to allow a user to update their own profile
