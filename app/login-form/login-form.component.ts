@@ -16,6 +16,8 @@ export class TetraLoginForm {
   username: string = '';
   password: string = '';
   user: User|null = null;
+  message: string = '';
+  resetSent: boolean = false;
   @Output() cb = new EventEmitter<User>();
 
 
@@ -23,8 +25,11 @@ export class TetraLoginForm {
     protected userService: UserService
   ){}
 
-  test(){
-    alert('submit');
+  forgotPassword() {
+    this.resetSent = true;
+    this.userService.forgotPassword(this.username).then((data: any) => {
+      this.message = data.message
+    })
   }
 
   login() {

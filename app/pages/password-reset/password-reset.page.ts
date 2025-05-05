@@ -22,7 +22,7 @@ export class TetraPasswordResetPage extends TetraPage {
   };
   token: string = '';
 
-  override ngOnInit(){
+  override ngOnInit() {
     const self = this;
     let bodyClass = 'page-' + this.title;
     this.app.setBodyClass(bodyClass);
@@ -31,15 +31,15 @@ export class TetraPasswordResetPage extends TetraPage {
 
   override onLoad() {
     this.token = this.getParam('token', 'string');
-    if (!this.token){
-      setTimeout(() => {
-        console.log('delay');
-        this.onLoad();
-      }, 200);
-    } else {
+    // if (!this.token){
+    //   setTimeout(() => {
+    //     console.log('delay');
+    //     this.onLoad();
+    //   }, 200);
+    // } else {
       this.userService.loginByToken(this.token).then((data: any) => {
         console.log('login by token', data);
       });
-    }
+    // }
   }
 }

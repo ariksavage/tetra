@@ -118,11 +118,15 @@ class Base {
   protected function checkAuth(): bool
   {
     $user = $this->getCurrentUser();
-    if ($this->requiresAuth() && !$user) {
-      $this->error('Login required', 401);
-      return FALSE;
+    if ($this->requiresAuth()){
+      if (!$user) {
+        $this->error('Login required', 401);
+        return FALSE;
+      } else {
+        $user->updateSession();
+        return TRUE;
+      }
     } else {
-      $user->updateSession();
       return TRUE;
     }
   }

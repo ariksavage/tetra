@@ -287,6 +287,10 @@ class User extends Base {
     return $this->endSession();
   }
 
+  public function message(string $subject, string $body) {
+    return $this->sendEmail($this->email, $subject, $body);
+  }
+
   /**
    * Start a new session and generate a link to
    * allow a user to reset their password.

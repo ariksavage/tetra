@@ -37,7 +37,6 @@ export class UserService {
   }
 
   loginByToken(token: string|null = null) {
-
     const self = this;
     if (token){
       this.token = token;
@@ -95,5 +94,14 @@ export class UserService {
       this.setUser(user);
       self.route.navigateByUrl('/logout');
     })
+  }
+
+  forgotPassword(username: string) {
+    const host = window.location.origin;
+    const params = {
+      username,
+      host
+    };
+    return this.core.getParams(params, 'users', 'password-reset');
   }
 }
