@@ -18,7 +18,6 @@ export class TetraPasswordResetPage extends TetraPage {
   override title = 'Reset Password';
   override requiresLogin = false;
   override pageConfig: any = {
-    showHeader: false,
     showTitle: false
   };
   token: string = '';
@@ -35,15 +34,19 @@ export class TetraPasswordResetPage extends TetraPage {
 
   override onLoad() {
     this.token = this.getParam('token', 'string');
-      this.userService.loginByToken(this.token).then((data: any) => {
+    this.userService.loginByToken(this.token).then((data: any) => {
+      if (this.currentUser.id){
         this.app.setPageTitle("Reset password for " + this.currentUser.name());
-      });
-    // }
+      } else {
+        window.location.href = '/login';
+      }
+    });
   }
 
   isValid(){
     return this.userService.validatePassword(this.newPassword);
   }
+
   resetPassword() {
     return this.userService.resetPassword(this.newPassword, this.repeatNewPassword).then((data: any) => {
       this.newPassword = '';
