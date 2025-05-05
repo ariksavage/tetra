@@ -407,6 +407,37 @@ class User extends Base {
   }
 
   /**
+   * Update the user's password
+   * @param  string $password  Password
+   * @param  string $password2 Repeated password
+   * @return boolean           TRUE on success
+   */
+  public function resetPassword(string $password, string $password2)
+  {
+    if ($password !== $password2){
+      return FALSE;
+    }
+    $hash = $this->passwordHash($password);
+    $this->password = $hash;
+    if ($this->save()){
+      $this->endAllSessions();
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  protected function endAllSessions()
+  {
+    $data = array(
+      'date_ended' => $this->timestamp()
+    );
+    return $this->update($data, 'user_sessions')
+    ->where('user_id', '=', $this->id)
+    ->execute();
+  }
+
+  /**
    * Create a random auth token from the username and current timestamp
    */
   private function generateAuthToken()

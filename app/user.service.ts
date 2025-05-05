@@ -13,6 +13,24 @@ export class UserService {
   _user: User = new User();
   isAdmin: boolean = false;
   token: string = '';
+  passwordRules = [
+    {
+      label: 'Password must be at least 8 characters long',
+      fn: (password: string) => password.length >= 8
+    },
+    {
+      label: 'Password must contain one lowercase letter',
+      fn: (password: string) => /[a-z]/.test(password)
+    },
+    {
+      label: 'Password must contain one uppercase letter',
+      fn: (password: string) => /[A-Z]/.test(password)
+    },
+    {
+      label: 'Password must contain one number',
+      fn: (password: string) => /[0-9]/.test(password)
+    }
+  ];
 
   constructor(
     private core: CoreService,
@@ -20,6 +38,16 @@ export class UserService {
     private cookies: CookiesService,
     protected activeRoute: ActivatedRoute
   ) {}
+
+  validatePassword(password: string) {
+    let valid = true;
+    this.passwordRules.forEach((rule: any) => {
+      if (!rule.fn(password)) {
+        valid = false;
+      }
+    });
+    return valid;
+  }
 
   getUser(): Observable<User> {
     const self = this;
@@ -103,5 +131,13 @@ export class UserService {
       host
     };
     return this.core.getParams(params, 'users', 'password-reset');
+  }
+
+  resetPassword(newPassword: string, repeatNewPassword: string) {
+    const payload = {
+      newPassword,
+      repeatNewPassword
+    };
+    return this.core.post('users', 'password-reset', payload);
   }
 }
