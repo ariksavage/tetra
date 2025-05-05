@@ -84,7 +84,7 @@ trait Common {
       ->and('key', '=', $key)
       ->execute(true);
     if (!$config) {
-      $this->error("Config {$key} not found", 404);
+      return NULL;
     }
     switch($config->value_type) {
       case 'int':
@@ -149,17 +149,62 @@ trait Common {
     return $user;
   }
 
-  public function sendEmail(string $to, string $subject, string $htmlMessage)
+  public function sendEmail(string $to, string $subject, string $message)
   {
     $boundary = uniqid("boundary_", true);
-    $plainText = strip_tags($htmlMessage);
 
+    $from = $this->configValue('from_email');
+    if (!$from) {
+      $from = 'noreply@' .  $_SERVER['HTTP_HOST'];
+    }
+
+    $host = $_GET['host'];
+    if (!$host){
+      $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
+      $host = $protocol . "://" . $_SERVER['HTTP_HOST'];
+    }
+
+    $appName = $this->configValue('name');
+    $bodyColor = '#ddd';
+    $htmlMessage = [];
+    $htmlMessage[] = '<!DOCTYPE html>';
+    $htmlMessage[] = '<html>';
+    $htmlMessage[] = '<head>';
+    $htmlMessage[] = '<meta charset="UTF-8">';
+    $htmlMessage[] = '<title>' . $subject . '</title>';
+    $htmlMessage[] = '</head>';
+    $htmlMessage[] = '<body style="margin:0; padding:0; background-color:' . $bodyColor . ';">';
+    $htmlMessage[] = '<table width="100%" bgcolor="' . $bodyColor . '" cellpadding="0" cellspacing="0">';
+    $htmlMessage[] = '<tr>';
+    $htmlMessage[] = '<td align="center">';
+    $htmlMessage[] = '<table width="600" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="margin: 20px 0 60px; padding: 20px; border-radius: 6px; font-family: Arial, sans-serif; text-align: left;">';
+    $htmlMessage[] = '<tr>';
+    $htmlMessage[] = '<td>';
+    $htmlMessage[] = '<a href="'.$host.'"><img style="height: 60px;margin-right: 40px;" src="' . $host . '/public/KD-min.svg"/></a>';
+    $htmlMessage[] = '</td>';
+    $htmlMessage[] = '<td>';
+    $htmlMessage[] = '<h1 style="margin:0;">' . $appName . '</h1>';
+    $htmlMessage[] = '</td>';
+    $htmlMessage[] = '</tr>';
+    $htmlMessage[] = '<tr>';
+    $htmlMessage[] = '<td colspan="2">';
+    $htmlMessage[] = trim($message);
+    $htmlMessage[] = '</td>';
+    $htmlMessage[] = '</tr>';
+    $htmlMessage[] = '</table>';
+    $htmlMessage[] = '</td>';
+    $htmlMessage[] = '</tr>';
+    $htmlMessage[] = '</table>';
+    $htmlMessage[] = '</body>';
+    $htmlMessage[] = '</html>';
+    $htmlBody = implode("\r\n", $htmlMessage);
+    $plainText = strip_tags($htmlBody);
     // Always set content-type when sending HTML email
     $headers  = "MIME-Version: 1.0" . "\r\n";
 
     // Additional headers
-    $headers .= 'From: noreply@kd8.io' . "\r\n";
-    $headers .= 'Reply-To: noreply@kd8.io' . "\r\n";
+    $headers .= 'From: ' . $from . "\r\n";
+    $headers .= 'Reply-To: ' . $from . "\r\n";
     $headers .= 'X-Mailer: PHP/' . phpversion() . "\r\n";
     $headers .= "Content-Type: multipart/alternative; boundary=\"$boundary\"\r\n";
 
@@ -169,7 +214,7 @@ trait Common {
     $body .= $plainText . "\r\n";
     $body .= "--$boundary\r\n";
     $body .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
-    $body .= $htmlMessage . "\r\n";
+    $body .= $htmlBody . "\r\n";
     $body .= "--$boundary--";
 
     if (mail($to, $subject, $body, $headers)) {
