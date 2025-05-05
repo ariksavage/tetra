@@ -49,10 +49,17 @@ export class AppService {
   }
 
   addBreadcrumbParent(title: string, path: string) {
-    this._breadcrumbs.push({
-      title,
-      path
-    });
+    const last = this._breadcrumbs[this._breadcrumbs.length - 1];
+    if (last.title == title) {
+      last.path = path;
+    } else if (last.path == path){
+      last.title = title;
+    } else {
+      this._breadcrumbs.push({
+        title,
+        path
+      });
+    }
     this.breadcrumbs.next(this._breadcrumbs);
   }
 

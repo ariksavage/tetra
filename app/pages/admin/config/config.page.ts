@@ -4,15 +4,13 @@ import { TetraPage } from '@tetra/page/page.component';
 import { TetraFieldNumberComponent } from '@tetra/field-number/field-number.component';
 import { TetraFieldTextComponent } from '@tetra/field-text/field-text.component';
 import { Config } from '@tetra/config';
-import { TetraButtonComponent } from '@tetra/button/button.component';
 import { TetraSectionCollapseComponent } from '@tetra/section-collapse/section-collapse.component';
 
 @Component({
 		standalone: true,
     selector: "AdminConfigPage",
     imports: [
-        TetraButtonComponent,
-        CommonModule, TetraFieldNumberComponent, TetraFieldTextComponent, TetraButtonComponent, TetraSectionCollapseComponent
+        CommonModule, TetraFieldNumberComponent, TetraFieldTextComponent, TetraSectionCollapseComponent
     ],
     templateUrl: './config.page.html',
     styleUrl: './config.page.scss'
