@@ -18,7 +18,6 @@ export class LoginPage extends TetraPage {
   override title = 'Login';
   override requiresLogin = false;
   override pageConfig: any = {
-    showHeader: false,
     showTitle: false
   };
 
