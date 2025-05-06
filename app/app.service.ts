@@ -127,7 +127,7 @@ export class AppService {
       } else {
         return null;
       }
-    });
+    }).filter(item => item && item.path);
     this.setSecondaryNav(navItems);
   }
 
