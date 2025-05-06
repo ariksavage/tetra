@@ -293,7 +293,7 @@ class Base {
       if (!count($searchColumns)) {
         $this->error("searchColumns() not configured.");
       }
-      foreach ($this->searchColumns() as $k => $column) {
+      foreach ($searchColumns as $k => $column) {
         if ($k > 0) {
           $query->or($column, 'CONTAINS', $search);
         }
