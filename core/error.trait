@@ -40,8 +40,7 @@ trait Error {
     $error->stack = explode("\n", $e->getTraceAsString());
     array_shift($error->stack);
 
-    if ($errorReporting && $code != 404){
-      // end($error->stack);
+    if ($errorReporting && $code != 404) {
       $errfile = '';
       $errline = 0;
       $errorReporting->handle($code, $message, $errfile, $errline);

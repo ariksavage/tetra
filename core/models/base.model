@@ -70,6 +70,12 @@ class Base {
   public Array $tags = [];
 
   /**
+   * Stores an error message to be retrieved by the API
+   * @var string
+   */
+  protected string $_error;
+
+  /**
    * Construct the model
    *
    * @param string      itemLabel Singular name for this item, eg "User"
@@ -334,6 +340,20 @@ class Base {
     return $this;
   }
 
+  protected function allowDelete()
+  {
+    return TRUE;
+  }
+
+  protected function setError($text)
+  {
+    $this->_error = $text;
+  }
+  public function getError()
+  {
+    return $this->_error;
+  }
+
   /**
    * Delete this item from the database
    *
@@ -341,8 +361,12 @@ class Base {
    */
   public function delete()
   {
-    if ($this->deleteQuery($this->table, $this->id)->execute()) {
-      return $this->postDelete();
+    if (!$this->allowDelete()) {
+      return FALSE;
+    } else {
+      if ($this->deleteQuery($this->table, $this->id)->execute()) {
+        return $this->postDelete();
+      }
     }
   }
 

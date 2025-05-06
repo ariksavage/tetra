@@ -119,7 +119,8 @@ export class AppService {
     const navItems = items.filter(item => {
       return item.title
     }).map(item => {
-      if (item.path[0] !== ':'){
+      console.log(item.path, path);
+      if (item.path[0] !== ':' && item.path){
         return {
           title: item.title,
           path: path + '/' + item.path
@@ -128,7 +129,11 @@ export class AppService {
         return null;
       }
     }).filter(item => item && item.path);
-    this.setSecondaryNav(navItems);
+    if (navItems.length > 1){
+      this.setSecondaryNav(navItems);
+    } else {
+      this.setSecondaryNav([]);
+    }
   }
 
   getConfig() {
