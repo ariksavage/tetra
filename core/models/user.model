@@ -73,7 +73,7 @@ class User extends Base {
 
   public array $user_groups = [];
 
-  protected int $category_id = 0;
+  public int $category_id = 0;
   public ?object $category;
 
 
