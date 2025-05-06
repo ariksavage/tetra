@@ -119,9 +119,9 @@ class User extends Base {
   public function getGroups()
   {
     $this->user_groups = $this->select(['`groups`.*'])->from('groups')
-      ->leftJoin('user_group_assignments', 'id', 'group_id')
-      ->where('`user_group_assignments`.`user_id`', '=', $this->id)
-      ->execute();
+    ->leftJoin('user_group_assignments', 'id', 'group_id')
+    ->where('`user_group_assignments`.`user_id`', '=', $this->id)
+    ->execute();
   }
 
   public function getCategory()
@@ -288,7 +288,8 @@ class User extends Base {
     return $this->endSession();
   }
 
-  public function message(string $subject, string $body) {
+  public function message(string $subject, string $body)
+  {
     return $this->sendEmail($this->email, $subject, $body);
   }
 
@@ -415,12 +416,12 @@ class User extends Base {
    */
   public function resetPassword(string $password, string $password2)
   {
-    if ($password !== $password2){
+    if ($password !== $password2) {
       return FALSE;
     }
     $hash = $this->passwordHash($password);
     $this->password = $hash;
-    if ($this->save()){
+    if ($this->save()) {
       $this->endAllSessions();
       return TRUE;
     } else {

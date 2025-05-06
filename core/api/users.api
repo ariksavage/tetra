@@ -12,7 +12,7 @@ class Users extends Base {
     parent::__construct('users', '\Core\Models\User', 'Users', 'User');
   }
 
-    public function requiresAuth(): bool
+  public function requiresAuth(): bool
   {
     return FALSE;
   }
@@ -108,7 +108,8 @@ class Users extends Base {
     $link = $user->passwordResetLink($host);
     $this->data->link = $link;
     $expiresDays = $this->configValue('password_reset_expires_days');
-    $this->data->text = "Copy the link below to send to the user. This link will expire in <strong>{$expiresDays}</strong> days.";
+    $this->data->text  = "Copy the link below to send to the user.";
+    $this->data->text .= " This link will expire in <strong>{$expiresDays}</strong> days.";
     $this->success();
   }
 
@@ -124,24 +125,26 @@ class Users extends Base {
     $user = $this->select()->from('users')
     ->where('username', '=', $username)
     ->execute(TRUE, '\Core\Models\User');
-    if ($user){
+    if ($user) {
       $appName = $this->configValue('name');
       $supportEmail = $this->configValue('support_email');
       $host = $this->getValue('host');
-      if (!$host){
+      if (!$host) {
         $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
         $host = $protocol . "://" . $_SERVER['HTTP_HOST'];
       }
       $resetLink = $user->passwordResetLink($host);
       $subject = "Password reset for " . $appName;
-      $message = '
-          <h2>Password Reset Request</h2>
-          <p>Hello ' . $user->name() . ',</p>
-          <p>You recently requested to reset your password for your <strong>'.$appName.'</strong> account.</p>
-          <p><a href="' . $resetLink . '">Reset your password</a></p>
-          <p>If you did not request a password reset, please ignore this email or <a href="mailto:' . $supportEmail . '?subject=password%20reset%20request">contact support</a> if you have questions.</p>
-      ';
-      if (!$user->message($subject, $message)){
+      $supportLink = '<a href="mailto:' . $supportEmail . '?subject=password%20reset%20request">contact support</a>';
+      $supportLink .= ' if you have questions.';
+      $lines = array();
+      $lines[] = '<h2>Password Reset Request</h2>';
+      $lines[] = '<p>Hello ' . $user->name() . ',</p>';
+      $lines[] = '<p>You recently requested to reset your password for your <strong>'.$appName.'</strong> account.</p>';
+      $lines[] = '<p><a href="' . $resetLink . '">Reset your password</a></p>';
+      $lines[] = '<p>If you did not request a password reset, please ignore this email or '.$supportLink.'</p>';
+      $message = implode("\r\n", $lines);
+      if (!$user->message($subject, $message)) {
         $this->error("Password reset could not be sent");
       }
     }
@@ -154,8 +157,8 @@ class Users extends Base {
     $currentUser = $this->getCurrentUser();
     $password = $this->postValue('newPassword', '', 'string');
     $password2 = $this->postValue('repeatNewPassword', '', 'string');
-    if ($password && $password2 && $password == $password2){
-      if ($currentUser->resetPassword($password, $password2)){
+    if ($password && $password2 && $password == $password2) {
+      if ($currentUser->resetPassword($password, $password2)) {
         $this->success('message', "Password updated for {$currentUser->name()}");
       }
     }
