@@ -54,6 +54,7 @@ export class CoreService {
    */
   handleError(url: string, error: any) {
     if (error) {
+      this.messages.error(error.message, url);
       this.errorService.setError(error);
       console.error(url, error);
 

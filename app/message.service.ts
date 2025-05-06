@@ -39,6 +39,6 @@ export class MessageService {
    * @return String message ID.
    */
   error(error: string, key: string = '', lifespan: number = 60000): string {
-    return this.add(error, 'error');
+    return this.add('ERROR: ' + error, 'error');
   }
 }
