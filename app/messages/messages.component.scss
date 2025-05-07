@@ -67,7 +67,7 @@
   z-index: 99;
   background: var(--body);
   border: 1px solid var(--border);
-  box-shadow: -2px 2px 2px #000;
+  box-shadow: -2px 2px 2px var(--default-text);
   transition: top 2s, right 1s;
   top: 0;
 

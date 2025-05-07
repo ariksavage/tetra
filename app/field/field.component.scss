@@ -7,13 +7,13 @@
   box-sizing: border-box;
 
   &.filter {
-    border: 1px solid #000;
+    border: 1px solid var(--border);
 
     .label {
       display: block;
       margin: 0;
-      background: #000;
-      color: #fff;
+      background: var(--border);
+      color: var(--body-light);
       margin-bottom: .5em;
       padding: 0 1ex;
     }

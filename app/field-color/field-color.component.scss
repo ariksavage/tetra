@@ -22,7 +22,7 @@
   position: relative;
   flex: 0 1 auto;
   margin: 0 0 1em;
-  border: 1px solid #000;
+  border: 1px solid var(--border);
   padding-bottom: 100%;
 
   .picker {
