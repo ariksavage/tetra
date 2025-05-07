@@ -10,7 +10,7 @@
 }
 .toggle {
   width: 3em;
-  box-shadow: 2px 2px 1px #000 inset;
+  box-shadow: 2px 2px 1px var(--default-text) inset;
   height: 1.5em;
   background: var(--error);
   border-radius: 1em;
@@ -19,6 +19,7 @@
   position: relative;
   overflow: hidden;
   padding: 1px;
+
   &::before {
     content: '';
     height: 100%;
@@ -39,9 +40,9 @@
     z-index: 2;
     border-radius: 1em;
     transition: left .2s linear;
-    background: #fff;
+    background: var(--body-light);
     display: inline-block;
-    box-shadow: 1px 1px 2px #000;
+    box-shadow: 1px 1px 2px var(--default-text);
   }
 
   &.on {
