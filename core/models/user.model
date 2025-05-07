@@ -133,9 +133,9 @@ class User extends Base {
 
   /**
    * Get full category data.
-   * @return [type] [description]
+   * @return \Core\Models\UserCategory Category
    */
-  public function getCategory()
+  public function getCategory(): object
   {
     require_once(CORE_ROOT. '/models/user_category.model');
     $query = $this->select()->from('user_categories')
@@ -169,10 +169,11 @@ class User extends Base {
    */
   public function getGroups(): array
   {
+    require_once(CORE_ROOT . '/models/user_group.model');
     $this->user_groups = $this->select(['`user_groups`.*'])->from('user_groups')
     ->leftJoin('user_group_assignments', 'id', 'group_id')
     ->where('`user_group_assignments`.`user_id`', '=', $this->id)
-    ->execute();
+    ->execute(FALSE, '\Core\Models\UserGroup');
     return $this->user_groups;
   }
 
@@ -183,11 +184,11 @@ class User extends Base {
    */
   protected function inGroup(int $groupId): bool
   {
-    if(!$this->user_groups){
+    if (!$this->user_groups) {
       $this->getGroups();
     }
     $in = FALSE;
-    foreach($this->user_groups as $group) {
+    foreach ($this->user_groups as $group) {
       if ($group->id == $groupId) {
         $in = TRUE;
         break;
@@ -345,7 +346,7 @@ class User extends Base {
   {
     $this->status = 'deactivated';
     if ($this->save()) {
-      $this->endAllSessions();
+      $this->cleanupSessions();
       return TRUE;
     } else {
       return FALSE;
@@ -374,9 +375,9 @@ class User extends Base {
    * @param String $username Username
    * @param String $password Password
    *
-   * @return Boolean Login success
+   * @return bool Login success
    */
-  public function login(string $username, string $password)
+  public function login(string $username, string $password): bool
   {
     $this->byUsername($username, TRUE);
     if ($this->testPassword($password)) {
@@ -390,16 +391,22 @@ class User extends Base {
   /**
    * End the current user's session.
    *
-   * @return Boolean Success.
+   * @return bool Success.
    */
-  public function logout()
+  public function logout(): bool
   {
     $_SESSION['authorization_token'] = NULL;
     $_SESSION['user'] = NULL;
     return $this->endSession();
   }
 
-  public function message(string $subject, string $body)
+  /**
+   * Send an email to this user
+   * @param  string $subject Subject line
+   * @param  string $body    HTML Body
+   * @return bool            TRUE on success
+   */
+  public function message(string $subject, string $body): bool
   {
     return $this->sendEmail($this->email, $subject, $body);
   }
@@ -491,9 +498,9 @@ class User extends Base {
    *
    * @param String $password   Un-encrypted password
    *
-   * @return Boolean           Password verified
+   * @return bool           Password verified
    */
-  public function testPassword(string $password)
+  public function testPassword(string $password): bool
   {
     $passwordHash = $this->password;
     if (!$passwordHash) {
@@ -523,7 +530,7 @@ class User extends Base {
    * Update the user's password
    * @param  string $password  Password
    * @param  string $password2 Repeated password
-   * @return boolean           TRUE on success
+   * @return bool           TRUE on success
    */
   public function resetPassword(string $password, string $password2)
   {
@@ -533,27 +540,18 @@ class User extends Base {
     $hash = $this->passwordHash($password);
     $this->password = $hash;
     if ($this->save()) {
-      $this->endAllSessions();
+      $this->cleanupSessions();
       return TRUE;
     } else {
       return FALSE;
     }
   }
 
-  protected function endAllSessions()
-  {
-    $data = array(
-      'date_ended' => $this->timestamp()
-    );
-    return $this->update($data, 'user_sessions')
-    ->where('user_id', '=', $this->id)
-    ->execute();
-  }
-
   /**
    * Create a random auth token from the username and current timestamp
+   * @return string Auth token
    */
-  private function generateAuthToken()
+  private function generateAuthToken(): string
   {
     $token = md5($this->username . date('Y-m-d-h-i-s'));
     $_SESSION['authorization_token'] = $token;
@@ -564,9 +562,9 @@ class User extends Base {
    * Start a new session in the user_sessions table
    * with a new auth token.
    *
-   * @return String  Authorization token
+   * @return String  Authorization token or empty on failure
    */
-  protected function startSession($expiresDays)
+  protected function startSession($expiresDays): string
   {
     $token = $this->generateAuthToken();
     $data = array();
@@ -575,13 +573,12 @@ class User extends Base {
     $data['date_started'] = date('Y-m-d h:i:s');
     $data['date_last_access'] = $data['date_started'];
     $data['date_expires'] = date('Y-m-d h:i:s', strtotime("+{$expiresDays} days"));
-    // die( $this->insert($data, 'user_sessions') );
     if ($this->insert($data, 'user_sessions')->execute()) {
       $_SESSION['authorization_token'] = $token;
       $_SESSION['user'] = $this;
       return $token;
     } else {
-      return FALSE;
+      return '';
     }
   }
 
@@ -591,7 +588,7 @@ class User extends Base {
    *
    * @param String $token  Authorization token matching a session for this user.
    *
-   * @return Boolean       Success.
+   * @return bool       Success.
    */
   public function updateSession(string $token = '')
   {
@@ -611,7 +608,7 @@ class User extends Base {
    * End the current session
    * add the date_ended value to user_sessions
    *
-   * @return Boolean  Success
+   * @return bool  Success
    */
   protected function endSession()
   {
@@ -628,9 +625,9 @@ class User extends Base {
   /**
    * End any outstanding sessions
    *
-   * @return Boolean  Success
+   * @return bool  Success
    */
-  protected function cleanupSessions()
+  protected function cleanupSessions(): bool
   {
     $now = date('Y-m-d h:i:s');
     $data = array('date_ended' => $now);

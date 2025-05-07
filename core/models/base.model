@@ -353,7 +353,7 @@ class Base {
   public function getError(array $replacements = [])
   {
     $error = $this->_error;
-    foreach($replacements as $key => $value){
+    foreach ($replacements as $key => $value) {
       $error = str_replace('{{'.$key.'}}', $value, $error);
     }
     return $error;
@@ -442,7 +442,7 @@ class Base {
   protected function saveTags()
   {
     $currentUser = $this->getCurrentUser();
-    if (!$currentUser){
+    if (!$currentUser) {
       die('Could not find current user');
     }
     $userId = $this->getCurrentUser()->id;

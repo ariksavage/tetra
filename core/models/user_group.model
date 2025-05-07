@@ -51,7 +51,11 @@ class UserGroup extends Base {
     return $this;
   }
 
-  protected function getUserCount()
+  /**
+   * Get the total number of users in the group.
+   * @return  int  Number of users
+   */
+  protected function getUserCount(): int
   {
     $users = $this->select()
     ->from('user_group_assignments')
@@ -60,6 +64,10 @@ class UserGroup extends Base {
     return $this->count = count($users);
   }
 
+  /**
+   * Get all users in the group.
+   * @return array<User>  Array of users.
+   */
   protected function getUsers()
   {
     $users = $this->select()
@@ -72,8 +80,8 @@ class UserGroup extends Base {
 
   /**
    * Get additional related data based on provided flags
-   * @param  array  $flags [description]
-   * @return [type]        [description]
+   * @param  array  $flags Optional flags for additional data.
+   * @return $this
    */
   protected function postLoad(array $flags = [])
   {
@@ -87,6 +95,12 @@ class UserGroup extends Base {
     return $this;
   }
 
+  /**
+   * Provide validation before this Group is allowed to be deleted.
+   *
+   * Group may not be deleted if it has members.
+   * @return bool TRUE if group may be deleted.
+   */
   protected function allowDelete()
   {
     $users = $this->getUserCount();
@@ -104,8 +118,9 @@ class UserGroup extends Base {
    * Convert the model to an array for use in a query.
    *
    * Apply any other necessary business logic before saving
+   * - remove count and/or users before saving
    *
-   * @return Array
+   * @return Array Data to be saved.
    */
   public function prepareSave()
   {

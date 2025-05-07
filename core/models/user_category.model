@@ -46,7 +46,11 @@ class UserCategory extends Base {
     return $this;
   }
 
-  protected function getUserCount()
+  /**
+   * Get a count of users in tis category.
+   * @return int Number of users in the category.
+   */
+  protected function getUserCount(): int
   {
     $users = $this->select()
     ->from('users')
@@ -55,6 +59,10 @@ class UserCategory extends Base {
     return $this->count = count($users);
   }
 
+  /**
+   * Get all users in the category.
+   * @return array<User>  Array of users.
+   */
   protected function getUsers()
   {
     $users = $this->select()
@@ -66,8 +74,8 @@ class UserCategory extends Base {
 
   /**
    * Get additional related data based on provided flags
-   * @param  array  $flags [description]
-   * @return [type]        [description]
+   * @param  array  $flags Optional flags for additional data.
+   * @return $this
    */
   protected function postLoad(array $flags = [])
   {
@@ -81,6 +89,12 @@ class UserCategory extends Base {
     return $this;
   }
 
+  /**
+   * Provide validation before this Category is allowed to be deleted.
+   *
+   * Group may not be deleted if it has members.
+   * @return bool TRUE if group may be deleted.
+   */
   protected function allowDelete()
   {
     $users = $this->getUserCount();
@@ -98,8 +112,9 @@ class UserCategory extends Base {
    * Convert the model to an array for use in a query.
    *
    * Apply any other necessary business logic before saving
+   * - remove count and/or users before saving
    *
-   * @return Array
+   * @return Array Data to be saved.
    */
   public function prepareSave()
   {
