@@ -387,6 +387,14 @@ class Migration extends Base {
       'on update CURRENT_TIMESTAMP'
     );
   }
+  protected function dateCreatedToTimestamp(string $tableName)
+  {
+    return $this->updateColumnIntegerToTimestamp($tableName, 'date_created', FALSE, TRUE, FALSE);
+  }
+  protected function dateModifiedToTimestamp(string $tableName)
+  {
+    return $this->updateColumnIntegerToTimestamp($tableName, 'date_modified', FALSE, TRUE, TRUE);
+  }
 
   protected function addModifiedBy(string $tableName)
   {

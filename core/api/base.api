@@ -454,7 +454,7 @@ class Base {
    *
    * @return JSON.
    */
-  public function success(string $key = '', mixed $data = NULL, string $message = '')
+  public function success(string $key = '', mixed $data = NULL, string $message = ''): never
   {
     if ($key) {
       $key = strtolower($key);
@@ -465,7 +465,8 @@ class Base {
     $this->message = $message;
     http_response_code(intval(200));
     header('Content-Type: application/json; charset=utf-8');
-    die(json_encode($this));
+    echo json_encode($this, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    exit;
   }
 
   /**

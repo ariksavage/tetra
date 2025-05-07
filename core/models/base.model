@@ -349,9 +349,14 @@ class Base {
   {
     $this->_error = $text;
   }
-  public function getError()
+
+  public function getError(array $replacements = [])
   {
-    return $this->_error;
+    $error = $this->_error;
+    foreach($replacements as $key => $value){
+      $error = str_replace('{{'.$key.'}}', $value, $error);
+    }
+    return $error;
   }
 
   /**
@@ -436,6 +441,10 @@ class Base {
 
   protected function saveTags()
   {
+    $currentUser = $this->getCurrentUser();
+    if (!$currentUser){
+      die('Could not find current user');
+    }
     $userId = $this->getCurrentUser()->id;
     // Get existing tags
     $assignments = $this->select()

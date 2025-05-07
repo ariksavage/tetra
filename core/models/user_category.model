@@ -1,0 +1,111 @@
+<?php
+/**
+ * User Rolemodel
+ *
+ * Represents a Category of users.
+ *
+ * PHP version 8.4
+ *
+ * @category   Model
+ * @package    Core
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @version    1.0
+ * @since      2025-01-05
+ */
+
+namespace Core\Models;
+
+class UserCategory extends Base {
+  /**
+   * Name of the group
+   * @var string
+   */
+  public string $label = '';
+
+  /**
+   * Description of the group
+   * @var string
+   */
+  public string $description = '';
+
+  /**
+   * Tenant ID
+   * @var int
+   */
+  public int $tenant_id = 1;
+
+  /**
+   * Count of users in this category
+   * @var int
+   */
+  public int $count = 0;
+
+  public function __construct(object|NULL $data = NULL, array $flags = [])
+  {
+    parent::__construct('category', 'user_categories', $data, $flags);
+    return $this;
+  }
+
+  protected function getUserCount()
+  {
+    $users = $this->select()
+    ->from('users')
+    ->where('category_id', '=', $this->id)
+    ->execute();
+    return $this->count = count($users);
+  }
+
+  protected function getUsers()
+  {
+    $users = $this->select()
+    ->from('users')
+    ->where('category_id', '=', $this->id)
+    ->execute(FALSE, '\Core\Models\User');
+    return $this->users = $users;
+  }
+
+  /**
+   * Get additional related data based on provided flags
+   * @param  array  $flags [description]
+   * @return [type]        [description]
+   */
+  protected function postLoad(array $flags = [])
+  {
+    parent::postLoad($flags);
+    if (in_array('USER_COUNT', $flags)) {
+      $this->getUserCount();
+    }
+    if (in_array('WITH_USERS', $flags)) {
+      $this->getUsers();
+    }
+    return $this;
+  }
+
+  protected function allowDelete()
+  {
+    $users = $this->getUserCount();
+    if ($users > 0) {
+      $error = "Can not delete. Category {$this->label} has {$users} ";
+      $error .= $users > 1 ? 'users' :'user';
+      $this->setError($error);
+      return FALSE;
+    } else {
+      return TRUE;
+    }
+  }
+
+  /**
+   * Convert the model to an array for use in a query.
+   *
+   * Apply any other necessary business logic before saving
+   *
+   * @return Array
+   */
+  public function prepareSave()
+  {
+    $data = parent::prepareSave();
+    unset($data['count']);
+    unset($data['users']);
+    return $data;
+  }
+}
