@@ -375,9 +375,9 @@ class User extends Base {
    * @param String $username Username
    * @param String $password Password
    *
-   * @return bool Login success
+   * @return string token
    */
-  public function login(string $username, string $password): bool
+  public function login(string $username, string $password): string
   {
     $this->byUsername($username, TRUE);
     if ($this->testPassword($password)) {

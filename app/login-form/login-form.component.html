@@ -3,5 +3,5 @@
   <div class="field text block" label="username" [(model)]="username"></div>
   <div class="field password block" label="password" [(model)]="password" (onEnter)="login()"></div>
   <button *ngIf="username && password" (click)="login()" >Log In</button>
-  <p><button *ngIf="username && !password && !resetSent" (click)="forgotPassword()" class="reset-link">Forgot your password?</button></p>
+  <p><button *ngIf="username && !password && !resetSent" (click)="forgotPassword()" class="small muted reset-link">Forgot your password?</button></p>
 </div>

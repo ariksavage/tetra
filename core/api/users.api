@@ -48,13 +48,15 @@ class Users extends Base {
    * Get the current user
    * @return never JSON user data
    */
-  public function currentGET(): never
+  public function currentGET()
   {
-    $this->requirePermission('users', 'VIEW OWN');
+    // $this->requirePermission('users', 'VIEW OWN');
     if ($currentUser = $this->getCurrentUser()) {
       $currentUser->getGroups();
       $currentUser->getRoles();
       $this->success('user', $currentUser);
+    } else {
+      var_dump($currentUser);
     }
   }
 
@@ -65,9 +67,10 @@ class Users extends Base {
   public function logoutGET(): never
   {
     $currentUser = $this->getCurrentUser();
-    if ($currentUser->logout()) {
-      $this->successMsg("Successfully logged out.");
+    if ($currentUser) {
+      $currentUser->logout();
     }
+    $this->successMsg("Successfully logged out.");
   }
 
   /**
@@ -196,7 +199,7 @@ class Users extends Base {
   {
     require_once(CORE_ROOT . '/models/user_category.model');
     $query = $this->select()->from('user_categories')->where('id', '=', $catId);
-    $category = $query->execute(TRUE, 'UserCategory', $flags);
+    $category = $query->execute(TRUE, '\Core\Models\UserCategory', $flags);
     return $category;
     return $category;
   }
@@ -231,7 +234,7 @@ class Users extends Base {
   {
     require_once(CORE_ROOT . '/models/user_category.model');
     $query = $this->select()->from('user_categories')->orderBy('label');
-    $categories = $query->execute(FALSE, 'UserCategory', ['USER_COUNT']);
+    $categories = $query->execute(FALSE, '\Core\Models\UserCategory', ['USER_COUNT']);
     $this->success('categories', $categories);
   }
 
