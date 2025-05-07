@@ -150,7 +150,7 @@ class DB extends \mysqli
       $result = parent::query($query, $resultMode);
       return $result;
     } catch (\mysqli_sql_exception $ex) {
-      $this->error($ex->getMessage(), "MySQL", 500, array('query' => $query));
+      $this->error($ex->getMessage(), 500, "MySQL", array('query' => $query));
       return FALSE;
     }
   }

@@ -3,7 +3,9 @@
 namespace Core\API;
 
 
-use Models\User;
+use \Core\Models\User;
+use \Core\Models\UserCategory;
+use \Core\Models\UserGroup;
 
 class Users extends Base {
 
@@ -39,11 +41,41 @@ class Users extends Base {
   protected function listQuery(int $page = 1, int $per = 20): \Core\Database\selectQuery
   {
     $query = parent::listQuery($page, $per);
-    // update query here
     return $query;
   }
 
-  public function deactivatePUT(int $userId)
+  /**
+   * Get the current user
+   * @return never JSON user data
+   */
+  public function currentGET(): never
+  {
+    $this->requirePermission('users', 'VIEW OWN');
+    if ($currentUser = $this->getCurrentUser()) {
+      $currentUser->getGroups();
+      $currentUser->getRoles();
+      $this->success('user', $currentUser);
+    }
+  }
+
+  /**
+   * Log out the current user.
+   * @return never JSON response message
+   */
+  public function logoutGET(): never
+  {
+    $currentUser = $this->getCurrentUser();
+    if ($currentUser->logout()) {
+      $this->successMsg("Successfully logged out.");
+    }
+  }
+
+  /**
+   * Deactivate a user
+   * @param  int    $userId User ID
+   * @return never          Success message.
+   */
+  public function deactivatePUT(int $userId): never
   {
     $user = $this->getById($userId);
     if ($user->deactivate()) {
@@ -51,7 +83,12 @@ class Users extends Base {
     }
   }
 
-  public function activatePUT(int $userId)
+  /**
+   * Activate a user
+   * @param  int    $userId User ID
+   * @return never          Success message.
+   */
+  public function activatePUT(int $userId): never
   {
     $user = $this->getById($userId);
     if ($user->activate()) {
@@ -63,10 +100,10 @@ class Users extends Base {
    * Assign roles to the given user.
    *
    * Any roles not included in the request will be removed.
-   * @param  [type] $userId [description]
-   * @return [type]         [description]
+   * @param  [type] $userId User ID
+   * @return never
    */
-  public function rolesPUT($userId)
+  public function rolesPUT($userId): never
   {
     $this->requirePermission('user_roles', 'UPDATE');
     $user = $this->getById($userId);
@@ -78,27 +115,10 @@ class Users extends Base {
     }
   }
 
-  public function currentGET()
-  {
-    $this->requirePermission('users', 'VIEW OWN');
-    if ($currentUser = $this->getCurrentUser()) {
-      $currentUser->getRoles();
-      $this->success('user', $currentUser);
-    }
-  }
-
-  public function logoutGET()
-  {
-    $currentUser = $this->getCurrentUser();
-    if ($currentUser->logout()) {
-      $this->successMsg("Successfully logged out.");
-    }
-  }
-
   /**
    * Get a password reset link for the given user.
-   * @param  int    $userId [description]
-   * @return [type]         [description]
+   * @param  int    $userId User ID
+   * @return never          JSON response includes link and text.
    */
   public function passwordResetLinkGET(int $userId)
   {
@@ -115,12 +135,11 @@ class Users extends Base {
 
   /**
    * Email a user with a password reset link.
-   * @param  int    $userId [description]
-   * @return [type]         [description]
+   * @param  int    $userId User ID
+   * @return never          Response message
    */
-  public function passwordResetGET()
+  public function passwordResetGET(): never
   {
-
     $username = $this->getValue('username');
     $user = $this->select()->from('users')
     ->where('username', '=', $username)
@@ -152,7 +171,11 @@ class Users extends Base {
     $this->success('message', 'A password reset link has been sent to your email address.');
   }
 
-  public function passwordResetPOST()
+  /**
+   * Updates the current user's password
+   * @return never        Response message
+   */
+  public function passwordResetPOST(): never
   {
     $currentUser = $this->getCurrentUser();
     $password = $this->postValue('newPassword', '', 'string');
@@ -165,13 +188,208 @@ class Users extends Base {
   }
 
   /**
+   * Get a user category by ID
+   * @param  int    $catId Category ID
+   * @return UserCategory           The category
+   */
+  protected function getCategoryById(int $catId, array $flags = []): UserCategory
+  {
+    require_once(CORE_ROOT . '/models/user_category.model');
+    $query = $this->select()->from('user_categories')->where('id', '=', $catId);
+    $category = $query->execute(TRUE, 'UserCategory', $flags);
+    return $category;
+    return $category;
+  }
+
+  /**
+   * Set a user's category. Category is removed when $catId is 0
+   * @param  int         $userId User ID
+   * @param  int|integer $catId  Category ID
+   * @return never               JSON response message
+   */
+  public function categoryPUT(int $userId, int $catId = 0): never
+  {
+    if ($catId){
+      $category = $this->getCategoryById($catId);
+    }
+      $user = $this->getById($userId);
+    if ($user->setCategory($catId)) {
+      if (isset($category)) {
+        $this->successMsg("Updated {$user->name()}'s category to {$category->label}");
+      } else {
+        $this->successMsg("Removed {$user->name()}'s category");
+      }
+    }
+  }
+
+  /**
+   * Get all available user categories.
+   *
+   * @return never               JSON array of categories
+   */
+  public function categoriesGET(): never
+  {
+    require_once(CORE_ROOT . '/models/user_category.model');
+    $query = $this->select()->from('user_categories')->orderBy('label');
+    $categories = $query->execute(FALSE, 'UserCategory', ['USER_COUNT']);
+    $this->success('categories', $categories);
+  }
+
+  /**
+   * Get a user category by its ID
+   * @param  int    $catId Category ID.
+   * @return never         JSON category data.
+   */
+  public function categoryGET(int $catId): never
+  {
+    $category = $this->getCategoryById($catId, ['USER_COUNT']);
+    $this->success('category', $category);
+  }
+
+  /**
+   * Save or Update a user category.
+   * @return never             JSON updated
+   */
+  public function categoryPOST()
+  {
+    require_once(CORE_ROOT . '/models/user_category.model');
+    $data = $this->postValue('category');
+    $category = new UserCategory($data);
+    if ($category->save()) {
+      $this->success('category', $category, "Successfully saved {$category->label}");
+    } else {
+      $this->error("Could not save {$category->label}. {$category->getError()}", 500, 'Users', $data);
+    }
+  }
+
+  /**
+   * Delete a user category.
+   * @param  int    $categoryId Category's ID
+   * @return never              JSON response message
+   */
+  public function categoryDELETE(int $catId): never
+  {
+    $category = $this->getCategoryById($catId);
+    $name = $category->label;
+    if ($category->delete()) {
+      $this->successMsg("Deleted category: {$name}");
+    } else {
+      $this->error($category->getError(), 500, 'Users', $category);
+    }
+  }
+
+  /**
+   * Get a group by its ID
+   * @param  int    $groupId Group ID
+   * @param  array  $flags   Optional flags to add data to the Group object
+   * @return UserGroup       Group object
+   */
+  protected function getGroupById(int $groupId, array $flags = []): UserGroup
+  {
+    require_once(CORE_ROOT . '/models/user_group.model');
+    $query = $this->select()->from('user_groups')->where('id', '=', $groupId);
+    $group = $query->execute(TRUE, '\Core\Models\UserGroup', $flags);
+    return $group;
+  }
+
+  /**
+   * Get all user groups.
+   *
+   * @return void
+   */
+  public function groupsGET()
+  {
+    require_once(CORE_ROOT . '/models/user_group.model');
+    $groups = $this->select()->from('user_groups')->orderBy('label')->execute(FALSE, '\Core\Models\UserGroup', ['USER_COUNT']);
+    $this->success('groups', $groups);
+  }
+
+  /**
+   * Get a user group by ID
+   * @param  int    $groupId Group ID
+   * @return never          JSON API response: Group data.
+   */
+  public function groupGET(int $groupId): never
+  {
+    $group = $this->getGroupById($groupId, ['USER_COUNT']);
+    $this->success('group', $group);
+  }
+
+  /**
+   * Add a user to a user group.
+   * @param  int    $userId  User ID
+   * @param  int    $groupId Group ID
+   * @return never           JSON API response: success message.
+   */
+  public function groupAddPUT(int $userId, int $groupId): never
+  {
+    $user = $this->getById($userId);
+    $group = $this->getGroupById($groupId);
+    if ($user->addGroup($groupId)) {
+      $this->successMsg("Added {$user->name()} to {$group->label}");
+    } else {
+      $this->error($user->getError(['group' => $group->label]), 500, 'Users');
+    }
+  }
+
+  /**
+   * Remove a user from a group
+   * @param  int    $userId  User ID
+   * @param  int    $groupId Group ID
+   * @return never           JSON API response: success message.
+   */
+  public function groupRemovePUT(int $userId, int $groupId): never
+  {
+    $group = $this->getGroupById($groupId);
+    $user = $this->getById($userId);
+    if ($user->removeGroup($groupId)) {
+      $this->successMsg("Removed {$user->name()} from {$group->label}");
+    } else {
+      $this->error($user->getError(['group' => $group->label]), 500, 'Users');
+    }
+  }
+
+  /**
+   * Create or update a user group
+   * @return never          JSON API response: Group data.
+   */
+  public function groupPOST(): never
+  {
+    require_once(CORE_ROOT . '/models/user_group.model');
+    $data = $this->postValue('group');
+    $group = new UserGroup($data);
+    if ($group->save()) {
+      $this->success('group', $group, "Successfully saved {$group->label}");
+    } else {
+      $this->error("Could not save {$group->label}. {$group->getError()}", 500, 'Users', $data);
+    }
+  }
+
+  /**
+   * Delete a user group
+   * @param  int    $groupId Group ID
+   * @return never           JSON response message.
+   */
+  public function groupDELETE(int $groupId): never
+  {
+    $group = $this->getGroupById($groupId);
+    $name = $group->label;
+    if ($group->delete()) {
+      $this->successMsg("Deleted group: {$name}");
+    } else {
+      $this->error($group->getError(), 500, 'Users', $group);
+    }
+  }
+
+
+  /**
    * Saves a user to the database.
    *
    * Overrides base to allow a user to update their own profile
    *
    * @return JSON response
    */
-  public function savePOST()
+  public function savePOST(): never
   {
     $key = strtolower($this->singular);
     $data = $this->postValue($key);

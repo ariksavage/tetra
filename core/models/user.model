@@ -16,6 +16,8 @@
 
 namespace Core\Models;
 
+use \Core\Models\UserCategory;
+
 class User extends Base {
 
   /**
@@ -68,13 +70,26 @@ class User extends Base {
 
   /**
    * Roles
+   * @var array
    */
   public array $roles = [];
 
+  /**
+   * User groups
+   * @var array
+   */
   public array $user_groups = [];
 
+  /**
+   * Category ID
+   * @var integer
+   */
   public int $category_id = 0;
-  public ?object $category;
+  /**
+   * Category Object
+   * @var object
+   */
+  public object $category;
 
 
   /**
@@ -89,15 +104,15 @@ class User extends Base {
    */
   public function __construct(object|null $data = NULL, array $flags = [])
   {
-
+    $this->category = new \stdClass();
     parent::__construct('User', 'users', $data, $flags);
     return $this;
   }
 
   /**
    * Get additional related data based on provided flags
-   * @param  array  $flags [description]
-   * @return [type]        [description]
+   * @param  array  $flags Flags passed in to get additional data
+   * @return $this         Returns the current user.
    */
   protected function postLoad(array $flags = [])
   {
@@ -116,21 +131,113 @@ class User extends Base {
     return $this;
   }
 
-  public function getGroups()
+  /**
+   * Get full category data.
+   * @return [type] [description]
+   */
+  public function getCategory()
   {
-    $this->user_groups = $this->select(['`groups`.*'])->from('groups')
+    require_once(CORE_ROOT. '/models/user_category.model');
+    $query = $this->select()->from('user_categories')
+    ->where('id', '=', $this->category_id);
+    $category =  $query->execute(TRUE, '\Core\Models\UserCategory');
+    if ($category) {
+      $this->category = $category;
+    }
+    return $this->category;
+  }
+
+  /**
+   * Set the user's category.
+   * @param int|integer $catId Category ID
+   *
+   * @return bool              TRUE on success.
+   */
+  public function setCategory(int $catId = 0): bool
+  {
+    $this->category_id = $catId;
+    if ($this->save()) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  /**
+   * Get all user groups to which this user belongs.
+   * @return array User Groups
+   */
+  public function getGroups(): array
+  {
+    $this->user_groups = $this->select(['`user_groups`.*'])->from('user_groups')
     ->leftJoin('user_group_assignments', 'id', 'group_id')
     ->where('`user_group_assignments`.`user_id`', '=', $this->id)
     ->execute();
+    return $this->user_groups;
   }
 
-  public function getCategory()
+  /**
+   * Tests if this user is in a particular group
+   * @param  int    $groupId Group ID
+   * @return bool            TRUE if the user is a member of the group.
+   */
+  protected function inGroup(int $groupId): bool
   {
-    $query = $this->select()->from('user_categories')
-    ->where('id', '=', $this->category_id);
-    $category =  $query->execute(TRUE);
-    if ($category) {
-      $this->category = $category;
+    if(!$this->user_groups){
+      $this->getGroups();
+    }
+    $in = FALSE;
+    foreach($this->user_groups as $group) {
+      if ($group->id == $groupId) {
+        $in = TRUE;
+        break;
+      }
+    }
+    return $in;
+  }
+
+  /**
+   * Adds this user as a member of the given group.
+   * @param int $groupId  Group ID to which the user will be added.
+   *
+   * @return bool         TRUE on success
+   */
+  public function addGroup(int $groupId): bool
+  {
+    if ($this->inGroup($groupId)) {
+      $this->setError("{$this->name()} is already in group \"{{group}}\".");
+      return FALSE;
+    }
+    $data = array(
+      'user_id' => $this->id,
+      'group_id' => $groupId
+    );
+    if ($this->insert($data)->into('user_group_assignments')->execute()) {
+      return TRUE;
+    } else {
+      return FALSE;
+    }
+  }
+
+  /**
+   * Removes this user as a member from the given group.
+   * @param int $groupId  Group ID from which the user will be removed.
+   *
+   * @return bool         TRUE on success
+   */
+  public function removeGroup(int $groupId): bool
+  {
+    if (!$this->inGroup($groupId)) {
+      $this->setError("{$this->name()} is not in group \"{{group}}\".");
+      return FALSE;
+    }
+    if ($this->deleteQuery('user_group_assignments')
+      ->where('user_id', '=', $this->id)
+      ->and('group_id', '=', $groupId)
+      ->execute()) {
+      return TRUE;
+    } else {
+      return FALSE;
     }
   }
 
@@ -142,7 +249,9 @@ class User extends Base {
    * before saving
    *
    * - Ensure the user's password is hashed, if provided.
-   *
+   * - Remove role data (managed separately)
+   * - Remove group data (managed separately)
+   * - Remove category data (managed separately)
    * @return array
    */
   public function prepareSave()
@@ -159,7 +268,7 @@ class User extends Base {
       $data['password'] = $this->generateAuthToken();
     }
 
-    // Roles are added / removed in their oewn separate process
+    // Roles are added / removed in their own separate process
     unset($data['roles']);
     unset($data['category']);
     unset($data['user_groups']);
@@ -197,7 +306,9 @@ class User extends Base {
   public function postDelete()
   {
     if ($this->deleteQuery('user_role_assignments')->where('user_id', '=', $this->id)->execute()) {
-      return parent::postDelete();
+      if ($this->deleteQuery('user_group_assignments')->where('user_id', '=', $this->id)->execute()) {
+        return parent::postDelete();
+      }
     }
   }
 
