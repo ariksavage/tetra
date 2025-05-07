@@ -209,7 +209,7 @@ class Users extends Base {
    */
   public function categoryPUT(int $userId, int $catId = 0): never
   {
-    if ($catId){
+    if ($catId) {
       $category = $this->getCategoryById($catId);
     }
       $user = $this->getById($userId);
@@ -300,7 +300,10 @@ class Users extends Base {
   public function groupsGET()
   {
     require_once(CORE_ROOT . '/models/user_group.model');
-    $groups = $this->select()->from('user_groups')->orderBy('label')->execute(FALSE, '\Core\Models\UserGroup', ['USER_COUNT']);
+    $groups = $this->select()
+      ->from('user_groups')
+      ->orderBy('label')
+      ->execute(FALSE, '\Core\Models\UserGroup', ['USER_COUNT']);
     $this->success('groups', $groups);
   }
 
