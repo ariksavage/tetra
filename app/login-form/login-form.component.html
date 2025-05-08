@@ -2,6 +2,6 @@
   <p *ngIf="message">{{message}}</p>
   <div class="field text block" label="username" [(model)]="username"></div>
   <div class="field password block" label="password" [(model)]="password" (onEnter)="login()"></div>
-  <button *ngIf="username && password" (click)="login()" >Log In</button>
-  <p><button *ngIf="username && !password && !resetSent" (click)="forgotPassword()" class="small muted reset-link">Forgot your password?</button></p>
+  <button *ngIf="username && password" (click)="login()" class="primary">Log In</button>
+  <p><button *ngIf="username && !password && !resetSent" (click)="forgotPassword()" class="small link">Forgot your password?</button></p>
 </div>
