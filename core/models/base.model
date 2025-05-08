@@ -73,7 +73,13 @@ class Base {
    * Stores an error message to be retrieved by the API
    * @var string
    */
-  protected string $_error;
+  protected string $_error = '';
+
+  /**
+   * Stores a message to be retrieved by the API
+   * @var string
+   */
+  protected string $_message = '';
 
   /**
    * Construct the model
@@ -357,6 +363,24 @@ class Base {
       $error = str_replace('{{'.$key.'}}', $value, $error);
     }
     return $error;
+  }
+
+  protected function setMessage($text)
+  {
+    $this->_message = $text;
+  }
+  protected function appendMessage($text)
+  {
+    $this->_message .= $text;
+  }
+
+  public function getMessage(array $replacements = [])
+  {
+    $message = $this->_message;
+    foreach ($replacements as $key => $value) {
+      $message = str_replace('{{'.$key.'}}', $value, $message);
+    }
+    return $message;
   }
 
   /**

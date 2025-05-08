@@ -1,4 +1,11 @@
 <label class="label">{{label}}</label>
 <ul class="options">
-  <li class="option" *ngFor="let option of options"><label (click)="set(option)"><input type="radio" [name]="label" [value]="itemValue(option)" [(ngModel)]="model">{{itemLabel(option)}}</label></li>
+  <li class="option" *ngFor="let option of options">
+    <label (click)="set(option)">
+      <input class="radio" type="radio" [name]="label" [value]="itemValue(option)" [(ngModel)]="model">
+      <i class="far"
+      [ngClass]="{'fa-circle-dot': itemValue(option) == model, 'fa-circle': itemValue(option) !== model}"></i>
+      {{itemLabel(option)}}
+    </label>
+  </li>
 </ul>

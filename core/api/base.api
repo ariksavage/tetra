@@ -18,6 +18,8 @@
  */
 namespace Core\API;
 
+use \Core\Database\SelectQuery;
+
 class Base {
   use \Core\Common;
   use \Core\Error;
@@ -312,6 +314,36 @@ class Base {
     return $query;
   }
 
+  protected function filterByTags(SelectQuery &$query, array $tags, string $type = '', bool $exclude = FALSE)
+  {
+    if (is_string($tags)) {
+      $tags = explode(',', $tags);
+    }
+    if (count($tags)) {
+      if (!$type) {
+        $type = $this->table;
+      }
+      $tagsQ = $this->select(['entity_id'])
+      ->from('tag_assignments')
+      ->where('entity_type', '=', $type)
+      ->andGroup();
+      foreach($tags as $tag){
+        $tagsQ ->or('tag_id', '=', $tag);
+      }
+      $tagsQ->endGroup();
+      $op = $exclude ? 'NOT IN QUERY' : 'IN QUERY';
+      $query->and('id', $op, $tagsQ);
+    }
+  }
+
+  protected function searchQueryFilter(&$query): \Core\Database\SelectQuery
+  {
+    if ($tags = $this->getValue('tags', [], 'array')) {
+      $this->filterByTags($query, $tags);
+    }
+    return $query;
+  }
+
   /**
    * Build a query to list items.
    * May be expanded by specific APIs
@@ -325,6 +357,7 @@ class Base {
   {
     $query = $this->select()->from($this->table);
     $this->searchQuery($query);
+    $this->searchQueryFilter($query);
     $this->orderQuery($query);
     $query->paginate($page, $per);
     return $query;

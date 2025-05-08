@@ -6,22 +6,8 @@
   max-width: 100%;
   box-sizing: border-box;
 
-  &.filter {
-    border: 1px solid var(--border);
-
-    .label {
-      display: block;
-      margin: 0;
-      background: var(--border);
-      color: var(--body-light);
-      margin-bottom: .5em;
-      padding: 0 1ex;
-    }
-
-    .input {
-      display: block;
-      width: 100%;
-    }
+  &:first-child {
+    margin-top: 0;
   }
 
   &.full {
@@ -80,14 +66,10 @@
 }
 
 .label {
-  // display: block;
   font-weight: bold;
-  margin: 0 0 .2em;
 }
 
 .input {
-  // display: block;
-  // width: 100%;
   font-size: 1em;
   max-width: 100%;
   box-sizing: border-box;
