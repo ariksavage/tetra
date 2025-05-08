@@ -327,7 +327,7 @@ class Base {
       ->from('tag_assignments')
       ->where('entity_type', '=', $type)
       ->andGroup();
-      foreach($tags as $tag){
+      foreach ($tags as $tag) {
         $tagsQ ->or('tag_id', '=', $tag);
       }
       $tagsQ->endGroup();
