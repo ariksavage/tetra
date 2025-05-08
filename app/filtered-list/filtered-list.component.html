@@ -20,7 +20,9 @@
 </div>
 
 <ul class="items">
-  <li class="loading" *ngIf="loading()"><p><i class="spinner"></i> Loading {{plural}}...</p></li>
+  <li class="loading" *ngIf="loading()">
+    <p><i class="spinner"></i>{{loadingMessage()}}</p>
+  </li>
   <ng-content *ngIf="!loading()" select=".list-item"></ng-content>
 </ul>
 <div class="filters">

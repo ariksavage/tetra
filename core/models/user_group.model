@@ -45,6 +45,8 @@ class UserGroup extends Base {
    */
   public int $count = 0;
 
+  public array $users = [];
+
   public function __construct(object|NULL $data = NULL, array $flags = [])
   {
     parent::__construct('group', 'user_groups', $data, $flags);
@@ -55,7 +57,7 @@ class UserGroup extends Base {
    * Get the total number of users in the group.
    * @return  int  Number of users
    */
-  protected function getUserCount(): int
+  public function getUserCount(): int
   {
     $users = $this->select()
     ->from('user_group_assignments')
@@ -68,7 +70,7 @@ class UserGroup extends Base {
    * Get all users in the group.
    * @return array<User>  Array of users.
    */
-  protected function getUsers()
+  public function getUsers()
   {
     $users = $this->select()
     ->from('user_group_assignments')

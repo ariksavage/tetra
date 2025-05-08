@@ -13,6 +13,7 @@ import { TetraSpinnerComponent } from '../spinner/spinner.component';
 export class TetraFilteredListComponent implements OnInit {
   loaded: boolean = false;
   @Output() load = new EventEmitter<number>();
+  @Input() loadMessage: string = '';
   @Input() items: Array<any> = [];
   @Input() pagination: any = {};
   @Output() paginationChange = new EventEmitter<any>();
@@ -31,6 +32,14 @@ export class TetraFilteredListComponent implements OnInit {
     setTimeout(function() {
       self.load.emit(self.page);
     }, 100);
+  }
+
+  loadingMessage() {
+    if (this.loadMessage){
+      return this.loadMessage;
+    } else {
+      return 'Loading ' + this.plural + '...';
+    }
   }
 
   loading() {

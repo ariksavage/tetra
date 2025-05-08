@@ -7,5 +7,16 @@
 }
 
 .option {
+  border-bottom: 1px solid var(--border);
+  margin-bottom: .5lh;
+  padding: .5lh 1ex;
+  cursor: pointer;
 
+  &:last-child {
+    border-bottom: 0;
+    margin: 0;
+  }
+}
+.radio {
+  display: none;
 }
