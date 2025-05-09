@@ -17,7 +17,7 @@
 namespace Core\Models;
 
 use \Core\Models\UserCategory;
-
+use \Core\Models\UserGroup;
 class User extends Base {
 
   /**
@@ -276,9 +276,14 @@ class User extends Base {
       $this->updateRoles($data['roles']);
       unset($data['roles']);
     }
-
     unset($data['category']);
-    unset($data['user_groups']);
+    if (isset($data['user_groups'])){
+      if (is_string($data['user_groups']) && json_decode($data['user_groups'])) {
+        $data['user_groups'] = json_decode($data['user_groups']);
+      }
+      $this->updateGroups($data['user_groups']);
+      unset($data['user_groups']);
+    }
     return $data;
   }
 
@@ -700,6 +705,31 @@ class User extends Base {
           $success = FALSE;
           $this->error("Could not assign role ({$roleId}) to user ({$this->id})");
         }
+      }
+    }
+    return $success;
+  }
+
+  public function updateGroups(array $newGroups): bool
+  {
+    $success = TRUE;
+    $existingGroups = $this->getGroups();
+    $existingGroupIds = array_map(function($group){return $group->id;}, $existingGroups);
+    $newGroupIds = array_map(function($group){return $group->id;}, $newGroups);
+    $addGroups = array_diff($newGroupIds, $existingGroupIds);
+    foreach($addGroups as $id) {
+      if (!$this->addGroup($id)) {
+        $success = FALSE;
+        $this->error("Could not add user ({$this->id}) to group ({$id})");
+        break;
+      }
+    }
+    $removeGroups = array_diff($existingGroupIds, $newGroupIds);
+    foreach($removeGroups as $id) {
+      if (!$this->removeGroup($id)) {
+        $success = FALSE;
+        $this->error("Could not remove user ({$this->id}) from group ({$id})");
+        break;
       }
     }
     return $success;
