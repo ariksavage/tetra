@@ -9,9 +9,15 @@ export class User extends Model {
   public name_suffix!: string;
   public email!: string;
   public roles: any = null;
+  public category: any = null;
+  public category_id!: number;
+  public user_groups: Array<any> = [];
 
   constructor(data: any = {}) {
     super(data);
+    if (this.category && !this.category_id){
+      this.category_id = this.category.id;
+    }
   }
 
   name() {
