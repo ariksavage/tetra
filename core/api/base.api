@@ -442,7 +442,9 @@ class Base {
         }
         break;
       case 'boolean':
-        $value = $value == 1;
+        if ($value !== '' && $value !== NULL) {
+          $value = $value == 1;
+        }
         break;
       case 'integer':
         $value = intval($value);
