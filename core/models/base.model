@@ -362,7 +362,7 @@ class Base {
     foreach ($replacements as $key => $value) {
       $error = str_replace('{{'.$key.'}}', $value, $error);
     }
-    return $error;
+    return trim($error);
   }
 
   protected function setMessage($text)
@@ -380,7 +380,7 @@ class Base {
     foreach ($replacements as $key => $value) {
       $message = str_replace('{{'.$key.'}}', $value, $message);
     }
-    return $message;
+    return trim($message);
   }
 
   /**
