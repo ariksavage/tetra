@@ -2,13 +2,8 @@
 :host {
   display: block;
   position: relative;
-  margin-top: 1em;
   max-width: 100%;
   box-sizing: border-box;
-
-  &:first-child {
-    margin-top: 0;
-  }
 
   &.full {
     .input {

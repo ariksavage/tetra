@@ -119,8 +119,7 @@ export class AppService {
     const navItems = items.filter(item => {
       return item.title
     }).map(item => {
-      console.log(item.path, path);
-      if (item.path[0] !== ':' && item.path){
+      if (item.path[0] !== ':' && item.path && (!item.data || !item.data.hideFromNav)){
         return {
           title: item.title,
           path: path + '/' + item.path

@@ -86,7 +86,7 @@ export class TetraPage {
 
   getParam(key: string, type: string = 'number'){
     let value = this.routeParams.get(key);
-
+    console.log('param');
     if (type == 'number'){
       return parseInt(value);
     } else {
