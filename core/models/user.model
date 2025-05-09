@@ -268,9 +268,15 @@ class User extends Base {
     if (!$this->id && !isset($data['password'])) {
       $data['password'] = $this->generateAuthToken();
     }
+    if ($data && isset($data['roles'])){
+      if (is_string($data['roles']) && json_decode($data['roles'])) {
+        $data['roles'] = json_decode($data['roles']);
+      }
 
-    // Roles are added / removed in their own separate process
-    unset($data['roles']);
+      $this->updateRoles($data['roles']);
+      unset($data['roles']);
+    }
+
     unset($data['category']);
     unset($data['user_groups']);
     return $data;
@@ -647,14 +653,11 @@ class User extends Base {
   {
     $this->roles = array();
     require_once(__dir__ . '/user_role.model');
-    $roles = $this->select(['user_roles.*'])
+    $this->roles = $this->select(['user_roles.*'])
       ->from('user_role_assignments')
       ->leftJoin('user_roles', 'role_id', 'id')
       ->where('user_role_assignments.user_id', '=', $this->id)
       ->execute(FALSE, '\Core\Models\UserRole');
-    foreach ($roles as $role) {
-      $this->roles[$role->key] = $role;
-    }
   }
 
   /**
@@ -669,6 +672,7 @@ class User extends Base {
    */
   public function updateRoles(array $roles): bool
   {
+    $roles = array_map(function($role){return $role->id;}, $roles);
     $existingRolesQuery = $this->select()->from('user_role_assignments')->where('user_id', '=', $this->id);
     $existing = $existingRolesQuery->execute();
     $existingRoles = array_map( function ($item) {
