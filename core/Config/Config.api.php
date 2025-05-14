@@ -12,9 +12,11 @@
  * @version    1.0
  * @since      2025-01-10
  */
-namespace Core\API;
+namespace Core\Config\API;
 
-class Config extends Base {
+use \Core\Database\MySQL\Query\Select as selectQuery;
+
+class Config extends \Core\Base\API\Base {
 
   /**
    * Class constructor
@@ -22,10 +24,7 @@ class Config extends Base {
   public function __construct()
   {
     $this->requirePermission('config');
-
-    require_once(CORE_ROOT . '/models/config.model');
-
-    parent::__construct('config', '\Core\Models\Config', 'Config', 'Config');
+    parent::__construct('config', '\Core\Config\Models\Config', 'Config', 'Config');
   }
 
   /**
@@ -50,7 +49,7 @@ class Config extends Base {
    *
    * @return selectQuery  Query object
    */
-  protected function listQuery(int $page = 1, int $per = 999999): \Core\Database\selectQuery
+  protected function listQuery(int $page = 1, int $per = 999999): selectQuery
   {
     $query = parent::listQuery($page, $per);
     $query->orderBy('type')->orderBy('key');
@@ -124,7 +123,7 @@ class Config extends Base {
     $this->reqPermission('VIEW');
     $config = $this->select()
       ->where('type', '=', $type)
-      ->execute(FALSE, '\Core\Models\Config');
+      ->execute(FALSE, '\Core\Config\Models\Config');
     $this->success('config', $config);
   }
 
@@ -140,7 +139,7 @@ class Config extends Base {
     $this->reqPermission('UPDATE');
     $value = $this->postValue('value');
 
-    $config = new \Core\Models\Config();
+    $config = new \Core\Config\Models\Config();
     $config->byId($id);
     $config->setValue($value);
     $this->success('config', $config);

@@ -14,14 +14,15 @@
  * @version    1.0
  * @since      2025-04-01
  */
-namespace Core\API;
+namespace Core\Tags\API;
 
+use \Core\Tags\Models\Tag;
 /**
  * Class Tags
  *
  * Handles all tags-related operations
  */
-class Tags extends Base {
+class Tags extends \Core\Base\API\Base {
 
   /**
    * Class constructor
@@ -31,14 +32,13 @@ class Tags extends Base {
   public function __construct()
   {
     $this->requirePermission('tags');
-    require_once(CORE_ROOT . '/models/tag.model');
-    parent::__construct('tags', '\Core\Models\Tag', 'Tags', 'Tag');
+    parent::__construct('tags', '\Core\Tags\Models\Tag', 'Tags', 'Tag');
   }
 
   public function newPOST()
   {
     $label = $this->postValue('label', '', 'string');
-    $tag = new \Core\Models\Tag();
+    $tag = new Tag();
     $tag->label = $label;
     $tag->save();
     $this->success('tag', $tag, "Tag \"$label\" created");
@@ -52,7 +52,7 @@ class Tags extends Base {
       ->where('entity_type', '=', $type)
       ->groupBy('`tag_assignments`.`tag_id`')
       ->orderBy('`tags`.`label`')
-      ->execute(FALSE, '\Core\Models\Tag');
+      ->execute(FALSE, '\Core\Tags\Models\Tag');
       $this->success('tags', $tags);
   }
 }

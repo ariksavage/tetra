@@ -13,12 +13,12 @@
  * @since      2025-01-10
  */
 
-namespace Core\Database;
+namespace Core\Database\MySQL\DB;
 
-class DB extends \mysqli
+class MySQL extends \mysqli
 {
-  use \Core\Common;
-  use \Core\Error;
+  use \Core\Base\Traits\Common;
+  use \Core\Base\Traits\Errors;
 
   public function __construct()
   {

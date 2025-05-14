@@ -24,9 +24,9 @@
  * @version    1.0
  * @since      2025-01-10
  */
-namespace Core\Database;
+namespace Core\Database\MySQL\Query;
 
-class DeleteQuery extends Query
+class Delete extends Base
 {
   public function __construct($table = NULL)
   {

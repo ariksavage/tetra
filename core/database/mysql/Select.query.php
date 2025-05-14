@@ -40,9 +40,9 @@
  * @since      2025-01-10
  */
 
-namespace Core\Database;
+namespace Core\Database\MySQL\Query;
 
-class SelectQuery extends \Core\Database\Query
+class Select extends Base
 {
   protected $fields = [];
   protected $joins = [];

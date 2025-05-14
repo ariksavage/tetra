@@ -13,9 +13,9 @@
  * @since      2025-01-05
  */
 
-namespace Core\Models;
+namespace Core\Users\Models;
 
-class UserRole extends Base {
+class UserRole extends \Core\Base\Models\Base {
 
   /**
    * Shorthand string for this role
@@ -103,8 +103,7 @@ class UserRole extends Base {
     ->leftJoin('user_permissions', 'permission_id', 'id')
     ->where('user_role_permissions_assignments.role_id', 'IN', $roleIds);
 
-    require_once(__dir__ . '/user_permission.model');
-    $permissions = $query->execute(FALSE, '\Core\Models\UserPermission');
+    $permissions = $query->execute(FALSE, '\Core\Users\Models\UserPermission');
     foreach ($permissions as $permission) {
       $dimension = $permission->dimension;
       if (!isset($this->permissions->$dimension)) {

@@ -13,9 +13,9 @@
  * @version    1.0
  * @since      2025-01-10
  */
-namespace Core\Database;
+namespace Core\Database\MySQL\Query;
 
-class RawQuery extends Query
+class Raw extends Base
 {
   /**
    * Query string

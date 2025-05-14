@@ -14,9 +14,11 @@
  * @version    1.0
  * @since      2025-01-10
  */
-namespace Core\Database;
+namespace Core\Database\MySQL\Query;
 
-class Query
+use \Core\Database\MySQL\DB\MySQL as DB;
+
+class Base
 {
   protected $method;
   protected $table;
@@ -26,7 +28,7 @@ class Query
   protected $offset;
   protected $orderConditions = [];
 
-  use \Core\Error;
+  use \Core\Base\Traits\Errors;
 
   /**
    * Construct the query object.

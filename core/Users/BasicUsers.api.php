@@ -1,17 +1,19 @@
 <?php
 
-namespace Core\API;
+namespace Core\Users\API;
 
 
-use \Core\Models\User;
-use \Core\Models\UserCategory;
-use \Core\Models\UserGroup;
+use \Core\Users\Models\User;
+use \Core\Users\Models\UserCategory;
+use \Core\Users\Models\UserGroup;
+use \Core\Users\Models\UserRole;
+use \Core\Database\MySQL\Query\Select as selectQuery;
 
-class Users extends Base {
+class BasicUsers extends \Core\Base\API\Base {
 
   public function __construct()
   {
-    parent::__construct('users', '\Core\Models\User', 'Users', 'User');
+    parent::__construct('users', '\Core\Users\Models\User', 'Users', 'User');
   }
 
   public function requiresAuth(): bool
@@ -38,7 +40,7 @@ class Users extends Base {
    *
    * @return selectQuery  Query object
    */
-  protected function listQuery(int $page = 1, int $per = 20): \Core\Database\selectQuery
+  protected function listQuery(int $page = 1, int $per = 20): SelectQuery
   {
     $query = parent::listQuery($page, $per);
     return $query;
@@ -146,7 +148,7 @@ class Users extends Base {
     $username = $this->getValue('username');
     $user = $this->select()->from('users')
     ->where('username', '=', $username)
-    ->execute(TRUE, '\Core\Models\User');
+    ->execute(TRUE, '\Core\Users\Models\User');
     if ($user) {
       $appName = $this->configValue('name');
       $supportEmail = $this->configValue('support_email');
@@ -197,9 +199,8 @@ class Users extends Base {
    */
   protected function getCategoryById(int $catId, array $flags = []): UserCategory
   {
-    require_once(CORE_ROOT . '/models/user_category.model');
     $query = $this->select()->from('user_categories')->where('id', '=', $catId);
-    $category = $query->execute(TRUE, '\Core\Models\UserCategory', $flags);
+    $category = $query->execute(TRUE, '\Core\Users\Models\UserCategory', $flags);
     return $category;
     return $category;
   }
@@ -232,9 +233,8 @@ class Users extends Base {
    */
   public function categoriesGET(): never
   {
-    require_once(CORE_ROOT . '/models/user_category.model');
     $query = $this->select()->from('user_categories')->orderBy('label');
-    $categories = $query->execute(FALSE, '\Core\Models\UserCategory', ['USER_COUNT']);
+    $categories = $query->execute(FALSE, '\Core\Users\Models\UserCategory', ['USER_COUNT']);
     $this->success('categories', $categories);
   }
 
@@ -255,7 +255,6 @@ class Users extends Base {
    */
   public function categoryPOST()
   {
-    require_once(CORE_ROOT . '/models/user_category.model');
     $data = $this->postValue('category');
     $category = new UserCategory($data);
     if ($category->save()) {
@@ -289,9 +288,8 @@ class Users extends Base {
    */
   protected function getGroupById(int $groupId, array $flags = []): UserGroup
   {
-    require_once(CORE_ROOT . '/models/user_group.model');
     $query = $this->select()->from('user_groups')->where('id', '=', $groupId);
-    $group = $query->execute(TRUE, '\Core\Models\UserGroup', $flags);
+    $group = $query->execute(TRUE, '\Core\Users\Models\UserGroup', $flags);
     return $group;
   }
 
@@ -302,11 +300,10 @@ class Users extends Base {
    */
   public function groupsGET()
   {
-    require_once(CORE_ROOT . '/models/user_group.model');
     $groups = $this->select()
       ->from('user_groups')
       ->orderBy('label')
-      ->execute(FALSE, '\Core\Models\UserGroup', ['USER_COUNT']);
+      ->execute(FALSE, '\Core\Users\Models\UserGroup', ['USER_COUNT']);
     $this->success('groups', $groups);
   }
 
@@ -361,7 +358,6 @@ class Users extends Base {
    */
   public function groupPOST(): never
   {
-    require_once(CORE_ROOT . '/models/user_group.model');
     $data = $this->postValue('group');
     $group = new UserGroup($data);
     if ($group->save()) {

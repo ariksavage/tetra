@@ -13,10 +13,10 @@
  * @since      2025-01-14
  */
 
-namespace Core\Models;
+namespace Core\Migrations\Models;
 
 
-class Migration extends Base {
+class Migration extends \Core\Base\Models\Base {
   /**
    * Human friendly name for this migration.
    * @var string

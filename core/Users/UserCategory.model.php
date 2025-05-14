@@ -2,7 +2,7 @@
 /**
  * User Rolemodel
  *
- * Represents a Group of users.
+ * Represents a Category of users.
  *
  * PHP version 8.4
  *
@@ -13,9 +13,9 @@
  * @since      2025-01-05
  */
 
-namespace Core\Models;
+namespace Core\Users\Models;
 
-class UserGroup extends Base {
+class UserCategory extends \Core\Base\Models\Base {
   /**
    * Name of the group
    * @var string
@@ -29,54 +29,46 @@ class UserGroup extends Base {
   public string $description = '';
 
   /**
-   * Group is publicly visible
-   * @var boolean
-   */
-  public bool $public = FALSE;
-
-  /**
    * Tenant ID
+   * @var int
    */
   public int $tenant_id = 1;
 
-    /**
-   * Count of users in this group
+  /**
+   * Count of users in this category
    * @var int
    */
   public int $count = 0;
 
-  public array $users = [];
-
   public function __construct(object|NULL $data = NULL, array $flags = [])
   {
-    parent::__construct('group', 'user_groups', $data, $flags);
+    parent::__construct('category', 'user_categories', $data, $flags);
     return $this;
   }
 
   /**
-   * Get the total number of users in the group.
-   * @return  int  Number of users
+   * Get a count of users in tis category.
+   * @return int Number of users in the category.
    */
-  public function getUserCount(): int
+  protected function getUserCount(): int
   {
     $users = $this->select()
-    ->from('user_group_assignments')
-    ->where('group_id', '=', $this->id)
+    ->from('users')
+    ->where('category_id', '=', $this->id)
     ->execute();
     return $this->count = count($users);
   }
 
   /**
-   * Get all users in the group.
+   * Get all users in the category.
    * @return array<User>  Array of users.
    */
-  public function getUsers()
+  protected function getUsers()
   {
     $users = $this->select()
-    ->from('user_group_assignments')
-    ->leftJoin('users', 'user_id', 'id')
-    ->where('group_id', '=', $this->id)
-    ->execute(FALSE, '\Core\Models\User');
+    ->from('users')
+    ->where('category_id', '=', $this->id)
+    ->execute(FALSE, '\Core\Users\Models\User');
     return $this->users = $users;
   }
 
@@ -98,7 +90,7 @@ class UserGroup extends Base {
   }
 
   /**
-   * Provide validation before this Group is allowed to be deleted.
+   * Provide validation before this Category is allowed to be deleted.
    *
    * Group may not be deleted if it has members.
    * @return bool TRUE if group may be deleted.
@@ -107,7 +99,7 @@ class UserGroup extends Base {
   {
     $users = $this->getUserCount();
     if ($users > 0) {
-      $error = "Can not delete. Group {$this->label} has {$users} ";
+      $error = "Can not delete. Category {$this->label} has {$users} ";
       $error .= $users > 1 ? 'users' :'user';
       $this->setError($error);
       return FALSE;

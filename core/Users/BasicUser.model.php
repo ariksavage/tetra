@@ -14,11 +14,11 @@
  * @since      2025-01-05
  */
 
-namespace Core\Models;
+namespace Core\Users\Models;
 
-use \Core\Models\UserCategory;
-use \Core\Models\UserGroup;
-class User extends Base {
+use \Core\Users\Models\UserCategory;
+use \Core\Users\Models\UserGroup;
+class BasicUser extends \Core\Base\Models\Base {
 
   /**
    * Username
@@ -91,6 +91,13 @@ class User extends Base {
    */
   public object $category;
 
+  /**
+   * User status
+   * 'Active', 'Deactivated', 'Pending'
+   * @var string
+   */
+  public string $status = 'Pending';
+
 
   /**
    * Construct the user
@@ -133,14 +140,13 @@ class User extends Base {
 
   /**
    * Get full category data.
-   * @return \Core\Models\UserCategory Category
+   * @return \Core\Users\Models\UserCategory Category
    */
   public function getCategory(): object
   {
-    require_once(CORE_ROOT. '/models/user_category.model');
     $query = $this->select()->from('user_categories')
     ->where('id', '=', $this->category_id);
-    $category =  $query->execute(TRUE, '\Core\Models\UserCategory');
+    $category =  $query->execute(TRUE, '\Core\Users\Models\UserCategory');
     if ($category) {
       $this->category = $category;
     }
@@ -169,11 +175,10 @@ class User extends Base {
    */
   public function getGroups(): array
   {
-    require_once(CORE_ROOT . '/models/user_group.model');
     $this->user_groups = $this->select(['`user_groups`.*'])->from('user_groups')
     ->leftJoin('user_group_assignments', 'id', 'group_id')
     ->where('`user_group_assignments`.`user_id`', '=', $this->id)
-    ->execute(FALSE, '\Core\Models\UserGroup');
+    ->execute(FALSE, '\Core\Users\Models\UserGroup');
     return $this->user_groups;
   }
 
@@ -271,17 +276,18 @@ class User extends Base {
     if ($data && isset($data['roles'])){
       if (is_string($data['roles']) && json_decode($data['roles'])) {
         $data['roles'] = json_decode($data['roles']);
+        if (is_array($data['roles'])){
+          $this->updateRoles($data['roles']);
+        }
       }
-
-      $this->updateRoles($data['roles']);
       unset($data['roles']);
     }
     unset($data['category']);
     if (isset($data['user_groups'])){
       if (is_string($data['user_groups']) && json_decode($data['user_groups'])) {
         $data['user_groups'] = json_decode($data['user_groups']);
+        $this->updateGroups($data['user_groups']);
       }
-      $this->updateGroups($data['user_groups']);
       unset($data['user_groups']);
     }
     return $data;
@@ -657,12 +663,11 @@ class User extends Base {
   public function getRoles()
   {
     $this->roles = array();
-    require_once(__dir__ . '/user_role.model');
     $this->roles = $this->select(['user_roles.*'])
       ->from('user_role_assignments')
       ->leftJoin('user_roles', 'role_id', 'id')
       ->where('user_role_assignments.user_id', '=', $this->id)
-      ->execute(FALSE, '\Core\Models\UserRole');
+      ->execute(FALSE, '\Core\Users\Models\UserRole');
   }
 
   /**
@@ -677,7 +682,9 @@ class User extends Base {
    */
   public function updateRoles(array $roles): bool
   {
-    $roles = array_map(function($role){return $role->id;}, $roles);
+    $roles = array_map(function($role) {
+      return is_int($role) ? $role : $role->id;
+    }, $roles);
     $existingRolesQuery = $this->select()->from('user_role_assignments')->where('user_id', '=', $this->id);
     $existing = $existingRolesQuery->execute();
     $existingRoles = array_map( function ($item) {
