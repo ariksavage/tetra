@@ -14,15 +14,15 @@
  * @since      2025-01-05
  */
 
-namespace Core\Models;
+namespace Core\Base\Models;
 
 /**
  * Base model class.
  */
 class Base {
-  use \Core\Common;
-  use \Core\Error;
-  use \Core\Database\Queries;
+  use \Core\Base\Traits\Common;
+  use \Core\Base\Traits\Errors;
+  use \Core\Database\MySQL\Traits\Queries;
 
   /**
    * Database table
@@ -448,7 +448,6 @@ class Base {
 
   public function getTags($type = NULL)
   {
-    require_once(CORE_ROOT . '/models/tag.model');
     if (!$type) {
       $type = $this->table;
     }
@@ -456,7 +455,7 @@ class Base {
     ->leftJoin('tags', 'tag_id', 'id')
     ->where('`tag_assignments`.`entity_type`', '=', $type)
     ->and('`tag_assignments`.`entity_id`', '=', $this->id);
-    $this->tags = $tagsQuery->execute(FALSE, '\Core\Models\Tag');
+    $this->tags = $tagsQuery->execute(FALSE, '\Core\Tags\Models\Tag');
     foreach ($this->tags as &$tag) {
       $tag->id = intval($tag->id);
       $tag->tenant_id = intval($tag->tenant_id);

@@ -1,18 +1,11 @@
 <?php
-namespace Core\Database;
+namespace Core\Database\MySQL\Traits;
 
-require_once(__DIR__ . '/query.php');
-require_once(__DIR__ . '/select.php');
-require_once(__DIR__ . '/insert.php');
-require_once(__DIR__ . '/update.php');
-require_once(__DIR__ . '/delete.php');
-require_once(__DIR__ . '/raw.php');
-
-use \Core\Database\selectQuery;
-use \Core\Database\insertQuery;
-use \Core\Database\updateQuery;
-use \Core\Database\deleteQuery;
-use \Core\Database\rawQuery;
+use \Core\Database\MySQL\Query\Select as selectQuery;
+use \Core\Database\MySQL\Query\Insert as insertQuery;
+use \Core\Database\MySQL\Query\Update as updateQuery;
+use \Core\Database\MySQL\Query\Delete as deleteQuery;
+use \Core\Database\MySQL\Query\Raw as rawQuery;
 
 trait Queries {
 
@@ -46,7 +39,8 @@ trait Queries {
     if (!$table && $this->table) {
       $table = $this->table;
     }
-    $q =  new updateQuery($table)->set($data);
+    $q =  new updateQuery($table);
+      $q->set($data);
     return $q;
   }
 

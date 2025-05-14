@@ -13,9 +13,9 @@
  * @since      2025-01-10
  */
 
-namespace Core\Models;
+namespace Core\Config\Models;
 
-class Config extends Base {
+class Config extends \Core\Base\Models\Base {
 
   /**
    * User facing label

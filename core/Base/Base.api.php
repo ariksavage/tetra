@@ -16,14 +16,15 @@
  * @version    1.0
  * @since      2025-01-10
  */
-namespace Core\API;
+namespace Core\Base\API;
 
-use \Core\Database\SelectQuery;
+use \Core\Database\MySQL\Query\Select as selectQuery;
+
 
 class Base {
-  use \Core\Common;
-  use \Core\Error;
-  use \Core\Database\Queries;
+  use \Core\Base\Traits\Common;
+  use \Core\Base\Traits\Errors;
+  use \Core\Database\MySQL\Traits\Queries;
 
   /**
    * Default table name.
@@ -79,7 +80,7 @@ class Base {
   /**
    * Class constructor
    * @param string $table    Table name. eg "users"
-   * @param string $model    Fully namespaced class for returned items. eg "\Core\Models\User"
+   * @param string $model    Fully namespaced class for returned items. eg "\Core\Users\Models\User"
    * @param string $plural   Plural name for items.                     eg "Users"
    * @param string $singular Singular name for item.                    eg "User"
    */
@@ -212,15 +213,15 @@ class Base {
   /**
    * Get results from a query, along with pagination information.
    *
-   * @param  \Core\Database\selectQuery $query    SELECT Query
+   * @param  selectQuery $query    SELECT Query
    * @param  int                        $page     Current page of results to return
    * @param  int                        $perPage  Number of items top return per page
-   * @param string $model                         Fully namespaced class for returned items. eg \Core\Models\User
+   * @param string $model                         Fully namespaced class for returned items. eg \Core\Users\Models\User
    *
    * @return array<$model>                        Query results
    */
   protected function paginatedResults(
-      \Core\Database\selectQuery $query,
+      selectQuery $query,
       int $page,
       int $perPage,
       string $model = '',
@@ -314,7 +315,7 @@ class Base {
     return $query;
   }
 
-  protected function filterByTags(SelectQuery &$query, array $tags, string $type = '', bool $exclude = FALSE)
+  protected function filterByTags(selectQuery &$query, array $tags, string $type = '', bool $exclude = FALSE)
   {
     if (is_string($tags)) {
       $tags = explode(',', $tags);
@@ -336,7 +337,7 @@ class Base {
     }
   }
 
-  protected function searchQueryFilter(&$query): \Core\Database\SelectQuery
+  protected function searchQueryFilter(selectQuery &$query): selectQuery
   {
     if ($tags = $this->getValue('tags', [], 'array')) {
       $this->filterByTags($query, $tags);
@@ -353,7 +354,7 @@ class Base {
    *
    * @return selectQuery  Query object
    */
-  protected function listQuery(int $page = 1, int $per = 20): \Core\Database\selectQuery
+  protected function listQuery(int $page = 1, int $per = 20): selectQuery
   {
     $query = $this->select()->from($this->table);
     $this->searchQuery($query);

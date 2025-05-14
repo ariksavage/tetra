@@ -1,11 +1,11 @@
 <?php
-namespace Core;
+namespace Core\Base\Traits;
 
-use \Core\Database\selectQuery;
-use \Core\Database\insertQuery;
-use \Core\Database\updateQuery;
-use \Core\Database\deleteQuery;
-use \Core\Models\User;
+use \Core\Database\MySQL\Query\Select as selectQuery;
+use \Core\Database\MySQL\Query\Insert as insertQuery;
+use \Core\Database\MySQL\Query\Update as updateQuery;
+use \Core\Database\MySQL\Query\Delete as deleteQuery;
+use \Core\Users\Models\User;
 
 trait Common {
 
@@ -78,7 +78,8 @@ trait Common {
    */
   protected function configValue($key, $type = 'application')
   {
-    $config = new selectQuery()
+    $query = new selectQuery();
+    $config = $query
       ->from('config')
       ->where('type', '=', $type)
       ->and('key', '=', $key)

@@ -1,7 +1,7 @@
 <?php
-namespace Core;
+namespace Core\Base\Traits;
 
-trait Error {
+trait Errors {
 
   /**
    * Kill the current script, and return as much useful JSON data as possible

@@ -1,10 +1,10 @@
 <?php
 
-namespace Core\API;
+namespace Core\App\API;
 
-use \Core\Models\User;
+use \Core\Users\Models\User;
 
-class App extends Base {
+class App extends \Core\Base\API\Base {
 
   public function __construct()
   {

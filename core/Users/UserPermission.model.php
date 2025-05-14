@@ -14,9 +14,9 @@
  * @since      2025-01-05
  */
 
-namespace Core\Models;
+namespace Core\Users\Models;
 
-class UserPermission extends Base {
+class UserPermission extends \Core\Base\Models\Base {
 
   /**
    * Human-friendly title

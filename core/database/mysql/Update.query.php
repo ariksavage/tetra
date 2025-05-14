@@ -26,9 +26,9 @@
  * @version    1.0
  * @since      2025-01-10
  */
-namespace Core\Database;
+namespace Core\Database\MySQL\Query;
 
-class UpdateQuery extends Query
+class Update extends Base
 {
   /**
    * Data as $column => $value

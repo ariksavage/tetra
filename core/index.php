@@ -2,27 +2,17 @@
 namespace Core;
 require_once(__dir__ . '/bootstrap.php');
 
-if (file_exists(SERVER_ROOT . '/vendor/autoload.php')) {
-  require_once(SERVER_ROOT . '/vendor/autoload.php');
-}
 
-$pluginsDir = realpath(SERVER_ROOT . '/plugins');
-
-if (file_exists($pluginsDir . '/loader.php')) {
-  require_once($pluginsDir.'/loader.php');
-}
 
 // All back end time is used / stored in UTC.
 // On the front end, it can be converted to local time.
-date_default_timezone_set('UTC');
-mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-$core = new \Core\API\App();
 
-if (file_exists($pluginsDir. '/error/errorReporting.php')) {
-  require_once($pluginsDir. '/error/errorReporting.php');
-  $errorReporting = new \Core\ErrorReporting();
-}
+$core = new \Core\App\API\App();
+// die();
+// if (file_exists($pluginsDir. '/error/errorReporting.php')) {
+// $errorReporting = new \Core\ErrorReporting();
+// }
 
 // Globals
 
@@ -46,41 +36,23 @@ unset($_GET['id2']);
 
 $APIclass = '';
 
-/**
- * Find core plugin, if it exists
- */
-if (file_exists(CORE_ROOT . "/api/$type.api")) {
-  require_once CORE_ROOT . "/api/$type.api";
-  $APIclass = __NAMESPACE__ . '\\API\\' . $core->toCamelCase($type);
-}
-/**
- * If a corresponding $type plugin exists, load it first.
- */
+$type = $core->toCamelCase($type);
+$className = "\\Core\\{$type}\\API\\{$type}";
 
-if (is_dir($pluginsDir)) {
-  $pluginDir = $pluginsDir . "/{$type}";
-  if (is_dir($pluginDir)) {
-    $files = $images = glob("{$pluginDir}/*.api", GLOB_BRACE);
-    if (count($files) == 1) {
-      $pluginAPIfile = reset($files);
-
-      require_once $pluginAPIfile;
-      $name = str_replace('.api', '', basename($pluginAPIfile));
-      $APIclass = __NAMESPACE__ . '\\API\\' . ucfirst($name);
-    }
-  }
+if (class_exists($className)) {
+  $api = new $className();
 } else {
-  mkdir($pluginsDir);
+  $core->error("$className is not a valid type", 404);
 }
 
 /**
  * Instatiate the API class.
  */
-if ($APIclass && class_exists($APIclass)) {
-  $api = new $APIclass();
-} else {
-  $core->error("$type is not a valid type", 404);
-}
+// if ($APIclass && class_exists($APIclass)) {
+//   $api = new $APIclass();
+// } else {
+//   $core->error("$APIclass is not a valid type", 404);
+// }
 
 /**
  * Call the API method as defined by the request type and action.

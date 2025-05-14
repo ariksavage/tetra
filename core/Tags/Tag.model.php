@@ -14,13 +14,25 @@
  * @since      2025-04-02
  */
 
-namespace Core\Models;
+namespace Core\Tags\Models;
 
-class Tag extends Base {
+class Tag extends \Core\Base\Models\Base {
+  /**
+   * Tag name / label
+   * @var string
+   */
   public string $label = '';
 
+  /**
+   * Color code. Unused?
+   * @var string
+   */
   public string $hex = '';
 
+  /**
+   * Tenant ID. Unused?
+   * @var integer
+   */
   public int $tenant_id = 1;
   /**
    * Construct the tag
