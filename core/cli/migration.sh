@@ -73,7 +73,7 @@ echo " */" >> $path
 echo "" >> $path
 echo "namespace Core\Migrations;" >> $path
 echo "" >> $path
-echo "class $class extends \Core\Models\Migration" >> $path
+echo "class $class extends \Core\Migrations\Models\Migration" >> $path
 echo "{" >> $path
 echo "" >> $path
 echo "  /**" >> $path
