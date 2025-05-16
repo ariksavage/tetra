@@ -196,7 +196,11 @@ export class CoreService {
   }
 
   postUrl(url: string, payload: any = {}) {
-    return this.http.post(url, payload, this.getConfig()).toPromise();
+    return this.http.post(url, payload, this.getConfig()).toPromise().then((result: any) => {
+      return this.handleResult(result, url);
+    }, (response: any) => {
+      return this.handleError(url, response.error)
+    });
   }
 
   /**
@@ -219,7 +223,11 @@ export class CoreService {
   }
 
   putUrl(url: string, payload: any) {
-    return this.http.put(url, payload, this.getConfig()).toPromise();
+    return this.http.put(url, payload, this.getConfig()).toPromise().then((result: any) => {
+      return this.handleResult(result, url);
+    }, (response: any) => {
+      return this.handleError(url, response.error)
+    });
   }
 
   /**
