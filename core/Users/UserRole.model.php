@@ -134,6 +134,7 @@ class UserRole extends \Core\Base\Models\Base {
       return FALSE;
     }
 
+    // User has some permissions for the dimensions, but no particular action is provided
     if (!$action) {
       return TRUE;
     }

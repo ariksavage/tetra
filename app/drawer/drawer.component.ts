@@ -11,6 +11,7 @@ import { CommonModule } from '@angular/common';
 export class TetraDrawerComponent {
   @Input() title: string = '';
   @Input() icon: string = '';
+  @Input() buttonClass: string = '';
   @Input() position: string = 'bottom';
   @Output() onToggle: EventEmitter<any> = new EventEmitter<any>();
   open: boolean = false;
