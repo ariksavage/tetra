@@ -1,4 +1,4 @@
-<button class="drawer-toggle btn icon" title="{{open ? 'Hide' : 'Show'}} {{title}}" (click)="toggle()">
+<button class="drawer-toggle btn icon" [ngClass]="buttonClass" title="{{open ? 'Hide' : 'Show'}} {{title}}" (click)="toggle()">
   <i class="icon" [ngClass]="icon"></i>
   <ng-content select="[button]"></ng-content>
 </button>
