@@ -48,7 +48,7 @@ class ClassLoader
     } else {
       $path .= "/{$name}.{$ext}";
     }
-    return $path;
+    return strtolower($path);
   }
 
   /**
