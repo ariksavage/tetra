@@ -197,7 +197,7 @@ class Migration extends \Core\Base\Models\Base {
     if (is_array($key)) {
       $q .= ', ' . implode(", ", $key) . ")";
     }
-    $q .= " ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+    $q .= " ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci";
     return $this->raw($q)->execute();
   }
 
