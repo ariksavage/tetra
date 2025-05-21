@@ -175,7 +175,7 @@ class Migration extends \Core\Base\Models\Base {
     //show tables where tables_in_db = 'config'
     $q = $this->raw("SHOW TABLES WHERE tables_in_db = '$tableName'");
     $results = $q->execute();
-    return $results->num_rows > 0;
+    return $results && $results->num_rows > 0;
   }
 
   /**
