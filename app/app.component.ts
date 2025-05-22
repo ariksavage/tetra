@@ -12,7 +12,7 @@ export class TetraAppComponent {
     name: 'Application'
   };
   pageTitle: string = '';
-  pageConfig: any;
+  pageConfig: any = {};
   year = new Date().getFullYear();
   user: User|null = null;
   copyright: string = '';
