@@ -172,12 +172,13 @@ class Migration extends \Core\Base\Models\Base {
    */
   protected function tableExists(string $tableName): bool
   {
-    //show tables where tables_in_db = 'config'
     $q = $this->raw("SHOW TABLES");
-    $results = $q->execute();
-    var_dump($results);
-    return TRUE;
-    // return $results && $results->num_rows > 0;
+    $results = $q->executeSelect();
+    $tables = array_map(function($obj) {
+      $array = (array)$obj;
+      return reset($array);
+    }, $results);
+    return in_array($tableName, $tables);
   }
 
   /**
