@@ -259,7 +259,7 @@ class Base {
   protected function getById(int $id, $flags = [])
   {
     $model = new $this->model();
-    $model->byId($id, $flags);
+    $model->byId($id, TRUE, $flags);
     return $model;
   }
 
@@ -297,10 +297,10 @@ class Base {
       if (!count($searchColumns)) {
         $this->error("searchColumns() not configured.");
       }
-      foreach ($searchColumns as $k => $column) {
-        if ($k > 0) {
-          $query->or($column, 'CONTAINS', $search);
-        }
+      // or() adds no OR straight after the group's opening bracket, so the
+      // first column joins the group plainly and the rest are OR'd on.
+      foreach ($searchColumns as $column) {
+        $query->or($column, 'CONTAINS', $search);
       }
       $query->endGroup();
     }
