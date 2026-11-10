@@ -555,6 +555,11 @@ class Base implements \JsonSerializable {
 
   protected function saveTags()
   {
+    // Models that aren't tagged skip this, as getTags() does. A model that
+    // unsets $tags (Tag does) would otherwise fail here on every save.
+    if (!$this->hasTags() || !isset($this->tags)) {
+      return;
+    }
     $currentUser = $this->getCurrentUser();
     if ($currentUser){
       $userId = $this->getCurrentUser()->id;
