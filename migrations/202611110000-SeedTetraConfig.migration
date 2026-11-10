@@ -1,0 +1,41 @@
+<?php
+/**
+ * Migration: Seed Tetra's configuration
+ *
+ * The application settings Tetra reads, with their defaults. Without
+ * session_expires_days a new login session expired the moment it began.
+ * An app changes the values on its configuration page, or in its own
+ * migration; these rows are never overwritten.
+ *
+ * PHP version 8.4
+ *
+ * @category   Migration
+ * @package    Tetra
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @since      2026-11-11
+ */
+
+namespace Core\Migrations;
+
+class SeedTetraConfig extends \Core\Migrations\Models\Migration
+{
+  public string $name = 'Seed Tetra configuration';
+
+  protected function isComplete(): bool
+  {
+    $result = $this->raw("SELECT 1 FROM `config` WHERE `type` = 'application' AND `key` = 'session_expires_days' LIMIT 1")->execute();
+    return $result && $result->num_rows > 0;
+  }
+
+  protected function execute(): bool
+  {
+    return !!$this->raw(<<<'SQL'
+      INSERT IGNORE INTO `config` (`type`, `key`, `label`, `description`, `value`, `value_type`) VALUES
+        ('application', 'name', 'Application Name', 'Name used in page title, logo, etc', 'App', 'text'),
+        ('application', 'copyright_before', 'Copyright (before)', 'Text shown before the copyright year in the footer', '', 'text'),
+        ('application', 'copyright_after', 'Copyright (after)', 'Text shown after the copyright year in the footer', '', 'text'),
+        ('application', 'session_expires_days', 'Session Expires (days)', 'The number of days before a user session is automatically closed. Any activity within a session will restart this clock.', '1', 'number'),
+        ('application', 'password_reset_expires_days', 'Password Reset Expires (days)', 'The number of days that a password reset link will remain valid.', '10', 'number')
+      SQL)->execute();
+  }
+}

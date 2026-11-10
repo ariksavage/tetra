@@ -298,7 +298,7 @@ trait Common {
     if (is_string($date)) {
       $date = strtotime($date);
     }
-    return date('Y-m-d h:i:s', $date);
+    return date('Y-m-d H:i:s', $date);
   }
 
   public function baseUrl()

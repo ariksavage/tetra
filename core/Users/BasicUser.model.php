@@ -448,7 +448,7 @@ class BasicUser extends \Core\Base\Models\Base {
   public function passwordResetLink(string $host)
   {
     // end any open sessions
-    $now = date('Y-m-d h:i:s');
+    $now = date('Y-m-d H:i:s');
     $this->update(['date_ended' => $now], 'users_sessions')
     ->where('user_id', '=', $this->id)
     ->and('date_ended', 'IS NULL')
@@ -468,7 +468,7 @@ class BasicUser extends \Core\Base\Models\Base {
   public function byToken()
   {
     $token = $this->getAuthToken();
-    $now = date('Y-m-d h:i:s');
+    $now = date('Y-m-d H:i:s');
     if (!$token) {
       return FALSE;
     }
@@ -597,9 +597,9 @@ class BasicUser extends \Core\Base\Models\Base {
     $data = array();
     $data['user_id'] = $this->id;
     $data['token'] = $token;
-    $data['date_started'] = date('Y-m-d h:i:s');
+    $data['date_started'] = date('Y-m-d H:i:s');
     $data['date_last_access'] = $data['date_started'];
-    $data['date_expires'] = date('Y-m-d h:i:s', strtotime("+{$expiresDays} days"));
+    $data['date_expires'] = date('Y-m-d H:i:s', strtotime("+{$expiresDays} days"));
     if ($this->insert($data, 'users_sessions')->execute()) {
       $_SESSION['authorization_token'] = $token;
       $_SESSION['user'] = $this;
@@ -621,10 +621,10 @@ class BasicUser extends \Core\Base\Models\Base {
   {
     $token = $this->getAuthToken();
     $data = array();
-    $now = date('Y-m-d h:i:s');
+    $now = date('Y-m-d H:i:s');
     $data['date_last_access'] = $now; // updated by the table itself
     $expiresDays = $this->configValue('session_expires_days');
-    $data['date_expires'] = date('Y-m-d h:i:s', strtotime("+{$expiresDays} days"));
+    $data['date_expires'] = date('Y-m-d H:i:s', strtotime("+{$expiresDays} days"));
     if ($this->update($data, 'users_sessions')->where('token', '=', $token)->and('user_id', '=', $this->id)->execute()) {
       $this->cleanupSessions();
       return TRUE;
@@ -641,7 +641,7 @@ class BasicUser extends \Core\Base\Models\Base {
   {
     $token = $this->getAuthToken();
     $data = array();
-    $data['date_ended'] = date('Y-m-d h:i:s');
+    $data['date_ended'] = date('Y-m-d H:i:s');
     return $this->update($data, 'users_sessions')
       ->where('token', '=', $token)
       ->and('user_id', '=', $this->id)
@@ -656,7 +656,7 @@ class BasicUser extends \Core\Base\Models\Base {
    */
   protected function cleanupSessions(): bool
   {
-    $now = date('Y-m-d h:i:s');
+    $now = date('Y-m-d H:i:s');
     $data = array('date_ended' => $now);
       return $this->update($data, 'users_sessions')
       ->where('user_id', '=', $this->id)
