@@ -1,0 +1,23 @@
+@use '../field/field.component';
+
+.options {
+  margin: 0;
+  padding: 0;
+  list-style-type: none;
+}
+
+.option {
+  margin-bottom: .5lh;
+  padding: .5lh 1ex;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+
+  &:last-child {
+    margin: 0;
+    border-bottom: 0;
+  }
+}
+
+.radio {
+  display: none;
+}

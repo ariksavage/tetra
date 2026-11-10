@@ -1,0 +1,61 @@
+@use '../field/field.component';
+
+:host {
+  position: relative;
+  max-width: 100%;
+  margin:0;
+  padding: 0;
+}
+
+.preview {
+  width: 100%;
+  height: auto;
+
+  + .drop-zone {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-color: #fff;
+    border-radius: 0;
+    padding: 2lh 1em;
+    text-shadow: 2px 2px 0 #000;
+    color: #fff;
+    box-shadow: 2px 2px 4px #000 inset, 2px 2px 4px #000;
+    opacity: 0;
+
+    &:hover,
+    &:focus-within {
+      opacity: 1;
+    }
+  }
+}
+
+input {
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.inner-label {
+  position: static;
+  display: block;
+  width: 100%;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-align: center;
+  opacity: 1;
+}
+
+.drop-zone {
+  display: block;
+  box-sizing: border-box;
+  max-width: 100%;
+  height: 0;
+  border: 2px dashed #000;
+  border-radius: 1lh;
+  padding: 2lh 1em;
+  padding-bottom: 50%;
+  font-size: 1em;
+}

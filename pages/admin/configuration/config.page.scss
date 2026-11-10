@@ -1,0 +1,46 @@
+.config-page {
+  max-width: 60em;
+  margin: 0 auto;
+}
+
+.config-group {
+  margin: 0.5lh 0;
+  border: 1px solid rgb(0 0 0 / 60%);
+  padding: 0.5lh 1ex;
+  background: #fff;
+  box-shadow: 2px 2px 4px #000;
+}
+
+.config-item {
+  margin: 0.5lh 0;
+  border-left: 3px solid transparent;
+  padding-left: 1ex;
+
+  &.changed {
+    border-left-color: #c90;
+  }
+
+  &.invalid {
+    border-left-color: #c00;
+  }
+
+  .description {
+    margin: 0.25lh 0 0;
+    font-size: 0.9em;
+  }
+
+  .meta {
+    display: flex;
+    gap: 1ex;
+    align-items: center;
+    margin: 0.25lh 0 0;
+    font-size: 0.8em;
+    opacity: 0.7;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 1ex;
+  margin: 0.5lh 0;
+}

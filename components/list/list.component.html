@@ -1,0 +1,15 @@
+<h3 *ngIf="header">{{header}}</h3>
+<p *ngIf="loading"><i class="spinner"></i>{{loadingText}}</p>
+<p *ngIf="!items.length && !loading">{{noResultText}}</p>
+<ul class="items" *ngIf="items.length">
+  <li class="item" *ngFor="let item of items" (click)="onClick(item)" [attr.tabindex]="onClick ? 0 : -1" [ngClass]="getItemClass(item)">
+    <div class="icon-block">
+      <img class="thumbnail" *ngIf="thumbnailFunc" [src]="thumbnailFunc(item)"/>
+      <i class="icon" *ngIf="icon" [ngClass]="icon"></i>
+      <i class="icon" *ngIf="iconFunc" [ngClass]="iconFunc(item)"></i>
+    </div>
+    <div class="body">
+      <span class="title" *ngIf="titleFunc">{{titleFunc(item)}}</span>
+    </div>
+  </li>
+</ul>

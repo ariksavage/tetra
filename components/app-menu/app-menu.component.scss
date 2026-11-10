@@ -1,0 +1,106 @@
+
+
+:host {
+  border-right: 1px solid var(--border);
+
+  --fore: var(--default-text);
+  --back: var(--body);
+
+  &:hover {
+    .item-title {
+      max-width: 100vw;
+    }
+  }
+
+  &.open {
+    .items {
+      max-width: 100%;
+    }
+  }
+}
+
+.items {
+  position: relative;
+  position: absolute;
+  left: 0;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  max-width: 0;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--body);
+  overflow: hidden;
+  transition: max-width 1s;
+  list-style-type: none;
+  border-right: 1px solid var(--border);
+
+  @include global.screen-sm-up {
+    position: relative;
+    max-width: 100%;
+    border: none;
+    padding: var(--space) 0;
+    background: transparent;
+  }
+}
+
+.item {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  margin-top: 1em;
+  padding: 0 var(--space);
+  color: var(--fore);
+  background: var(--back);
+
+  &:hover {
+    color: var(--primary-text);
+    background: var(--primary);
+  }
+
+  &.current {
+    color: var(--primary-text);
+    background: var(--primary);
+  }
+}
+
+.item-link {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  text-decoration: none;
+  color: inherit;
+}
+
+.item-title {
+  white-space: nowrap;
+  overflow: hidden;
+  transition: max-width 1s;
+
+  @include global.screen-sm-up {
+    max-width: 0;
+  }
+
+  // Create a margin, unaffected by max-width
+  &::after,
+  &::before {
+    content: '';
+    display: inline-block;
+    width: 1ex;
+  }
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  align-self: flex-start;
+  width: 36px;
+  height: 36px;
+  font-size: 24px;
+  text-align: center;
+  place-content: center center;
+}

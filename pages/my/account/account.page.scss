@@ -1,0 +1,92 @@
+.account-details {
+  display: flex;
+  flex-wrap: wrap;
+
+  &::after,
+  &::before {
+    content: "";
+    flex: 1 0 400px;
+    order: 999;
+    padding: 0.5lh 1ex;
+  }
+}
+
+.section {
+  display: flex;
+  flex: 1 0 400px;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  width: calc(100% + 2ex);
+  margin: .5lh .5em;
+  border: 1px solid rgb(0 0 0 / 60%);
+  padding: .5lh 1ex;
+  background: #fff;
+  box-shadow: 2px 2px 4px #000;
+
+  &.block {
+    display: block;
+  }
+
+  button {
+    margin-left: auto;
+  }
+
+  h2 {
+    margin: 0 0 .5lh;
+  }
+
+  p {
+    flex: 0 0 100%;
+    margin: 0 0 1lh;
+  }
+
+  .label {
+    flex: 0 0 100%;
+    font-weight: bold;
+  }
+
+  .field {
+    flex: 0 0 90%;
+    box-sizing: border-box;
+    margin: 1lh 1ex;
+  }
+}
+
+.name {
+  .prefix,
+  .suffix {
+    flex: 0 1 5em;
+  }
+
+  .first,
+  .last {
+    flex: 0 3 10em;
+  }
+
+  .middle {
+    flex: 0 2 7em;
+  }
+}
+
+.address {
+  .address1,
+  .address2 {
+    flex: 1 0 25em;
+  }
+
+  .city {
+    flex: 4 0 12em;
+  }
+
+  .state {
+    flex: 1 0 5em;
+  }
+
+  .zip {
+    flex: 2 0 5em;
+  }
+
+  .country {
+    flex: 3 0 10em; 
+  }
+}

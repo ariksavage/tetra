@@ -1,0 +1,58 @@
+<section id="database" class="database-section">
+  <h2>Step 1: Database config</h2>
+  <div class="field text host" label="Database Host" [(model)]="db.host" [required]="true" [validate]="validateHost"></div>
+  <div class="field text name" label="Database Name" [(model)]="db.name" [required]="true"></div>
+  <div class="field text user" label="Database Username" [(model)]="db.user" [required]="true"></div>
+  <div class="field password" label="Database Password" [(model)]="db.password" [required]="true"></div>
+
+  <button [disabled]="!saveDbReady()" (click)="saveDbCredentials()">Save DB Credentials</button>
+</section>
+@if (installKey) {
+  <section id="tables" class="tables-section">
+    <h2>Step 2: Create base tables</h2>
+    <ul>
+      @for (table of installationTables; track table) {
+        <li>
+          {{toTitleFromUnderscore(table)}} ({{tablesInstalled.indexOf(table) > -1 ? 'exists' : 'does not exist'}})
+        </li>
+      }
+    </ul>
+    @if (installKey) {
+      <button [disabled]="tablesInstalled.length == installationTables.length" (click)="createTables()">Create Tables</button>
+    }
+  </section>
+}
+@if (installKey && tablesInstalled.indexOf('config') > -1) {
+  <section id="configuration" class="config-section">
+    <h2>Step 3: Basic site configuration</h2>
+    @if (config.length == 0) {
+      <button (click)="addDefaultConfig()">Add default config</button>
+    }
+    @if (config.length) {
+      <ul>
+        @for (item of config; track item) {
+          <li>
+            <div class="field text" [(model)]="item.value" [label]="item.label" [type]="item.value_type"></div>
+          </li>
+        }
+      </ul>
+    }
+    @if (config.length) {
+      <button (click)="saveDefaultConfig()">Save Config</button>
+    }
+  </section>
+}
+@if (installKey && tablesInstalled.indexOf('users') > -1) {
+  <section id="user" class="user-section">
+    <h2>Step 4: Create root user</h2>
+    <div class="field text username" label="Username" [(model)]="rootUser.username" [required]="true"></div>
+    <div class="field email" label="E-mail address" [(model)]="rootUser.email" [required]="true"></div>
+    <div class="field password" label="Password" [(model)]="rootUser.password"></div>
+    @if (rootUser.password) {
+      <div class="field password password2" label="Repeat Password" [(model)]="rootUser.password2"></div>
+    }
+    <div class="field text firstname" label="First Name" [(model)]="rootUser.first_name"></div>
+    <div class="field text lastname" label="Last Name" [(model)]="rootUser.last_name"></div>
+    <button [disabled]="!rootUserReady()" (click)="createRootUser()">Save Root User</button>
+  </section>
+}

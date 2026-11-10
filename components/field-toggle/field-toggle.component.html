@@ -1,0 +1,4 @@
+<button class="toggle-outer" (click)="toggle()" [ngClass]="{'on': model, 'off': !model}" [attr.aria-label]="aria()">
+  <span class="toggle-inner" [ngClass]="{'on': model, 'off': !model}"></span>
+</button>
+<label class="label" *ngIf="label" (click)="toggle()">{{label}}</label>

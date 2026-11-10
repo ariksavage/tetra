@@ -1,0 +1,11 @@
+<div class="icon" (click)="click()">
+  <ng-content select="[icon]"></ng-content>
+  <i class="fa-solid" [ngClass]="icon"></i>
+</div>
+<div class="body">
+  <h2 class="item-title" (click)="click()">{{title}}</h2>
+  <ng-content select="[body]"></ng-content>
+</div>
+<div class="actions">
+  <ng-content select="[action]"></ng-content>
+</div>

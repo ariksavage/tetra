@@ -1,0 +1,146 @@
+
+
+@keyframes rotating {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+:host {
+  --fore: var(--btn-primary-text);
+  --back: var(--btn-primary);
+
+  align-items: center;
+  width: auto;
+  border: 1px solid var(--back);
+  border-radius: 0;
+  padding: .4em 1ex;
+  font-size: 1em;
+  text-decoration: none;
+  color: var(--fore);
+  background: var(--back);
+  transition: all .2s;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--back);
+    color: var(--back);
+    background: var(--fore);
+  }
+
+  &.small {
+    font-size: .9em;
+  }
+
+  &.secondary {
+    --fore: var(--btn-secondary-text);
+    --back: var(--btn-secondary);
+  }
+
+  &.outline {
+    border-color: var(--fore);
+    color: var(--fore);
+    background: transparent;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--back);
+      background: var(--fore);
+    }
+  }
+
+  &.icon-only {
+    position: relative;
+    width: 2em;
+    height: 2em;
+    border: 1px solid transparent;
+    color: var(--fore);
+    background: transparent;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--back);
+      background: var(--fore);
+    }
+
+    .icon,
+    .fa-regular,
+    .fa-solid {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+  }
+
+  &.success,
+  &.republish,
+  &.add {
+    --fore: var(--success-text);
+    --back: var(--success);
+  }
+
+  &.info,
+  &.copy {
+    --fore: var(--info-text);
+    --back: var(--info);
+  }
+
+  &.danger,
+  &.delete {
+    --fore: var(--danger-text);
+    --back: var(--danger);
+  }
+
+  &.error,
+  &.archive {
+    --fore: var(--error-text);
+    --back: var(--error);
+  }
+
+  &.cancel {
+    --fore: var(--neutral-text);
+    --back: var(--neutral);
+  }
+
+  &.warning,
+  &.reset {
+    --fore: var(--warning-text);
+    --back: var(--warning);
+  }
+
+  &.emboss {
+    color: rgb(0 0 0 / 60%);
+
+    &:hover,
+    &:focus-visible {
+      border: none;
+      color: var(--back);
+      background: transparent;
+    }
+  }
+}
+
+.button-content {
+  margin: 0 1ex;
+
+  &:empty {
+    display: none;
+  }
+
+  &:first-child {
+    margin-left: 0;
+  }
+
+  &:last-child {
+    margin-right: 0;
+  }
+}
+
+.icon {
+  font-size: 1em;
+}

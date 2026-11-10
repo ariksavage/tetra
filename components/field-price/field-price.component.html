@@ -1,0 +1,17 @@
+<label class="label" [attr.for]="id()" *ngIf="label" [ngClass]="{'focus': onFocusClass()}">{{label}}</label>
+<span class="unit">$</span>
+<input
+  class="input"
+  [(ngModel)]="model"
+  [attr.id]="id()"
+  [attr.placeholder]="placeholder"
+  [attr.type]="type"
+  (blur)="onBlur($event)"
+  (focus)="onFocus($event)"
+  (change)="onChange($event)"
+  (keydown)="onKeyDown($event)"
+  [attr.min]="min"
+  [attr.max]="max"
+  [attr.step]="step"
+/>
+<p class="error" *ngIf="error">{{error}}</p>

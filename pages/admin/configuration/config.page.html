@@ -1,0 +1,45 @@
+<div class="app-layout">
+  <div class="config-page" content>
+    @for (group of groups; track group.type) {
+      <section class="config-group section">
+        <h2 class="label">{{groupTitle(group.type)}}</h2>
+        @for (item of group.items; track item.id) {
+          <div class="config-item" [class.changed]="item.touched()" [class.invalid]="!isValid(item)">
+            @switch (fieldFor(item.value_type)) {
+              @case ('textarea') {
+                <div class="field textarea" [label]="item.label" [(model)]="item.value"></div>
+              }
+              @case ('number') {
+                <div class="field number" [label]="item.label" [(model)]="item.value" [required]="true"></div>
+              }
+              @case ('checkbox') {
+                <div class="field checkbox" [label]="item.label" [(model)]="item.value"></div>
+              }
+              @case ('json') {
+                <div class="field textarea json" [label]="item.label + ' (JSON)'" [(model)]="item.value" [validate]="validateJson"></div>
+              }
+              @default {
+                <div class="field text" [label]="item.label" [(model)]="item.value"></div>
+              }
+            }
+            @if (item.description) {
+              <p class="description">{{item.description}}</p>
+            }
+            <p class="meta">
+              <code class="key">{{item.key}}</code>
+              @if (item.touched()) {
+                <button class="btn reset" (click)="item.reset()">Reset</button>
+              }
+            </p>
+          </div>
+        }
+      </section>
+    }
+    @if (groups.length) {
+      <div class="actions">
+        <button class="save" [disabled]="!canSave()" (click)="save()">Save Configuration</button>
+        <button class="reset-all" [disabled]="!changed().length || saving" (click)="resetAll()">Discard changes</button>
+      </div>
+    }
+  </div>
+</div>

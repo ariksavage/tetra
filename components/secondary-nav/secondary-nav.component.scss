@@ -1,0 +1,36 @@
+.nav-list {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+
+  &:hover,
+  &:focus-within {
+    .nav-item {
+      &.current {
+        border: none;
+        pointer-events: none;
+
+        // opacity: .8;
+        border-top: 2px solid var(--primary);
+      }
+    }
+  }
+}
+
+.nav-item {
+  margin-right: 1em;
+  list-style-type: none;
+
+  &.current,
+  &:hover,
+  &:focus-visible {
+    border-bottom: 2px solid var(--primary);
+  }
+}
+
+.nav-link {
+  text-decoration: none;
+  color: inherit;
+}

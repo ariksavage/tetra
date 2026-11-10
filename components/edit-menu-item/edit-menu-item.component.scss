@@ -1,0 +1,66 @@
+
+
+:host {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+
+  &:hover {
+    >.order {
+      opacity: 1;
+    }
+  }
+}
+
+.order {
+  width: 5em;
+  margin-right: 1em;
+  opacity: 0;
+
+  &:hover,
+  &:focus-within {
+    opacity: 1;
+  }
+
+  // position: absolute;
+  // // top: 1em;
+  // left: -2em;
+}
+
+.icon {
+  flex: 0 1 auto;
+  margin-right: 1em;
+}
+
+.title,
+.path {
+  flex: 1 0 300px;
+  margin-right: 1em;
+}
+
+.weight {
+  flex: 0 1 5em;
+}
+
+.children {
+  flex: 0 0 100%;
+  box-sizing: border-box;
+  max-width: 100%;
+  margin: 0;
+  padding: 0 3em;
+  list-style-type: none;
+}
+
+.add-child-item {
+  text-align: center;
+}
+
+.add-child-btn {
+  width: 100%;
+  max-width: 600px;
+  margin: 1em 0 0;
+}

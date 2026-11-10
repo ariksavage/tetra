@@ -1,0 +1,50 @@
+:host {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.label {
+  margin-left: 1ex;
+}
+
+.toggle-outer {
+  position: relative;
+  width: 5em;
+  height: 2em;
+  border: 1px solid var(--border);
+  border-radius: 1em;
+  transition: background .1s .1s;
+
+  &.on {
+    border-color: var(--body-light);
+    background: var(--primary);
+  }
+
+  &.off {
+    border-color: var(--primary);
+    background: var(--body-light);
+  }
+}
+
+.toggle-inner {
+  position: absolute;
+  top: -1px;
+  width: 2em;
+  height: 2em;
+  border-radius: 100%;
+  background: var(--body-light);
+  box-shadow: 1px 1px 2px var(--default-text);
+  transition: left .2s, box-shadow .2s, background .1s .1s;
+
+  &.off {
+    left: 0;
+    background: var(--primary);
+
+  }
+
+  &.on {
+    left: 3em;
+    background: var(--body-light);
+  }
+}

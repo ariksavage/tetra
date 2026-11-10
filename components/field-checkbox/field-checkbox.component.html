@@ -1,0 +1,15 @@
+<label class="label" [attr.for]="id()" *ngIf="label">{{label}}</label>
+<input type="checkbox"
+  class="input"
+  [attr.id]="id()"
+  (blur)="onBlurEvent($event)"
+  (focus)="onFocusEvent($event)"
+  (change)="onChangeEvent($event)"
+  [attr.placeholder]="placeholder"
+  [(ngModel)]="model"
+/>
+<div class="toggle" [ngClass]="{'on': model}" (click)="toggle()" [attr.title]="model ? valueTrue : valueFalse">
+  <span class="toggle-inner"></span>
+</div>
+<p class="description" *ngIf="description">{{description}}</p>
+

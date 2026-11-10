@@ -1,0 +1,31 @@
+@use '../field/field.component';
+
+:host {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -.5ex;
+}
+
+.label {
+  flex: 0 0 100%;
+  margin: 0 .5ex;
+}
+
+.month {
+  flex: 0 1 auto;
+  width: auto;
+  margin: 0 .5ex;
+}
+
+.date {
+  flex: 0 1 2em;
+  margin: 0 .5ex;
+  text-align: center;
+}
+
+.year {
+  flex: 0 1 4em;
+  width: 5em;
+  margin: 0 .5ex;
+  text-align: center;
+}

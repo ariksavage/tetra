@@ -1,0 +1,6 @@
+<div class="filter field text" [(model)]="filters.search" label="Search" placeholder="search..." (afterChange)="update()"></div>
+<div class="filter field select" [(model)]="sortBy" label="Sort By" [options]="sortOptions" [labelFunc]="itemLabel" [valueFunc]="sortValue" (afterChange)="setSort()"></div>
+<div class="filter field radios" label="Activation Status" [(model)]="filters.status" [options]="statusOptions" [labelFunc]="statusLabel" [valueFunc]="statusValue" (afterChange)="update()"></div>
+<div class="filter field multi-select" placeholder="Search roles..." *ngIf="roles" label="Roles" [items]="roles" [(model)]="filterRoles" [titleFunc]="itemLabel" [allowNew]="false" (afterChange)="setRoles()"></div>
+<div class="filter field multi-select" placeholder="Search categories..." *ngIf="categories && includeCategories" label="Category" [items]="categories" [(model)]="filterCategories" [titleFunc]="itemLabel" [allowNew]="false" (afterChange)="setCategories()"></div>
+<div class="filter field multi-select" placeholder="Search groups..." *ngIf="groups" label="Groups" [items]="groups" [(model)]="filterGroups" [titleFunc]="itemLabel" [allowNew]="false" (afterChange)="setGroups()"></div>

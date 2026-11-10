@@ -1,0 +1,18 @@
+<div class="login-form">
+  <div class="field text" label="Username" [(model)]="username" (onEnter)="loginSubmit()"></div>
+  <div class="field password" label="Password" [(model)]="password" (onEnter)="loginSubmit()"></div>
+  @if (loginError) {
+    <p class="login-error" role="alert">{{loginError}}</p>
+  }
+  @if (forgotPasswordMessage) {
+    <p>{{forgotPasswordMessage}}</p>
+  }
+  @if (username && !password) {
+    <button (click)="forgotPassword()">Forgot Password?</button>
+  }
+  <button class="login-submit" type="button" (click)="loginSubmit()">Log In</button>
+</div>
+
+
+
+

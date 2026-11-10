@@ -1,0 +1,137 @@
+:host {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  max-width: 100%;
+  margin: 0 0 1lh;
+  padding-top: var(--label-top-space);
+  font-size: 1em;
+
+  --label-top-space: 1lh;
+  --status-color: #000;
+
+  &.valid {
+    --status-color: green;
+
+    .input {
+      border-width: 2px;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+  }
+
+  &.invalid {
+    --status-color: #f00;
+
+    .input {
+      border-width: 2px;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+  }
+
+  &.full {
+    .input {
+      display:inline-block;
+      width: 100%;
+    }
+  }
+
+  &.checkbox {
+    .label {
+      display: inline-block;
+    }
+
+    .input {
+      display: inline-block;
+      width: auto;
+    }
+  }
+
+  &.block {
+    .label {
+      display: block;
+    }
+
+    .input {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  &.inline {
+    display: flex;
+
+    .field,
+    .label {
+      display: inline-block;
+      width: auto;
+    }
+
+    .label {
+      margin-right: 1ex;
+    }
+  }
+
+  &.flex {
+    display: flex;
+    align-items: center;
+
+    .label {
+      flex: 0 1 auto;
+      margin-right: 1ex;
+    }
+
+    .input {
+      flex: 1 0 auto;
+    }
+  }
+}
+
+.label { // as placeholder
+  position: absolute;
+  top: 1.5lh;
+  left: 1ex;
+  z-index: 5;
+  margin-left: var(--space);
+  padding-left: var(--space);
+  font-weight: bold;
+  line-height: 1;
+  color: var(--status-color, inherit);
+  opacity: .4;
+  transition: font-size 0.3s, top 0.3s, padding 0.3s, opacity 0.3s;
+
+
+  &.focus {
+    top: 0;
+    left: 0;
+    padding: 0;
+    font-size: .8em;
+    opacity: 1;
+  }
+}
+
+.input {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  border: 1px solid var(--status-color);
+  font-size: 1em;
+  color: var(--status-color);
+}
+
+.error {
+  margin: .4em 0 0;
+  font-size: .8em;
+  color: var(--danger);
+}
+
+textarea {
+  padding: .3ex;
+  font-size: 1em;
+  line-height: 1.5;
+}

@@ -48,7 +48,7 @@ class ClassLoader
     } else {
       $path .= "/{$name}.{$ext}";
     }
-    return strtolower($path);
+    return $path;
   }
 
   /**
@@ -64,21 +64,23 @@ class ClassLoader
    */
   public function loadClass(string $class): void
   {
-    // // Check if the class uses the namespace prefix
-    if (strpos($class, 'Core') !== 0) {
+    // Only handle Core namespace
+    if (strpos($class, 'Core\\') !== 0) {
       return;
     }
+
+    // Skip if already defined (e.g., built-in like \Imagick)
+    if (class_exists($class, false)) {
+      return;
+    }
+
     $path = $this->toPath($class);
-    $pluginFile = PLUGINS_ROOT . '/' . $path;
     $coreFile = CORE_ROOT . '/' . $path;
 
-    if (file_exists($pluginFile)) {
-      require($pluginFile);
-    } else if (file_exists($coreFile)) {
+    if (file_exists($coreFile)) {
       require($coreFile);
     } else {
       throw new \Exception($class . ' at ' . $path . ' not found');
     }
-    return;
   }
 }

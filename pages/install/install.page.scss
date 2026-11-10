@@ -1,0 +1,38 @@
+:host {
+	display: grid;
+	gap: 1lh 2em;
+	grid-template-columns: repeat( auto-fit, minmax(450px, 1fr) );
+	padding: 1lh 1em;
+	background: #000;
+}
+
+section {
+	border: 1px solid #000;
+	border-radius: 2em;
+	padding: 1lh 1em;
+	background: #ddd;
+	box-shadow: 0 2px 1lh #000 inset;
+
+	h2 {
+		flex: 0 0 100%;
+		margin: 0 0 1lh;
+	}
+}
+
+.database-section {
+	display: flex;
+	flex-wrap: wrap;
+
+	.field {
+		margin-right: 1ex;
+		margin-left: 1ex;
+	}
+
+	.text {
+		flex: 2 0 200px;
+	}
+
+	.password {
+		flex: 3 0 300px;
+	}
+}

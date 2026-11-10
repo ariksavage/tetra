@@ -1,0 +1,110 @@
+/* stylelint-disable selector-class-pattern */
+@use '../field/field.component';
+
+editor,
+textarea {
+  width: 100%;
+  overflow: auto;
+}
+
+button {
+  &::before,
+  &::after {
+    display: none !important;
+  }
+}
+
+:host {
+  display: block;
+
+  // Inline mode: the content sits directly in the page. No label above it, and
+  // only a faint outline to show it can be edited.
+  &.inline {
+    // Not the base field's inline flex row: as a flex item, an empty editor shrinks to nothing
+    display: block;
+    margin: 0;
+    padding-top: 0;
+
+    // The toolbar appears here while the content has focus
+    .inline-toolbar {
+      font-size: 1rem;
+
+      ::ng-deep .tox-tinymce-inline {
+        margin-top: .5lh;
+      }
+    }
+
+    ::ng-deep .mce-content-body {
+      min-height: 1lh;
+      border-radius: 2px;
+      outline: 1px dashed transparent;
+      outline-offset: .4em;
+      transition: outline-color .2s ease;
+
+      &:hover,
+      &:focus {
+        outline-color: #ccc;
+      }
+
+      // placeholder shown by the editor while empty
+      &[data-mce-placeholder]:not(.mce-visualblocks)::before {
+        opacity: .5;
+      }
+    }
+  }
+
+  ::ng-deep {
+    .tox-tinymce {
+      border: 1px solid transparent;
+      border-radius: 4px;
+      box-shadow: none !important;
+      transition: border-color 0.2s ease;
+
+      .tox-editor-header {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
+      }
+
+      .tox-statusbar {
+        display: none;
+      }
+
+      .tox-edit-area,
+      .tox-edit-area__iframe {
+        background: transparent !important;
+        transition: background 0.2s ease;
+      }
+    }
+
+    // Hover state
+    div:hover .tox-tinymce {
+      border-color: #ccc;
+
+      .tox-editor-header {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .tox-edit-area,
+      .tox-edit-area__iframe {
+        background: #fff !important;
+      }
+    }
+
+    // Focus state via class
+    div.is-focused .tox-tinymce {
+      border-color: #ccc;
+
+      .tox-editor-header {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .tox-edit-area,
+      .tox-edit-area__iframe {
+        background: #fff !important;
+      }
+    }
+  }
+}

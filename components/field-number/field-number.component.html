@@ -1,0 +1,24 @@
+@if (label) {
+  <label class="label" [attr.for]="id()" [ngClass]="{'focus': onFocusClass()}">{{label}}</label>
+}
+<input
+  class="input"
+  [(ngModel)]="model"
+  [style.width.ch]="model ? model.toString().length + 2 : 3"
+  [attr.id]="id()"
+  [attr.placeholder]="placeholder"
+  [attr.type]="type"
+  (blur)="onBlurEvent($event)"
+  (focus)="onFocusEvent($event)"
+  (change)="onChangeEvent($event)"
+  (keydown)="onKeyDownEvent($event)"
+  [attr.min]="min"
+  [attr.max]="max"
+  [attr.step]="step"
+  />
+  @if (after) {
+    <span class="after">{{after}}</span>
+  }
+@if (error) {
+  <p class="error">{{error}}</p>
+}

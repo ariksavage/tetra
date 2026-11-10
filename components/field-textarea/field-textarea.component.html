@@ -1,0 +1,12 @@
+@if (label) {
+  <label class="label" [attr.for]="id()"  [ngClass]="{'focus': onFocusClass()}">{{label}}</label>
+}
+<textarea #area
+  [attr.id]="id()"
+  class="input"
+  [(ngModel)]="model"
+  (change)="onChangeEvent($event)"
+  (keydown)="onKeyDownEvent($event)"
+  (blur)="onBlurEvent($event)"
+  (focus)="onFocusEvent($event)"
+></textarea>

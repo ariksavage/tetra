@@ -1,0 +1,21 @@
+@if (label) {
+  <label class="label" [attr.for]="id()" [ngClass]="{'focus': onFocusClass()}">{{label}}
+    @if (required) {
+      <span class="req" aria-label="(required)">*</span>
+    }
+  </label>
+}
+<input
+  class="input"
+  [(ngModel)]="model"
+  [attr.id]="id()"
+  [attr.placeholder]="placeholder"
+  [attr.type]="type"
+  (blur)="onBlurEvent($event)"
+  (focus)="onFocusEvent($event)"
+  (change)="onChangeEvent($event)"
+  (keydown)="onKeyDownEvent($event)"
+  />
+@if (error) {
+  <p class="error">{{error}}</p>
+}

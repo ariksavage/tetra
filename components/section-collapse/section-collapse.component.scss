@@ -1,0 +1,32 @@
+
+
+.header {
+  display: flex;
+  margin: 0 0 1em;
+  cursor: pointer;
+  border-bottom: 1px solid var(--border);
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.toggle-btn {
+  margin-right: 1em;
+  border: 0;
+  background: transparent;
+}
+
+.body {
+  max-height: 0;
+  padding: 0 2em;
+  overflow: hidden;
+  transition: max-height .5s linear;
+
+
+  &.open {
+    max-height: 100vh;
+    padding: 0 2em 1em;
+    overflow: auto;
+  }
+}

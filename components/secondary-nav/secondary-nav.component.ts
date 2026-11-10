@@ -1,0 +1,25 @@
+import { Component } from '@angular/core';
+import {  AppService  } from '@tetra/services/app.service';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'nav.secondary-nav',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './secondary-nav.component.html',
+  styleUrl: './secondary-nav.component.scss'
+})
+export class SecondaryNavComponent {
+  items: Array<any> = [];
+  constructor(
+    private app: AppService,
+  ) {
+    app.getSecondaryNav().subscribe((navItems: any) => {
+      this.items = navItems;
+    })
+  }
+
+  isCurrent(item: any) {
+    return item.path == window.location.pathname;
+  }
+}

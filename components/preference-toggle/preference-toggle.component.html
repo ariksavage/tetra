@@ -1,0 +1,4 @@
+<button class="preference-toggle-button" type="button" role="switch" [attr.aria-checked]="on" [class.on]="on" (click)="toggle()" [attr.title]="hint || label">
+  <i class="fa-solid" [class]="'fa-solid ' + (on ? iconOn : iconOff)" aria-hidden="true"></i>
+  <span class="button-label">{{ label }}: {{ on ? 'On' : 'Off' }}</span>
+</button>

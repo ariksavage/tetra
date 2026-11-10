@@ -1,0 +1,6 @@
+@if (supported) {
+  <button class="keep-awake-toggle" type="button" role="switch" [attr.aria-checked]="on" [class.on]="on" (click)="toggle()" title="Stop the screen from dimming or locking, eg. while cooking">
+    <i class="fa-solid" [class.fa-sun]="on" [class.fa-moon]="!on" aria-hidden="true"></i>
+    <span class="button-label">Keep screen on: {{ on ? 'On' : 'Off' }}</span>
+  </button>
+}

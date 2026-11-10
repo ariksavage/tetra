@@ -1,0 +1,36 @@
+@if (count > 0) {
+  <button class="messages-toggle" (click)="toggle()" (mouseover)="show()" (mouseout)="hide()" [attr.aria-label]="count + (count == 1 ? ' message' : ' messages')">
+    <i class="fas fa-message" aria-hidden="true"></i>
+    <span button class="badge">{{count}}</span>
+  </button>
+}
+<div content class="messages-inner" [ngClass]="{'open': open || toggleOpen}">
+  @if (count > 1) {
+    <button class="dismiss-all" (click)="clearList()">Dismiss all</button>
+  }
+  @if (count == 0) {
+    <p class="none">No messages.</p>
+  }
+  @if (count > 0) {
+    <ul class="messages">
+      @for (message of list(); track message) {
+        <li id="message-{{message.messageId}}" class="message" [ngClass]="message.type">
+          <button class="dismiss-btn icon" (click)="remove(message.messageId)"><i class="fa-solid fa-times"></i></button>
+          <p class="message-text" [innerHTML]="message.text"></p>
+          <p class="date" [title]="message.dateStr()">{{message.messageAge()}}</p>
+        </li>
+      }
+    </ul>
+  }
+</div>
+
+@if (toastMessage) {
+  <div class="toast message" [ngClass]="toastClass">
+    <button class="dismiss-btn icon" (click)="dismissToast(toastMessage.messageId)"><i class="fa-solid fa-times"></i></button>
+    <p class="toastMessage-text" [innerHTML]="toastMessage.text"></p>
+  </div>
+}
+
+@if (open || toggleOpen) {
+  <div class="backdrop" (click)="hideAll()"></div>
+}

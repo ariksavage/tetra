@@ -1,0 +1,64 @@
+<div class="app-layout">
+  <div class="account-details" content>
+    @if (account && account.id) {
+      <section class="account section block">
+        <p><strong>ID:</strong>  {{account.id}}</p>
+        <p><strong>Username:</strong>  {{account.username}}</p>
+      </section>
+    }
+    @if (account && account.id) {
+      <section class="password section">
+        <h2 class="label">Change Password</h2>
+        <div class="field password" [(model)]="password" label="New Password"></div>
+        <div [attr.disabled]="!password" class="field password" [(model)]="password2" label="Repeat password"></div>
+        <button [disabled]="!password || password !== password2" (click)="resetPassword()">Update Password</button>
+      </section>
+    }
+
+    @if (account && account.id) {
+      <section class="name section">
+        <h2 class="label">Name</h2>
+        <div class="field text prefix" label="Prefix" [(model)]="account.name_prefix"></div>
+        <div class="field text first" label="First" [(model)]="account.first_name"></div>
+        <div class="field text middle" label="Middle" [(model)]="account.middle_name"></div>
+        <div class="field text last" label="Last" [(model)]="account.last_name"></div>
+        <div class="field text suffix" label="Suffix" [(model)]="account.name_suffix"></div>
+      </section>
+    }
+    @if (account && account.id) {
+      <section class="section contact block">
+        <h2 class="label">Contact</h2>
+        <p class="email"><strong>E-mail address:</strong>  {{account.email}}</p>
+        <div class="field email" [(model)]="newEmail" label="Update Email address"></div>
+        @if (emailConfirmationSent) {
+          <p>Check your {{newEmail}} inbox for a confirmation code, and paste that code below.</p>
+        }
+        @if (emailConfirmationSent) {
+          <div class="field text" [(model)]="emailConfirmationCode" label="Confirmation code"></div>
+        }
+        @if (!emailConfirmationSent) {
+          <button [disabled]="!newEmail" (click)="confirmEmail()">Confirm email</button>
+        }
+        @if (emailConfirmationSent) {
+          <button [disabled]="!newEmail || !emailConfirmationCode" (click)="updateEmail()">Confirm email</button>
+        }
+        <div class="field text phone" label="Phone" [(model)]="account.phone_number"></div>
+      </section>
+    }
+
+    @if (account && account.id) {
+      <section class="section address">
+        <h2 class="label">Address</h2>
+        <div class="field text address1" label="Address" [(model)]="account.address_1"></div>
+        <div class="field text address2" label="Address 2" [(model)]="account.address_2"></div>
+        <div class="field text city" label="City" [(model)]="account.city"></div>
+        <div class="field text state" label="State" [(model)]="account.state"></div>
+        <div class="field text zip" label="Zip" [(model)]="account.zip"></div>
+        <div class="field text country" label="Country" [(model)]="account.country"></div>
+      </section>
+    }
+  </div>
+  @if (account && account.id) {
+    <button header (click)="saveUser()">Save</button>
+  }
+</div>

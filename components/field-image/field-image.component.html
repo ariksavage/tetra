@@ -1,0 +1,28 @@
+@if (showPreview && previewUrl) {
+  <img class="preview" [src]="previewUrl" [attr.alt]="alt"/>
+}
+@if (showPreview && !previewUrl && model) {
+  <img class="preview" [src]="model" [attr.alt]="alt"/>
+}
+<label class="drop-zone" [attr.for]="id()">
+@if (label) {
+  <span class="inner-label">{{ label }}
+  @if (required) {
+    <span class="req" aria-label="(required)">*</span>
+  }
+  </span>
+}
+<input
+  class="input"
+  [attr.id]="id()"
+  [attr.type]="type"
+  accept="image/*"
+  (blur)="onBlurEvent($event)"
+  (focus)="onFocusEvent($event)"
+  (change)="onChangeEvent($event)"
+/>
+</label>
+
+@if (error) {
+  <p class="error">{{ error }}</p>
+}

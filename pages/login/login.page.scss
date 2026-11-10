@@ -1,0 +1,52 @@
+.login-form {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 90vw;
+  max-width: 400px;
+  border: 1px solid #000;
+  padding: 1lh 1em;
+  background: #fff;
+  box-shadow: 1ex 1ex 1em #000;
+  transform: translate(-50%, -50%);
+}
+
+.login-form {
+  --input-pad-y: .5em;
+  --input-pad-x: .5em;
+  --input-line-height: 1.2em;
+
+  // Fixed line height so the label offset below (1lh of padding on the field) is predictable.
+  .field {
+    font-size: 1rem;
+    line-height: 1.2;
+  }
+
+  ::ng-deep .input {
+    padding-top: var(--input-pad-y);
+    padding-bottom: var(--input-pad-y);
+    padding-left: var(--input-pad-x);
+    font-family: inherit; // same face as the label, so baselines match
+    font-size: 1rem;
+    line-height: var(--input-line-height);
+  }
+
+  // Label as placeholder: sit exactly where the input's text would be.
+  // top = field padding (1.2rem) + input border (1px) + input padding
+  ::ng-deep .label:not(.focus) {
+    top: calc(1.2rem + 1px + var(--input-pad-y));
+    left: calc(1px + var(--input-pad-x));
+    margin-left: 0;
+    padding-left: 0;
+    font-size: 1rem;
+    line-height: var(--input-line-height);
+  }
+}
+
+.login-submit {
+  float: right;
+}
+
+.login-error {
+  color: #b00020;
+}

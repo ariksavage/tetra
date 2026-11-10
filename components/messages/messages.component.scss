@@ -1,0 +1,79 @@
+:host {
+  justify-self: flex-end;
+  margin-left: auto;
+}
+
+.messages-toggle {
+  position: relative;
+  z-index: 15;
+  border: none;
+  font-size: 1em;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 0;
+
+    // display: none;
+    z-index: -10;
+    width: 100%;
+    height: 400%;
+  }
+
+  .badge {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    width: 1.5em;
+    border: 1px solid var(--color-secondary);
+    border-radius: 100%;
+    font-size: .5em;
+    line-height: 1.5em;
+    text-align: center;
+    color: var(--color-secondary);
+    background: var(--color-accent);
+  }
+}
+
+.toast {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 20;
+  border: 1px solid var(--color-accent);
+  padding: 1lh 1em;
+  background: #fff;
+}
+
+.messages-inner {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 15;
+  max-height: 0;
+  background: #fff;
+  overflow: hidden;
+  transition: maxheight .3s;
+
+  &.open {
+    max-height: 40vh;
+    border: 1px solid var(--color-accent);
+  }
+}
+
+.messages {
+  margin: 0;
+  padding: 0 0 1lh;
+  list-style-type: none;
+}
+
+.message,
+.none {
+  margin: 1lh 0;
+  padding: 0 1em;
+
+  + .message {
+    margin: 0 0 1lh;
+  }
+}

@@ -1,0 +1,27 @@
+:host {
+  display: inline-block;
+}
+
+.preference-toggle-button {
+  // icon and text sit 1ex apart; with the text hidden on small screens there is no gap
+  display: inline-flex;
+  align-items: center;
+  gap: 1ex;
+
+  &.on {
+    font-weight: bold;
+  }
+}
+
+// On small screens only the icon shows; the text stays available to screen readers.
+@media (width <= 600px) {
+  .button-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    white-space: nowrap;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}

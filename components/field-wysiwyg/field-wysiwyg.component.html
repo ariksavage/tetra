@@ -1,0 +1,30 @@
+@if (label && !inline) {
+  <label
+    class="label"
+    [attr.for]="editorId"
+    [ngClass]="{'focus': model || isFocused}">
+    {{ label }}
+    @if (required) {
+      <span class="req" aria-label="(required)">*</span>
+    }
+  </label>
+}
+
+<div [class.is-focused]="isFocused">
+  <editor
+    [id]="editorId"
+    [init]="editorConfig"
+    [inline]="inline"
+    [ngModel]="model"
+    (ngModelChange)="onEditorChange($event)"
+    (onFocus)="onEditorFocus()"
+    (onBlur)="onEditorBlur()"
+  ></editor>
+  @if (inline) {
+    <div class="inline-toolbar" [id]="toolbarId"></div>
+  }
+</div>
+
+@if (error) {
+  <p class="error">{{ error }}</p>
+}

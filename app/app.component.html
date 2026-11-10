@@ -1,3 +1,33 @@
-<header class="app-header"></header>
-<main class="app-main"></main>
-<footer class="app-footer"></footer>
+<header>
+  <a class="logo" rel="home" routerLink="/">{{config.name}}</a>
+  <h1 class="page-title">{{pageTitle}}</h1>
+
+  <div class="user-menu">
+    @if (user && user.id) {
+      <p>Logged in as <a routerLink="/my/account" aria-label="View my account">{{user.name()}}</a></p>
+    }
+    @if (user && user.id) {
+      <button class="logout" (click)="logout()">Log out</button>
+    }
+    @if (!user || !user.id) {
+      <a class="login" routerLink="/login">Log in</a>
+    }
+  </div>
+</header>
+<main class="main">
+  {{config|json}}
+  <div class="content">
+    <router-outlet />
+  </div>
+</main>
+<footer>
+  <span class="copyright">
+    @if (getCopyrightBefore()) {
+      <span class="before">{{getCopyrightBefore()}}</span>
+    }
+    <span class="year">&copy; {{year}}</span>
+    @if (getCopyrightAfter()) {
+      <span class="after">{{getCopyrightAfter()}}</span>
+    }
+  </span>
+</footer>

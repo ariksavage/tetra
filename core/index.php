@@ -1,66 +1,66 @@
 <?php
+
+
 namespace Core;
 require_once(__dir__ . '/bootstrap.php');
 
-
-
-// All back end time is used / stored in UTC.
-// On the front end, it can be converted to local time.
-
-
 $core = new \Core\App\API\App();
-// die();
-// if (file_exists($pluginsDir. '/error/errorReporting.php')) {
-// $errorReporting = new \Core\ErrorReporting();
-// }
 
 // Globals
 
 $method = $_SERVER['REQUEST_METHOD'];
-$type = $_GET['apitype'] ?? 'error';
-$type = $core->toCamelCase($type);
-unset($_GET['apitype']);
-$action = $_GET['action'] ?? 'index';
-$action = $core->toCamelCase($action);
-unset($_GET['action']);
+if (isset($_GET['apitype'])){
+  $type = $_GET['apitype'];
+  $type = $core->toCamelCase($type);
+  $type = ucfirst($type);
+  unset($_GET['apitype']);
+} else {
+  $type = NULL;
+}
+if (isset($_GET['action'])){
+  $action = $_GET['action'];
+  $action = $core->toCamelCase($action);
+  unset($_GET['action']);
+} else {
+  $action = 'index';
+}
 
-
-$id  = $_GET['id']  ?? NULL;
-unset($_GET['id']);
-$id2 = $_GET['id2'] ?? NULL;
-unset($_GET['id2']);
-
+if (isset($_GET['id'])){
+  $id  = $_GET['id'];
+  unset($_GET['id']);
+} else {
+  $id = NULL;
+}
+if (isset($_GET['id2'])){
+  $id2 = $_GET['id2'];
+  unset($_GET['id2']);
+} else {
+  $id2 = NULL;
+}
 /**
  * Load the appropriate class of API to handle the request.
  */
-
-$APIclass = '';
-
-$type = $core->toCamelCase($type);
 $className = "\\Core\\{$type}\\API\\{$type}";
 
-if (class_exists($className)) {
-  $api = new $className();
-} else {
-  $core->error("$className is not a valid type", 404);
+// The class loader throws when a class has no file: for a type that does not exist,
+// that is a 404, not a server error.
+try {
+  $exists = $type && class_exists($className);
+} catch (\Exception $e) {
+  $exists = FALSE;
 }
 
-/**
- * Instatiate the API class.
- */
-// if ($APIclass && class_exists($APIclass)) {
-//   $api = new $APIclass();
-// } else {
-//   $core->error("$APIclass is not a valid type", 404);
-// }
+if ($exists) {
+  $api = new $className();
+} else {
+  $core->error($type ? "$type is not a valid type" : '', 404);
+}
+
 
 /**
  * Call the API method as defined by the request type and action.
  */
 $fn = "$action$method";
-if (isset($errorReporting)) {
-  $errorReporting->breadcrumb('API Method ' . $fn);
-}
 if (method_exists($api, $fn)) {
   if ($id && $id2) {
     $api->$fn($id, $id2);

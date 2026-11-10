@@ -1,0 +1,9 @@
+@if (open) {
+  <div class="consent-banner" role="dialog" aria-live="polite" aria-label="Cookie consent">
+    <p class="consent-message">{{message}} Cookies needed for logging in are always used.</p>
+    <div class="consent-actions">
+      <button class="consent-decline" type="button" (click)="decline()">Decline</button>
+      <button class="consent-accept" type="button" (click)="accept()">Accept</button>
+    </div>
+  </div>
+}

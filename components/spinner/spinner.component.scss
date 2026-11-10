@@ -1,0 +1,107 @@
+/* adapted from https://loading.io */
+
+:host {
+  position: relative;
+  display: inline-block;
+  width: 3em;
+  height: 3em;
+  vertical-align: middle;
+  background: var(--body);
+  overflow: hidden;
+
+  &.absolute {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: scale(3) translate(-33%, -33%);
+  }
+}
+
+@keyframes block-1 {
+  0% {
+    top: 18%;
+    height: 64%;
+  }
+
+  50% {
+    top: 30%;
+    height: 40%;
+  }
+
+  100% {
+    top: 30%;
+    height: 40%;
+  }
+}
+
+@keyframes block-2 {
+  0% {
+    top: 20%;
+    height: 58%;
+  }
+
+  50% {
+    top: 30%;
+    height: 40%;
+  }
+
+  100% {
+    top: 30%;
+    height: 40%;
+  }
+}
+
+@keyframes block-3 {
+  0% {
+    top: 24%;
+    height: 52%;
+  }
+
+  50% {
+    top: 30%;
+    height: 40%;
+  }
+
+  100% {
+    top: 30%;
+    height: 40%;
+  }
+}
+
+.blocks {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform: translateZ(0) scale(1);
+  transform-origin: 0 0;
+  backface-visibility: hidden;
+
+  .block {
+    position: absolute;
+    box-sizing: content-box;
+    width: 15%;
+  }
+
+  .block-1 {
+    left: 17.5%;
+    background: var(--primary);
+    animation: block-1 1s cubic-bezier(0,0.5,0.5,1) infinite;
+    animation-delay: -0.2s;
+  }
+
+  .block-2 {
+    left: 42.5%;
+    background: var(--secondary);
+    animation: block-2 1s cubic-bezier(0,0.5,0.5,1) infinite;
+    animation-delay: -0.1s;
+  }
+
+  .block-3 {
+    left: 67.5%;
+    background: var(--tertiary);
+    animation: block-3 1s cubic-bezier(0,0.5,0.5,1) infinite;
+    animation-delay: 0;
+  }
+}
+
+

@@ -1,24 +1,73 @@
-import { Directive, HostBinding, ElementRef, ViewChild, ChangeDetectorRef } from '@angular/core';
-import { UserService } from '@tetra/user.service';
-import { User } from '@tetra/user';
-import { CoreService } from '@tetra/core.service';
-import { AppService } from '@tetra/app.service';
+/**
+ * TetraAppComponent
+ *
+ * Tetra Application root component
+ * 
+ * This component will be extended by app specific functionality.
+ *
+ * @category   Component
+ * @package    App
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @version    1.0
+ * @since      2026-01-08
+ */
+
+import { Component, Directive, HostBinding, ElementRef, ViewChild, ChangeDetectorRef, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet, RouterLink } from '@angular/router';
 import { Title } from "@angular/platform-browser";
 
+import { UserService } from '@tetra/services/user.service';
+import { User } from '@tetra/classes/user';
+import { CoreService } from '@tetra/services/core.service';
+import { AppService } from '@tetra/services/app.service';
 
-@Directive()
+@Component({
+    selector: '[tetra-app-root]',
+    imports: [RouterOutlet, RouterLink, CommonModule],
+    templateUrl: './app.component.html',
+    changeDetection: ChangeDetectionStrategy.Eager,
+    styleUrl: './app.component.scss'
+})
+
 export class TetraAppComponent {
-  config: any = {
-    name: 'Application'
+  /**
+   * Application configuration
+   * @var object;
+   */
+  public config: any = {
+    name: 'Application',
+    author: 'Author Name'
   };
-  pageTitle: string = '';
-  pageConfig: any = {};
-  year = new Date().getFullYear();
-  user: User|null = null;
-  copyright: string = '';
-  @HostBinding('class') bodyClass = '';
-  @ViewChild('appRoot') appRoot: ElementRef = {} as ElementRef;
 
+  /**
+   * Page Specific Configuration
+   * @var object
+   */
+  pageConfig: any;
+
+  /**
+   * Page title
+   * used to set the page's <title> tag
+   * @var string
+   */
+  pageTitle = 'Default Page Title';
+
+  /**
+   * Current Year
+   * 
+   * Used in the app footer
+   */
+  year = new Date().getFullYear();
+
+  /**
+   * Currently logged in user
+   */
+  user: User|null = null;
+
+  /**
+   * Component constructor
+   */
   constructor(
     protected appService: AppService,
     protected userService: UserService,
@@ -27,11 +76,38 @@ export class TetraAppComponent {
     private cdRef: ChangeDetectorRef
   ) {}
 
-  ngOnInit() {
+  /**
+   * Function called by Angular on init
+   */
+  ngOnInit(){
+    this.subscriptions();
+    this.onInit();
+  }
+
+  /**
+   * Stub to be overridden by appComponents
+   */
+  onInit() {
+    // override
+  }
+
+  /**
+   * Subscribe and handle data from the app service
+   * 
+   * - App Config
+   * - Page Title
+   * - Body Class
+   * - Page Config
+   * - User
+   */
+  subscriptions() {
     const self = this;
+    this.appService.init();
     this.appService.getConfig().subscribe((config: any) => {
-      self.config = config;
-      self.titleService.setTitle(config.name);
+      if (config && Object.keys(config).length) {
+        self.config = config;
+        self.setTitle();
+      }
     });
     this.appService.getPageTitle().subscribe((title: string) => {
       self.pageTitle = title;
@@ -53,8 +129,20 @@ export class TetraAppComponent {
     this.appService.init();
   }
 
+
+  getCopyrightAfter() {
+    return this.config.copyright_after;
+  }
+  getCopyrightBefore() {
+    return this.config.copyright_before;
+  }
+
+  logout() {
+    this.userService.logout();
+  }
+
   setTitle() {
-    this.titleService.setTitle(this.config.name + ' | ' + this.pageTitle);
+    this.titleService.setTitle(this.pageTitle + ' | ' + this.config.name);
     this.cdRef.detectChanges();
   }
 
