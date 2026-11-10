@@ -151,7 +151,7 @@ class Base {
     if ($success) {
       $this->success($this->singular, $model, "Successfully saved {$this->singular}.");
     } else {
-      $this->error("Could not save {$this->singular}.", $this->plural, $code = 500, $data);
+      $this->error("Could not save {$this->singular}.", 500, $this->plural, $data);
     }
   }
 
