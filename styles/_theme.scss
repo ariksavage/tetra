@@ -1,0 +1,62 @@
+// Tetra's theme: every CSS variable Tetra's components read, with neutral
+// defaults so an app works before it is styled.
+//
+// An app themes Tetra by setting any of these on :root in its own global
+// stylesheet. The defaults sit in :where(:root), which has no specificity,
+// so the app's values win whichever stylesheet loads first.
+//
+//   @use 'tetra/styles/theme';   // in the app's styles.scss
+//   :root { --primary: #eac11c; --primary-text: #282828; }
+//
+// Text and background pairs (--primary / --primary-text and so on) are
+// chosen to pass WCAG AA contrast; keep that true when overriding them.
+
+:where(:root) {
+  // Page
+  --body: #ffffff;
+  --body-light: #f5f5f5;
+  --default-text: #1f1f1f;
+
+  // Brand colours, each with the text colour that sits on it
+  --primary: #1f4e79;
+  --primary-text: #ffffff;
+  --secondary: #e8eef4;
+  --secondary-text: #1f1f1f;
+  --tertiary: #5a6b7b;
+  --color-accent: var(--primary);
+  --color-secondary: var(--secondary);
+
+  // Buttons
+  --btn-primary: var(--primary);
+  --btn-primary-text: var(--primary-text);
+  --btn-secondary: var(--secondary);
+  --btn-secondary-text: var(--secondary-text);
+
+  // Messages and statuses
+  --success: #1e6b3a;
+  --success-text: #ffffff;
+  --info: #1f5f99;
+  --info-text: #ffffff;
+  --warning: #f2c94c;
+  --warning-text: #1f1f1f;
+  --danger: #b3261e;
+  --danger-text: #ffffff;
+  --error: var(--danger);
+  --error-text: var(--danger-text);
+  --neutral: #e0e0e0;
+  --neutral-text: #1f1f1f;
+
+  // Lines and spacing
+  --border: #8a8a8a;
+  --border-dark: #1f1f1f;
+  --space: 1rem;
+
+  // Form fields
+  --input-pad-x: 0.5em;
+  --input-pad-y: 0.35em;
+  --input-line-height: 1.4;
+  --label-top-space: 1.2em;
+
+  // Type
+  --font-size-h4: 1.25rem;
+}
