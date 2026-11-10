@@ -15,22 +15,16 @@
           <a class="dropdown-link" routerLink="/my/account" (click)="open = false">My Account</a>
         </li>
       }
-      @if (loggedIn() && user) {
-        <li class="dropdown-item plan">
-          <a class="dropdown-link" routerLink="/plan" (click)="open = false">Meal Plan</a>
-        </li>
-        <li class="dropdown-item list">
-          <a class="dropdown-link" routerLink="/list" (click)="open = false">Shopping List</a>
-        </li>
+      @for (item of items; track item.route) {
+        @if (canSee(item)) {
+          <li class="dropdown-item {{item.key ?? ''}}">
+            <a class="dropdown-link" [routerLink]="item.route" (click)="open = false">{{item.label}}</a>
+          </li>
+        }
       }
       @if (loggedIn() && user && user.hasPermission('config', 'EDIT')) {
         <li class="dropdown-item config">
           <a class="dropdown-link" routerLink="/admin/config" (click)="open = false">Configuration</a>
-        </li>
-      }
-      @if (loggedIn() && user && user.hasPermission('ingredients', 'EDIT')) {
-        <li class="dropdown-item ingredients">
-          <a class="dropdown-link" routerLink="/admin/ingredients" (click)="open = false">Ingredients</a>
         </li>
       }
       @if (loggedIn() && user) {

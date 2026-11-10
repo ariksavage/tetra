@@ -1,8 +1,9 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import {  UserService  } from '@tetra/services/user.service';
 import { User } from '@tetra/classes/user';
+import { USER_MENU_ITEMS, UserMenuItem } from './user-menu-items';
 
 @Component({
     selector: '.user-menu',
@@ -14,6 +15,7 @@ import { User } from '@tetra/classes/user';
 export class UserMenuComponent {
   user?: User;
   open: boolean = false;
+  readonly items: UserMenuItem[] = inject(USER_MENU_ITEMS);
 
   constructor(private userService: UserService) {
     userService.getUser().subscribe((user: User | null) => {
@@ -25,6 +27,13 @@ export class UserMenuComponent {
 
   loggedIn() {
     return (this.user && this.user.id);
+  }
+
+  canSee(item: UserMenuItem): boolean {
+    if (!this.loggedIn() || !this.user) {
+      return false;
+    }
+    return !item.permission || this.user.hasPermission(item.permission.dimension, item.permission.action);
   }
 
   logout(event?: Event) {
