@@ -172,10 +172,12 @@ class Migration extends \Core\Base\Models\Base {
    */
   protected function tableExists(string $tableName): bool
   {
-    //show tables where tables_in_db = 'config'
-    $q = $this->raw("SHOW TABLES WHERE tables_in_db = '$tableName'");
+    // Asks information_schema about the current database, whatever it's named.
+    // (SHOW TABLES WHERE tables_in_db = ... only worked for a database named
+    // "db", as DDEV's is.)
+    $q = $this->raw("SELECT 1 FROM information_schema.tables WHERE table_schema = DATABASE() AND table_name = '$tableName' LIMIT 1");
     $results = $q->execute();
-    return $results->num_rows > 0;
+    return $results && $results->num_rows > 0;
   }
 
   /**

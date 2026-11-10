@@ -75,12 +75,16 @@ class ClassLoader
     }
 
     $path = $this->toPath($class);
-    $coreFile = CORE_ROOT . '/' . $path;
 
-    if (file_exists($coreFile)) {
-      require($coreFile);
-    } else {
-      throw new \Exception($class . ' at ' . $path . ' not found');
+    // The app's own core first, so it can add types and override Tetra's
+    // classes, then Tetra's. In a deploy both are the same folder.
+    foreach ([APP_CORE_ROOT, CORE_ROOT] as $root) {
+      $file = $root . '/' . $path;
+      if (file_exists($file)) {
+        require($file);
+        return;
+      }
     }
+    throw new \Exception($class . ' at ' . $path . ' not found');
   }
 }

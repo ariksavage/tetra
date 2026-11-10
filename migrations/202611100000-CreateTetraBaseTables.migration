@@ -1,0 +1,289 @@
+<?php
+/**
+ * Migration: Create Tetra's base tables
+ *
+ * The tables every Tetra app needs (users, sessions, roles, permissions,
+ * groups, preferences, config, tags and the migrations log), with the
+ * standard permissions and the root, admin and user roles. Taken from
+ * Thyme's schema in November 2026, replacing v1's base.sql.
+ *
+ * Every statement is safe to run against a database that already has these
+ * tables, such as one moved over from v1 or Thyme.
+ *
+ * PHP version 8.4
+ *
+ * @category   Migration
+ * @package    Tetra
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @version    1.0
+ * @since      2026-11-10
+ */
+
+namespace Core\Migrations;
+
+class CreateTetraBaseTables extends \Core\Migrations\Models\Migration
+{
+
+  /**
+   * Human friendly name for this migration.
+   * @var string
+   */
+  public string $name = 'Create Tetra base tables';
+
+  /**
+   * Complete once the migrations log exists: it's the last thing a fresh
+   * database is missing, and end() writes to it.
+   *
+   * @return Boolean TRUE if this migration is complete.
+   */
+  protected function isComplete(): bool
+  {
+    return $this->tableExists('migrations') && $this->tableExists('users');
+  }
+
+  /**
+   * Create the tables, then the standard permissions and roles.
+   *
+   * @return Boolean TRUE if successful.
+   */
+  protected function execute(): bool
+  {
+    $tables = [
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `config` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `label` varchar(255) DEFAULT NULL,
+  `description` blob DEFAULT NULL,
+  `type` varchar(255) NOT NULL DEFAULT 'application',
+  `key` varchar(255) NOT NULL,
+  `value` text DEFAULT NULL,
+  `value_type` enum('text','longtext','number','boolean','object') DEFAULT 'text',
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID, 0 for System',
+  `date_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `modified_by` int(11) DEFAULT 0 COMMENT 'User ID, 0 for System',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `type` (`type`,`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `migrations` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `label` varchar(255) NOT NULL,
+  `completed` timestamp NOT NULL DEFAULT current_timestamp(),
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID, 0 for System',
+  `date_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `modified_by` int(11) DEFAULT 0 COMMENT 'User ID, 0 for System',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `label_UNIQUE` (`label`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `permissions` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `dimension` varchar(255) NOT NULL,
+  `action` enum('*','VIEW','VIEW OWN','CREATE','EDIT','EDIT OWN','DELETE','DELETE OWN') NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `description` blob DEFAULT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID, 0 for System',
+  `date_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `modified_by` int(11) DEFAULT 0 COMMENT 'User ID, 0 for System',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `dimension/action` (`dimension`,`action`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `roles` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `key` varchar(255) DEFAULT NULL,
+  `label` varchar(255) DEFAULT NULL,
+  `description` blob DEFAULT NULL,
+  `default` tinyint(1) NOT NULL COMMENT 'Role is added to any new users by default',
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID, 0 for System',
+  `date_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `modified_by` int(11) DEFAULT 0 COMMENT 'User ID, 0 for System',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `title` (`label`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `roles_inheritance` (
+  `role_id` int(11) DEFAULT NULL,
+  `inherits_role` int(11) DEFAULT NULL,
+  UNIQUE KEY `Role combination` (`role_id`,`inherits_role`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `roles_permissions` (
+  `role_id` int(11) NOT NULL,
+  `permission_id` int(11) NOT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID, 0 for System',
+  `date_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `modified_by` int(11) DEFAULT 0 COMMENT 'User ID, 0 for System',
+  PRIMARY KEY (`role_id`,`permission_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `tags` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `category` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `tags_assignments` (
+  `entity_type` varchar(255) NOT NULL,
+  `entity_id` int(10) unsigned NOT NULL,
+  `tag_id` int(10) unsigned NOT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID, 0 for System',
+  `date_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `modified_by` int(11) DEFAULT 0 COMMENT 'User ID, 0 for System',
+  PRIMARY KEY (`entity_type`,`entity_id`,`tag_id`),
+  KEY `entity_type-entity_id` (`entity_type`,`entity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `name_prefix` varchar(255) DEFAULT NULL,
+  `first_name` varchar(255) NOT NULL,
+  `middle_name` varchar(255) DEFAULT NULL,
+  `last_name` varchar(255) NOT NULL,
+  `name_suffix` varchar(255) DEFAULT NULL,
+  `password` varchar(255) NOT NULL,
+  `status` enum('active','pending','deactivated') DEFAULT 'active',
+  `change_password` tinyint(1) NOT NULL DEFAULT 0,
+  `notify_activation` int(11) NOT NULL DEFAULT 0,
+  `profile_pic_uri` varchar(255) DEFAULT NULL,
+  `phone_number` varchar(45) DEFAULT NULL,
+  `address_1` varchar(255) DEFAULT NULL,
+  `address_2` varchar(45) DEFAULT NULL,
+  `city` varchar(45) DEFAULT NULL,
+  `state` varchar(45) DEFAULT NULL,
+  `zip` varchar(45) DEFAULT NULL,
+  `country` varchar(128) DEFAULT NULL,
+  `date_of_birth` timestamp NULL DEFAULT NULL,
+  `lang` enum('af','ar','ar_AE','ar_BH','ar_DZ','ar_EG','ar_IQ','ar_JO','ar_KW','ar_LB','ar_LY','ar_MA','ar_OM','ar_QA','ar_SA','ar_SY','ar_TN','ar_YE','as','ast','az','be','bg','bn','br','bs','ca','ce','ch','co','cr','cs','cv','cy','da','de','de_AT','de_CH','de_DE','de_LI','de_LU','el','en','en_AU','en_BZ','en_CA','en_GB','en_IE','en_JM','en_NZ','en_PH','en_TT','en_US','en_ZA','en_ZW','eo','es','es_AR','es_BO','es_CL','es_CO','es_CR','es_DO','es_EC','es_ES','es_GT','es_HN','es_MX','es_NI','es_PA','es_PE','es_PR','es_PY','es_SV','es_UY','es_VE','et','eu','fa','fa_IR','fi','fj','fo','fr','fr_BE','fr_CA','fr_CH','fr_FR','fr_LU','fr_MC','fur','fy','ga','gd','gd_IE','gl','gu','he','hi','hr','hsb','ht','hu','hy','id','is','it','it_CH','iu','ja','ji','ka','kk','km','kn','ko','ko_KP','ko_KR','ks','ky','la','lb','lt','lv','mi','mk','ml','mo','mr','ms','mt','my','nb','ne','ng','nl','nl_BE','nn','no','nv','oc','om','or','pa','pa_IN','pa_PK','pl','pt','pt_BR','qu','rm','ro','ro_MO','ru','ru_MO','sa','sb','sc','sd','sg','si','sk','sl','so','sq','sr','sv','sv_FI','sv_SV','sw','sx','sz','ta','te','th','tig','tk','tlh','tn','tr','ts','tt','uk','ur','ve','vi','vo','wa','xh','zh','zh_CN','zh_HK','zh_SG','zh_TW','zu') DEFAULT 'en_US',
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID, 0 for System',
+  `date_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `modified_by` int(11) DEFAULT 0 COMMENT 'User ID, 0 for System',
+  `security` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username_UNIQUE` (`username`),
+  UNIQUE KEY `primary_email_UNIQUE` (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `users_groups` (
+  `user_id` int(11) NOT NULL,
+  `group_id` int(11) NOT NULL,
+  PRIMARY KEY (`user_id`,`group_id`),
+  UNIQUE KEY `user-group` (`user_id`,`group_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `users_roles` (
+  `user_id` int(11) NOT NULL,
+  `role_id` int(11) NOT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID, 0 for System',
+  `date_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `modified_by` int(11) DEFAULT 0 COMMENT 'User ID, 0 for System',
+  PRIMARY KEY (`user_id`,`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `users_sessions` (
+  `user_id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `date_started` timestamp NULL DEFAULT current_timestamp(),
+  `date_last_access` timestamp NULL DEFAULT current_timestamp(),
+  `date_expires` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `date_ended` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`token`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `user_groups` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `label` varchar(255) NOT NULL,
+  `description` varchar(255) DEFAULT NULL,
+  `public` tinyint(1) NOT NULL DEFAULT 0,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID, 0 for System',
+  `date_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `modified_by` int(11) DEFAULT 0 COMMENT 'User ID, 0 for System',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_label` (`label`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci ROW_FORMAT=DYNAMIC
+SQL,
+      <<<'SQL'
+CREATE TABLE IF NOT EXISTS `user_preferences` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `key` varchar(64) NOT NULL,
+  `value` text DEFAULT NULL,
+  `date_created` timestamp NOT NULL DEFAULT current_timestamp(),
+  `date_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `user_key` (`user_id`,`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci
+SQL
+    ];
+    foreach ($tables as $query) {
+      $this->raw($query)->execute();
+    }
+
+    // Permissions keep fixed IDs so the role grants below can refer to them.
+    $this->raw(<<<'SQL'
+      INSERT IGNORE INTO `permissions` (`id`, `dimension`, `action`, `title`, `description`) VALUES
+        (1, 'users', 'CREATE', 'Create User Account', 'Allows creating a new user account'),
+        (2, 'users', 'VIEW', 'View User Account', 'Allows viewing any user account'),
+        (3, 'users', 'VIEW OWN', 'View Own User Account', 'Allows viewing your own user account'),
+        (4, 'users', 'EDIT', 'Edit User Account', 'Allows editing any user account'),
+        (5, 'users', 'EDIT OWN', 'Edit Own User Account', 'Allows editing your own user account'),
+        (6, 'users', 'DELETE', 'Delete User Account', 'Allows deleting any user account'),
+        (7, 'users', 'DELETE OWN', 'Delete Own User Account', 'Allows deleting your own user account'),
+        (8, 'users', '*', 'All User Permissions', 'Grants all permissions related to user accounts'),
+        (9, 'config', 'CREATE', 'Create Configuration', 'Allows creating new configuration entries'),
+        (10, 'config', 'VIEW', 'View Configuration', 'Allows viewing any configuration entry'),
+        (11, 'config', 'EDIT', 'Edit Configuration', 'Allows editing any configuration entry'),
+        (12, 'config', 'DELETE', 'Delete Configuration', 'Allows deleting any configuration entry'),
+        (13, 'config', '*', 'All Configuration Permissions', 'Grants all permissions related to configurations'),
+        (14, 'permissions', 'CREATE', 'Create Permission', 'Allows creating new permissions'),
+        (15, 'permissions', 'VIEW', 'View Permission', 'Allows viewing any permission'),
+        (16, 'permissions', 'EDIT', 'Edit Permission', 'Allows editing any permission'),
+        (17, 'permissions', 'DELETE', 'Delete Permission', 'Allows deleting any permission'),
+        (18, 'permissions', '*', 'All Permission Permissions', 'Grants all permissions related to permissions'),
+        (19, 'roles', 'CREATE', 'Create Role', 'Allows creating new roles'),
+        (20, 'roles', 'VIEW', 'View Role', 'Allows viewing any role'),
+        (21, 'roles', 'EDIT', 'Edit Role', 'Allows editing any role'),
+        (22, 'roles', 'DELETE', 'Delete Role', 'Allows deleting any role'),
+        (23, 'roles', '*', 'All Role Permissions', 'Grants all permissions related to roles')
+      SQL)->execute();
+
+    // root inherits admin, which inherits user.
+    $this->raw(<<<'SQL'
+      INSERT IGNORE INTO `roles` (`id`, `key`, `label`, `description`, `default`) VALUES
+        (1, 'root', 'Root', 'Top level user with all available permissions', 0),
+        (2, 'admin', 'Admin', 'Application administrator', 0),
+        (3, 'user', 'User', 'General User', 1)
+      SQL)->execute();
+    $this->raw("INSERT IGNORE INTO `roles_inheritance` (`role_id`, `inherits_role`) VALUES (1, 2), (2, 3)")->execute();
+
+    // Admins get every permission on users, config, permissions and roles;
+    // users can view and edit their own account.
+    $this->raw("INSERT IGNORE INTO `roles_permissions` (`role_id`, `permission_id`) VALUES (2, 8), (2, 13), (2, 18), (2, 23), (3, 3), (3, 5)")->execute();
+
+    return TRUE;
+  }
+}

@@ -10,9 +10,10 @@ define('CORE_ROOT', __dir__);
 $serverRoot = getenv('TETRA_SERVER_ROOT');
 define('SERVER_ROOT', $serverRoot ? realpath($serverRoot) : realpath(CORE_ROOT . '/..'));
 
-// The app's own core/, which the class loader checks before Tetra's. In a
-// deploy the two are copied into one folder, so this is CORE_ROOT itself.
-define('PLUGINS_ROOT', SERVER_ROOT . '/core');
+// The app's own core/, which the class loader checks before Tetra's, so an
+// app can add API types and override Tetra's classes. In a deploy the two are
+// copied into one folder, so this is CORE_ROOT itself.
+define('APP_CORE_ROOT', SERVER_ROOT . '/core');
 
 // CONFIG_PATH is resolved independently, walking up from SERVER_ROOT until a
 // `config` directory is found. This lets config live outside SERVER_ROOT
