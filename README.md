@@ -1,130 +1,74 @@
-# TETRA Project
-## Installation
+# Tetra
 
-1. Clone the repository
-1. Initialize git submodules: `git submodule update --init --recursive`
-1. Configure *.ddev/config/yaml*
-  - Set 
-    - name: **you-project** (eg knowledge-direct)
-    - host_https_port: **unique_port** (eg 20250)
-    - host_db_port: **another_unique_port** (eg 20251)
-1. Start DDEV: `ddev start`
-1. Configure **proxy.conf.json**
-```
-{
-  "/core/**/*": {
-    "target": "https://127.0.0.1:{{host_https_port}}",
-    "secure": false,
-    "logLevel": "debug",
-    "changeOrigin": true
-  }
-}
-```
+The shared framework behind Arik Savage's PHP and Angular apps: login and
+sessions, users, roles and permissions, configuration, migrations, a MySQL
+query builder, and the Angular layout, form fields, services and guards that
+sit on top. An app includes Tetra as a git submodule and adds its own
+resources beside it.
 
-### First time setup
-1. Run tetra installer to configure the database: `ddev tetra install`
-### Migration from another system:
-1. Run tetra db-migrate to configure the database: `ddev tetra db-migrate`
+## Versions
 
-## Tetra Core
-The core layer defines back end logic, and handles database operations.
+| Version | Used by | Shape |
+| --- | --- | --- |
+| `v1` (tag) | ABSA | `core/` with `api/`, `models/` and a `plugins/` folder for app code; the older Angular `app/` |
+| v2 (this branch) | Work, and Thyme once it moves over | One folder per resource in `core/`; the app's own `core/` is checked first; Thyme's Angular |
 
-Generally speaking, the Core is made up of **APIs** that handle requests, **Models**, that represent individual database entities, and **interfaces** that communicate with the databse and other services.
+v2 is not a drop-in upgrade from v1: v1 apps keep their tag until they are
+moved over.
 
-Requests are set to the Core index.php.
-The URL of the request, eg `https://url.com/core/{apitype}/{action}/{id}/{id2}` is mapped to
-`index.php?apitype={apitype}&action={action}&id={id}&id2={id2}`. 
+## Layout
 
+| Path | What |
+| --- | --- |
+| `core/` | The PHP API. `Core\Users\Models\User` lives at `core/Users/User.model.php`. |
+| `migrations/` | Tetra's own migrations, such as its base tables. |
+| `app/`, `classes/`, `components/`, `guards/`, `pages/`, `services/`, `testing/` | The Angular half, imported as `@tetra/...`. |
+| `styles/_theme.scss` | Default values for every CSS variable Tetra's components read. |
 
-These parameters, along with the request's method (GET, PUT, POST, DELETE) determine:
+## Using Tetra in an app
 
-A) the API to be used: \\Core\\API\\{$apitype}
+1. **Add the submodule:** `git submodule add git@github.com:ariksavage/tetra.git tetra`, then
+   check out the version you want.
+2. **Point PHP at the app:** Tetra's `core/` sits at `tetra/core`, one level below the app, so
+   set `TETRA_SERVER_ROOT` to the app's root (in DDEV's `web_environment`, or with Apache's
+   `SetEnv`). A deploy that copies everything into one folder doesn't need it.
+3. **Config:** `config/db.config` (YAML: `host`, `user`, `password`, `name`, `port`) in the
+   app root or any folder above it. Keep it outside the web root in production. Never commit it.
+4. **Angular:** map `"@tetra/*": ["./tetra/*"]` in `tsconfig.json`, and start the app's routes
+   from `TETRA_ROUTES` (`@tetra/app/tetra.routes`).
+5. **Styles:** `@use '../tetra/styles/theme';` at the top of the app's global stylesheet, then
+   set any variables to theme it:
 
-B) the API's method to be called: {$action}{$method}
+   ```scss
+   :root {
+     --primary: #eac11c;
+     --primary-text: #282828;
+   }
+   ```
 
-Examples:
+6. **User menu:** provide the app's links with `USER_MENU_ITEMS`
+   (`@tetra/components/user-menu/user-menu-items`). Each can require a permission.
 
-Request: POST https://url.com/core/users/list
+## The app's own API
 
-```
-<?php
-$method="POST";
-$apitype="users";
-$action="list";
-$id = null;
-$id2 = null;
-$core = new \Core\API\Users();
+A request to `/core/{type}/{action}/{id}/{id2}` loads `\Core\{Type}\API\{Type}` and calls
+`{action}{METHOD}`, such as `Clients::listGET()`. The class loader looks in the app's own
+`core/` first, then Tetra's, so an app adds a type by creating `core/Clients/Clients.api.php`,
+and can override any Tetra class the same way.
 
-$core->listPOST();
-?>
-```
+## Migrations
 
-Request: GET https://url.com/core/users/id/42
+A migration is a class with `isComplete()` and `execute()`, in a file named
+`{timestamp}-{ClassName}.migration`. `php tetra/core/cli/maintenance.php` runs Tetra's
+`migrations/` first, then the app's, skipping any that are already complete, so every
+migration must be safe to meet again.
 
-```
-<?php
-$method="GET";
-$apitype="users";
-$action="id";
-$id = 42;
-$id2 = null;
-$core = new \Core\API\Users();
+## Changing Tetra from an app
 
-$core->idGET($id);
-?>
-```
-### Conventions
- Keeping common naming conventions will make this code more easily readable, and aid in abstraction.
-#### Database
-- Assignment table names will follow the convestion of `{subject}_{target}_assignments`. 
-    For example: `user_group_assignments`
-    Users are assigned to groups. Even in this case where it is a many-to-many relationship, so groups are also assigned to users, we assume the more basic element: the user is the subject of this action.
+1. In the app's `tetra/` folder, branch, make the change and commit it.
+2. Push it to this repository and merge it.
+3. Commit the new submodule pointer in the app. Other apps pick the change up when they next
+   update their submodule.
 
-- `Label` vs `title`. Label is the more general term, and a `label` may be used in multiple contexts, not just as the title of an object. Because of this, we will use `label` as the universal column name representing the names/titles/labels of objects.
-### APIs
-An API is a class which contains methods to handle HTTP requests. All responses, success and error, will be returned as raw JSON to be consumed by the Angular front end.
-
-A successful response will look something like the following:
-```
-{
-  "data": {
-    "property": "value",
-    "property2": "value2"
-  },
-  "message": "Potentially user facing text".
-}
-```
-#### Overriding
-When the core/index.php instantiates the API class, it will first look to the application's **Plugins** folder for a corresponding $type folder, and use the .api there.
-
-Example: 
-
-REQUEST: `https://url.com/core/users/id/2`
-
-If **Plugins/users/myUsers.api** exists, the API class will be \Core\API\myUsers.
-
-An override API class will look something like:
-
-```
-<?php
-namespace Core\API;
-
-require_once(CORE_ROOT . '/api/users.api');
-require_once(__DIR__ . '/myUser.model');
-
-
-class myUsers extends Users {
-  public function __construct()
-  {
-    parent::__construct();
-    $this->model = '\Core\Models\myUser';
-  }
-}
-```
-This override will contain all of the core methods related to the origin **Users** class, but instead use the **myUser** class for all items. See below for more on models.
-
-## Models
-Models represent an individual entity, one row of the database.
-
-### Overriding
-An overriding Model will have to be included in a plugin .api file, since models are not used directly outside of APIs.
+**This repository is public.** Keep config, credentials, client details and anything
+app-specific in the app's own repository.
