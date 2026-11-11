@@ -151,6 +151,22 @@ class BasicUser extends \Core\Base\Models\Base {
     return $this;
   }
 
+  /**
+   * Never send the one-time code that confirms an email change. (Unlike a
+   * hidden prop, it still saves: toArray() keeps it.)
+   */
+  public function jsonSerialize(): mixed
+  {
+    $data = parent::jsonSerialize();
+    unset($data['security']);
+    return $data;
+  }
+
+  public function toArray(): array
+  {
+    return parent::jsonSerialize();
+  }
+
   protected function hiddenProps()
   {
     $props = parent::hiddenProps();

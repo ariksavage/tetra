@@ -27,6 +27,17 @@ class BasicUsers extends \Core\Base\API\Base {
    *
    * @return Array<String> List of column names.
    */
+  /**
+   * The user list. This API doesn't require a login as a whole (password
+   * reset and the current user need to work without one), so each method
+   * checks its own permission.
+   */
+  public function listGET($flags = [])
+  {
+    $this->requirePermission('users', 'VIEW');
+    parent::listGET($flags);
+  }
+
   protected function searchColumns(): Array
   {
     return ['username', 'first_name', 'last_name', 'middle_name', 'email'];
@@ -162,6 +173,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function deactivatePUT(int $userId): never
   {
+    $this->requirePermission('users', 'EDIT');
     $user = $this->getById($userId);
     if ($user->deactivate()) {
       $this->successMsg('User: ' . $user->name() . ' has been deactivated');
@@ -175,6 +187,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function activatePUT(int $userId): never
   {
+    $this->requirePermission('users', 'EDIT');
     $user = $this->getById($userId);
     if ($user->activate()) {
       $this->successMsg('User: ' . $user->name() . ' has been activated');
@@ -190,7 +203,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function rolesPUT($userId): never
   {
-    $this->requirePermission('users_roles', 'UPDATE');
+    $this->requirePermission('users', 'EDIT');
     $user = $this->getById($userId);
     $roles = $this->postValue('roles');
 
@@ -207,6 +220,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function passwordResetLinkGET(int $userId)
   {
+    $this->requirePermission('users', 'EDIT');
     $user = $this->getById($userId);
     $host = $this->getValue('host');
 
@@ -293,6 +307,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function categoryPUT(int $userId, int $catId = 0): never
   {
+    $this->requirePermission('users', 'EDIT');
     if ($catId) {
       $category = $this->getCategoryById($catId);
     }
@@ -313,6 +328,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function categoriesGET(): never
   {
+    $this->requirePermission('users', 'VIEW');
     $query = $this->select()->from('user_categories')->orderBy('label');
     $categories = $query->execute(FALSE, '\Core\Users\Models\UserCategory', ['USER_COUNT']);
     $this->success('categories', $categories);
@@ -325,6 +341,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function categoryGET(int $catId): never
   {
+    $this->requirePermission('users', 'VIEW');
     $category = $this->getCategoryById($catId, ['USER_COUNT']);
     $this->success('category', $category);
   }
@@ -335,6 +352,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function categoryPOST()
   {
+    $this->requirePermission('users', 'EDIT');
     $data = $this->postValue('category');
     $category = new UserCategory($data);
     if ($category->save()) {
@@ -351,6 +369,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function categoryDELETE(int $catId): never
   {
+    $this->requirePermission('users', 'EDIT');
     $category = $this->getCategoryById($catId);
     $name = $category->label;
     if ($category->delete()) {
@@ -380,6 +399,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function groupsGET()
   {
+    $this->requirePermission('users', 'VIEW');
     $groups = $this->select()
       ->from('user_groups')
       ->orderBy('label')
@@ -394,6 +414,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function groupGET(int $groupId): never
   {
+    $this->requirePermission('users', 'VIEW');
     $group = $this->getGroupById($groupId, ['USER_COUNT']);
     $this->success('group', $group);
   }
@@ -406,6 +427,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function groupAddPUT(int $userId, int $groupId): never
   {
+    $this->requirePermission('users', 'EDIT');
     $user = $this->getById($userId);
     $group = $this->getGroupById($groupId);
     if ($user->addGroup($groupId)) {
@@ -423,6 +445,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function groupRemovePUT(int $userId, int $groupId): never
   {
+    $this->requirePermission('users', 'EDIT');
     $group = $this->getGroupById($groupId);
     $user = $this->getById($userId);
     if ($user->removeGroup($groupId)) {
@@ -438,6 +461,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function groupPOST(): never
   {
+    $this->requirePermission('users', 'EDIT');
     $data = $this->postValue('group');
     $group = new UserGroup($data);
     if ($group->save()) {
@@ -454,6 +478,7 @@ class BasicUsers extends \Core\Base\API\Base {
    */
   public function groupDELETE(int $groupId): never
   {
+    $this->requirePermission('users', 'EDIT');
     $group = $this->getGroupById($groupId);
     $name = $group->label;
     if ($group->delete()) {

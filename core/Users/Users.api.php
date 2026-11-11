@@ -63,6 +63,7 @@ class Users extends BasicUsers {
    */
   public function rolesGET()
   {
+    $this->requirePermission('roles', 'VIEW');
     $roles = $this->select()->from('roles')->orderBy('label')->execute(FALSE, '\Core\Users\Models\UserRole');
     $this->success('roles', $roles);
   }
