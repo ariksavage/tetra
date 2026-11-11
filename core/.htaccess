@@ -1,5 +1,14 @@
 RewriteEngine On
 
+# The only PHP reached over the web is index.php (the API). Everything else,
+# such as cli/maintenance.php or a class file, is for PHP itself to include.
+<FilesMatch "\.php$">
+  Require all denied
+</FilesMatch>
+<Files "index.php">
+  Require all granted
+</Files>
+
 # Do not rewrite anything under /images
 RewriteRule ^images/ - [L]
 

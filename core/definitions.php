@@ -8,6 +8,12 @@ define('CORE_ROOT', __dir__);
 // level too deep, so it can name its root in the TETRA_SERVER_ROOT environment
 // variable instead (eg. DDEV's web_environment, or Apache's SetEnv).
 $serverRoot = getenv('TETRA_SERVER_ROOT');
+// Without it, recognise the submodule layout itself: Tetra's core/ at
+// tetra/core with the app's own core/ beside tetra/. Then the web server,
+// cron and the command line all agree without setting anything.
+if (!$serverRoot && basename(dirname(CORE_ROOT)) === 'tetra' && is_dir(dirname(CORE_ROOT, 2) . '/core')) {
+  $serverRoot = dirname(CORE_ROOT, 2);
+}
 define('SERVER_ROOT', $serverRoot ? realpath($serverRoot) : realpath(CORE_ROOT . '/..'));
 
 // The app's own core/, which the class loader checks before Tetra's, so an
