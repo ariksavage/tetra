@@ -4,10 +4,20 @@
 }
 
 .messages-toggle {
+  // Centre the icon exactly (flex ignores the template's stray spaces).
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   z-index: 15;
   border: none;
   font-size: 1em;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--flat-icon-hover-background, transparent);
+    color: var(--flat-icon-hover-color, inherit);
+  }
 
   &::after {
     content: '';
@@ -83,6 +93,12 @@
   background: transparent;
   color: inherit;
   cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--flat-icon-hover-background, transparent);
+    color: var(--flat-icon-hover-color, inherit);
+  }
 }
 
 @keyframes toast-in {

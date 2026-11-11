@@ -1,5 +1,5 @@
 @if (count > 0) {
-  <button type="button" class="messages-toggle" (click)="toggle()" (mouseover)="show()" (mouseout)="hide()" [attr.aria-expanded]="open || toggleOpen" [attr.aria-label]="count + (count == 1 ? ' message' : ' messages')">
+  <button type="button" class="messages-toggle icon" (click)="toggle()" (mouseover)="show()" (mouseout)="hide()" [attr.aria-expanded]="open || toggleOpen" [attr.aria-label]="count + (count == 1 ? ' message' : ' messages')">
     <i class="fa-solid fa-message" aria-hidden="true"></i>
     <span class="badge" aria-hidden="true">{{count}}</span>
   </button>

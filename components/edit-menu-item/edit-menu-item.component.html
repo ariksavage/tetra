@@ -1,6 +1,6 @@
 <div class="order" *ngIf="!root">
-  <button class="order-up" *ngIf="item.weight > 0" (click)="move(item, -1)"><i class="fa-solid fa-angle-up" ></i></button>
-  <button class="order-up" *ngIf="item.weight < maxWeight" (click)="move(item, 1)"><i class="fa-solid fa-angle-down" ></i></button>
+  <button class="order-up icon" *ngIf="item.weight > 0" (click)="move(item, -1)" aria-label="Move up"><i class="fa-solid fa-angle-up" aria-hidden="true"></i></button>
+  <button class="order-up icon" *ngIf="item.weight < maxWeight" (click)="move(item, 1)" aria-label="Move down"><i class="fa-solid fa-angle-down" aria-hidden="true"></i></button>
 </div>
 <div class="icon popup" title="Edit {{item.title}} icon" *ngIf="!root">
   <i button class="fa-solid" [ngClass]="item.icon"></i>
@@ -11,7 +11,7 @@
 <div class="field text path" label="Path" [(model)]="item.path" *ngIf="!root"></div>
 <div class="field text title" label="Title" [(model)]="item.title" *ngIf="!root"></div>
 
-<button class="remove-btn" (click)="removeItem()" *ngIf="!root"><i class="fa-solid fa-trash" ></i></button>
+<button class="remove-btn icon" (click)="removeItem()" *ngIf="!root" aria-label="Remove"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
 
 <ul class="children" *ngIf="item && item.children && item.children.length">
   <li class="edit-menu-item" *ngFor="let child of item.children" [item]="child" (remove)="removeChild($event)" [maxWeight]="item.children.length + 1" (reorder)="orderWeight()"></li>

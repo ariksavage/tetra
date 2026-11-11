@@ -16,10 +16,20 @@
 }
 
 .toggle {
+  // Centre the icon exactly (flex ignores the template's stray spaces).
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   align-self: flex-end;
   border: none;
   font-size: 1em;
   background: transparent;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--flat-icon-hover-background, transparent);
+    color: var(--flat-icon-hover-color, inherit);
+  }
 }
 
 .dropdown {

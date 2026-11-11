@@ -26,6 +26,7 @@
 //   .checkbox-label a checkbox and its text on one line
 //   .checkbox-list  a list of checkbox-labels
 //   .muted, .empty, .sr-only, .danger (on a button)
+//   .icon           an icon-only button; its icon is centred
 
 :where(body) {
   font-family: var(--font-body);
@@ -50,6 +51,14 @@
   font-weight: bold;
   text-decoration: none;
   cursor: pointer;
+}
+
+// Icon-only buttons (class "icon"): the icon always sits in the exact centre.
+// Flex also ignores the stray spaces a template leaves around the icon.
+:where(button.icon, .button.icon) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 :where(button.primary, .button.primary, button[type="submit"]) {

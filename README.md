@@ -62,6 +62,10 @@ moved over.
    `form-grid`, `label.inline`, `checkbox-label`, `checkbox-list`, `tag`, `muted`, `empty`);
    style those and Tetra's pages match the app's. The full list is at the top of `_base.scss`.
 
+   Tetra's icon-only buttons (show password, the account and messages toggles, dismissing a
+   message) are flat. Their hover and focus look is `--flat-icon-hover-background` (a colour or
+   a gradient) and `--flat-icon-hover-color`.
+
 6. **Icons:** `npm install @fortawesome/fontawesome-free`, then `@use '../tetra/styles/icons';` in
    the same stylesheet. Tetra's buttons and notifications use its solid and regular icons.
 7. **User menu:** provide the app's links with `USER_MENU_ITEMS`

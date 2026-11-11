@@ -85,6 +85,12 @@
   --button-shadow: none;
   --button-pad: 0.35lh 1em;
 
+  // Flat icons: icon-only buttons with no border (show password, the
+  // account and messages toggles, dismissing a message). What they show on
+  // hover and keyboard focus; the background can be a gradient.
+  --flat-icon-hover-background: transparent;
+  --flat-icon-hover-color: inherit;
+
   // Tables
   --table-rule: 1px solid var(--border);
   --table-head-background: transparent;
