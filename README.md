@@ -46,7 +46,9 @@ moved over.
    }
    ```
 
-6. **User menu:** provide the app's links with `USER_MENU_ITEMS`
+6. **Icons:** `npm install @fortawesome/fontawesome-free`, then `@use '../tetra/styles/icons';` in
+   the same stylesheet. Tetra's buttons and notifications use its solid and regular icons.
+7. **User menu:** provide the app's links with `USER_MENU_ITEMS`
    (`@tetra/components/user-menu/user-menu-items`). Each can require a permission.
 
 ## The app's own API
