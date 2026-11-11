@@ -231,8 +231,10 @@ class Base implements \JsonSerializable {
             $this->$prop = !!$value;
             break;
           case "integer":
-            if (stristr($prop, 'date') && $value) {
-              $this->$prop = strtotime($value);
+            // A date arrives from the database as text, or from a client as
+            // either text or a Unix timestamp.
+            if (stristr($prop, 'date') && $value && !is_numeric($value)) {
+              $this->$prop = intval(strtotime($value));
             } else {
               $this->$prop = intval($value);
             }
@@ -329,7 +331,8 @@ class Base implements \JsonSerializable {
           case "integer":
           case "double":
           case "string":
-            if ($value || $value === 0) {
+            // An unset date (0) is saved as NULL, not the zero date.
+            if (($value || $value === 0) && !(stristr($prop, 'date') && !$value)) {
               $data[$prop] = $value;
             } else {
               $data[$prop] = NULL;
