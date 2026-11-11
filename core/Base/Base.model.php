@@ -274,6 +274,19 @@ class Base implements \JsonSerializable {
   /**
    * Reload this object by getting data from the database
    */
+  /**
+   * Copy the given fields onto this model, leaving the others as they are.
+   * Used to apply an edit that sends only some fields to a saved item.
+   *
+   * @param object $data Fields to set.
+   *
+   * @return $this
+   */
+  public function fill(object $data)
+  {
+    return $this->mapData($data);
+  }
+
   public function refresh()
   {
     $this->byId($this->id);

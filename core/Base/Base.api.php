@@ -145,8 +145,15 @@ class Base {
   {
     // $this->reqPermission('UPDATE');
     $key = strtolower($this->singular);
-    $data = $this->postValue($key);
-    $model = new $this->model($data);
+    $data = $this->postValue($key, NULL, 'object');
+    // An edit changes only the fields it sends. Building the model from the
+    // posted data alone would reset every other field to its default.
+    if (!empty($data->id)) {
+      $model = $this->getById(intval($data->id));
+      $model->fill($data);
+    } else {
+      $model = new $this->model($data);
+    }
     $success = $model->save();
     if ($success) {
       $this->success($this->singular, $model, "Successfully saved {$this->singular}.");
