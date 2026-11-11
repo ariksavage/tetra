@@ -19,7 +19,6 @@ export class MessagesComponent {
   open: boolean = false;
   toggleOpen: boolean = false;
   toastMessage: any = null;
-  toastClass: string = 'up';
 
   toggle() {
     this.toggleOpen = !this.toggleOpen;
@@ -38,10 +37,6 @@ export class MessagesComponent {
     this.toggleOpen = false;
   }
 
-  test() {
-    this.toastClass = this.toastClass == 'up' ? 'down' : 'up';
-  }
-
   constructor(
     private messages: MessageService,
     private cdRef:ChangeDetectorRef
@@ -54,33 +49,42 @@ export class MessagesComponent {
 
     })
   }
+  /**
+   * How long a toast stays up, in milliseconds. Errors stay until dismissed,
+   * and any toast stays while the pointer or keyboard focus is on it.
+   */
+  toastDuration = 5000;
+  private toastTimer?: ReturnType<typeof setTimeout>;
+
   dismissToast(id: string) {
     this.remove(id);
-    this.toastMessage = null;
-    this.toastClass = 'up';
+    this.clearToast();
   }
 
   handleToast(message: any) {
     this.toastMessage = message;
-    this.toastClass = 'up';
     this.cdRef.detectChanges();
-    setTimeout(() => {
-      this.toastClass = 'transition';
-      this.cdRef.detectChanges();
-      setTimeout(() => {
-        this.toastClass = 'down';
-        this.cdRef.detectChanges();
-        setTimeout(() => {
-          this.toastClass = 'right';
-          this.cdRef.detectChanges();
-          setTimeout(() => {
-            this.toastMessage = null;
-            this.toastClass = 'up';
-            this.cdRef.detectChanges();
-          }, 1000);
-        }, 6000);
-      }, 100);
-    }, 10);
+    this.resumeToast();
+  }
+
+  /** Hold the toast while it's hovered or focused. */
+  pauseToast() {
+    clearTimeout(this.toastTimer);
+  }
+
+  /** Start (or restart) the countdown to hiding the toast, unless it's an error. */
+  resumeToast() {
+    clearTimeout(this.toastTimer);
+    if (!this.toastMessage || this.toastMessage.type === 'error') {
+      return;
+    }
+    this.toastTimer = setTimeout(() => this.clearToast(), this.toastDuration);
+  }
+
+  private clearToast() {
+    clearTimeout(this.toastTimer);
+    this.toastMessage = null;
+    this.cdRef.detectChanges();
   }
 
   ngAfterViewInit() {

@@ -31,8 +31,9 @@ export class Message extends Model{
 
   dateStr() {
     let hours = this.date.getHours();
-    let a = hours > 12 ? 'pm' : 'am';
-    hours = hours > 12 ? hours - 12 : hours;
+    // Noon is 12pm, midnight 12am.
+    let a = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12 || 12;
     let h = hours.toString().padStart(2, '0');
     let i = this.date.getMinutes().toString().padStart(2, '0');
     let s = this.date.getSeconds().toString().padStart(2, '0');

@@ -3,7 +3,7 @@
 </button>
 <div #popupWindow [id]="id" class="popup-window" [ngClass]="{'show': open}">
   <div class="popup-header">
-    <button class="close-btn" (click)="toggle()"><i class="fa-solid fa-times"></i></button>
+    <button type="button" class="close-btn" (click)="toggle()" aria-label="Close"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
     <h2 class="popup-title">{{title}}</h2>
     <ng-content select="[header]"></ng-content>
   </div>

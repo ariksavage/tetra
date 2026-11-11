@@ -160,6 +160,17 @@ export class CoreService {
     });
   }
 
+  /**
+   * GET without the usual error handling: no message, no redirect. Resolves
+   * to the response data, or false if the request failed.
+   */
+  getQuietly(type: string, action: string = '', id: any = null, id2: any = null) {
+    const url = this.url(type, action, id, id2);
+    return this.http.get(url, this.getConfig()).toPromise().then((result: any) => {
+      return result && result.data ? result.data : false;
+    }, () => false);
+  }
+
   getParams(params: any, type: string, action: string = '', id: any = null, id2: any = null) {
     let url = this.url(type, action, id, id2);
     url += '?';

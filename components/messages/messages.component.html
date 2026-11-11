@@ -1,35 +1,39 @@
 @if (count > 0) {
-  <button class="messages-toggle" (click)="toggle()" (mouseover)="show()" (mouseout)="hide()" [attr.aria-label]="count + (count == 1 ? ' message' : ' messages')">
-    <i class="fas fa-message" aria-hidden="true"></i>
-    <span button class="badge">{{count}}</span>
+  <button type="button" class="messages-toggle" (click)="toggle()" (mouseover)="show()" (mouseout)="hide()" [attr.aria-expanded]="open || toggleOpen" [attr.aria-label]="count + (count == 1 ? ' message' : ' messages')">
+    <i class="fa-solid fa-message" aria-hidden="true"></i>
+    <span class="badge" aria-hidden="true">{{count}}</span>
   </button>
 }
-<div content class="messages-inner" [ngClass]="{'open': open || toggleOpen}">
+<div class="messages-inner" [ngClass]="{'open': open || toggleOpen}">
   @if (count > 1) {
-    <button class="dismiss-all" (click)="clearList()">Dismiss all</button>
+    <button type="button" class="dismiss-all" (click)="clearList()">Dismiss all</button>
   }
   @if (count == 0) {
     <p class="none">No messages.</p>
   }
   @if (count > 0) {
     <ul class="messages">
-      @for (message of list(); track message) {
+      @for (message of list(); track message.messageId) {
         <li id="message-{{message.messageId}}" class="message" [ngClass]="message.type">
-          <button class="dismiss-btn icon" (click)="remove(message.messageId)"><i class="fa-solid fa-times"></i></button>
-          <p class="message-text" [innerHTML]="message.text"></p>
+          <p class="message-text">{{message.text}}</p>
           <p class="date" [title]="message.dateStr()">{{message.messageAge()}}</p>
+          <button type="button" class="dismiss-btn icon" (click)="remove(message.messageId)" [attr.aria-label]="'Dismiss ' + message.text"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
         </li>
       }
     </ul>
   }
 </div>
 
-@if (toastMessage) {
-  <div class="toast message" [ngClass]="toastClass">
-    <button class="dismiss-btn icon" (click)="dismissToast(toastMessage.messageId)"><i class="fa-solid fa-times"></i></button>
-    <p class="toastMessage-text" [innerHTML]="toastMessage.text"></p>
-  </div>
-}
+<!-- Always present, so screen readers announce each new toast. -->
+<div class="toast-region" aria-live="polite">
+  @if (toastMessage) {
+    <div class="toast message" [ngClass]="toastMessage.type" [attr.role]="toastMessage.type === 'error' ? 'alert' : null"
+      (mouseenter)="pauseToast()" (mouseleave)="resumeToast()" (focusin)="pauseToast()" (focusout)="resumeToast()">
+      <p class="toast-text">{{toastMessage.text}}</p>
+      <button type="button" class="dismiss-btn icon" (click)="dismissToast(toastMessage.messageId)" [attr.aria-label]="'Dismiss ' + toastMessage.text"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+    </div>
+  }
+</div>
 
 @if (open || toggleOpen) {
   <div class="backdrop" (click)="hideAll()"></div>

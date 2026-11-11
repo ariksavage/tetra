@@ -36,14 +36,60 @@
   }
 }
 
+.toast-region {
+  // The live region itself takes no room; only a toast inside it shows.
+  position: fixed;
+  top: var(--toast-top, 4rem);
+  right: 1rem;
+  z-index: 30;
+  width: max-content;
+  max-width: min(24rem, calc(100vw - 2rem));
+  pointer-events: none;
+}
+
+// A toast floats in the corner under the header. It leaves after a few
+// seconds unless it's an error, and waits while hovered or focused. Clicks
+// beside it reach the page underneath.
 .toast {
-  position: absolute;
-  top: 100%;
-  right: 0;
-  z-index: 20;
-  border: 1px solid var(--color-accent);
-  padding: 1lh 1em;
-  background: #fff;
+  display: flex;
+  gap: 1ex;
+  align-items: flex-start;
+  border: 1px solid var(--border-dark);
+  border-left-width: 6px;
+  padding: .5lh 1ex .5lh 1em;
+  background: var(--body-light, #fff);
+  color: var(--default-text);
+  box-shadow: 4px 4px 0 var(--border-dark);
+  pointer-events: auto;
+
+  &.error {
+    border-left-color: var(--danger);
+  }
+
+  .toast-text {
+    flex: 1 1 auto;
+    margin: 0;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    animation: toast-in .2s ease-out;
+  }
+}
+
+.dismiss-btn {
+  flex: 0 0 auto;
+  border: 0;
+  padding: .1lh .6ex;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-.5rem);
+  }
 }
 
 .messages-inner {
