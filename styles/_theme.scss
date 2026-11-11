@@ -57,6 +57,35 @@
   --input-line-height: 1.4;
   --label-top-space: 1.2em;
 
-  // Type
+  // Type. --font-ui is for labels, buttons and table headings.
+  --font-body: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-heading: var(--font-body);
+  --font-ui: var(--font-heading);
   --font-size-h4: 1.25rem;
+
+  // Panels: the boxes pages are laid out in (see base.scss's .panel)
+  --panel-background: var(--body-light);
+  --panel-text: var(--default-text);
+  --panel-border: 1px solid var(--border);
+  --panel-radius: 4px;
+  --panel-shadow: none;
+  --panel-padding: 0.75lh 1em;
+  --panel-gap: 1lh;
+
+  // Inputs, selects and textareas
+  --input-background: #ffffff;
+  --input-text: var(--default-text);
+  --input-border: 1px solid var(--border);
+  --input-radius: 3px;
+  --focus-ring: 2px solid var(--primary);
+
+  // Buttons (colours are --btn-primary/--btn-secondary above)
+  --button-border: 1px solid var(--border-dark);
+  --button-radius: 3px;
+  --button-shadow: none;
+  --button-pad: 0.35lh 1em;
+
+  // Tables
+  --table-rule: 1px solid var(--border);
+  --table-head-background: transparent;
 }

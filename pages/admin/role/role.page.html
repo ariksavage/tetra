@@ -1,0 +1,55 @@
+<div class="app-layout">
+  <div class="tetra-admin admin-role" content>
+    <p class="breadcrumb"><a routerLink="/admin/roles">&larr; Roles</a></p>
+
+    @if (role) {
+      <form (ngSubmit)="save()">
+        <section class="panel" aria-labelledby="role-details-heading">
+          <h2 id="role-details-heading">Details</h2>
+          <fieldset [disabled]="!can('EDIT')">
+            <div class="form-grid">
+              <label class="inline">Role name <input name="label" [(ngModel)]="label" required autocomplete="off"></label>
+            </div>
+            <label class="inline">Description <textarea name="description" rows="2" [(ngModel)]="description"></textarea></label>
+            <p><label class="checkbox-label"><input type="checkbox" name="default" [(ngModel)]="isDefault"> Give this role to every new user</label></p>
+            <p class="muted">Machine name: <code>{{role.key}}</code>@if (role.built_in) {, built into Tetra}</p>
+          </fieldset>
+        </section>
+
+        <section class="panel" aria-labelledby="role-includes-heading">
+          <fieldset [disabled]="!can('EDIT')">
+            <legend id="role-includes-heading"><h2>Includes</h2></legend>
+            <p class="muted">People with this role also get every permission of the roles ticked here.</p>
+            <ul class="checkbox-list">
+              @for (other of others(); track other.id) {
+                <li><label class="checkbox-label">
+                  <input type="checkbox" [name]="'inherits-' + other.id" [ngModel]="inherits.has(other.id)" (ngModelChange)="toggleInherit(other.id, $event)">
+                  {{other.label}}
+                </label></li>
+              }
+            </ul>
+          </fieldset>
+        </section>
+
+        <div class="button-row">
+          @if (can('EDIT')) {
+            <button type="submit" class="primary" [disabled]="saving || !label.trim()">Save</button>
+          }
+          @if (can('VIEW', 'permissions')) {
+            <a class="button" [routerLink]="['/admin/permissions', role.id]">Edit permissions</a>
+          }
+          @if (can('VIEW', 'users')) {
+            <a class="button" [routerLink]="['/admin/people']" [queryParams]="{role: role.id}">People with this role ({{role.user_count}})</a>
+          }
+        </div>
+      </form>
+
+      @if (!role.built_in && can('DELETE')) {
+        <section class="panel danger-zone" aria-labelledby="role-delete-heading">
+          <h2 id="role-delete-heading">Delete role</h2>
+          <div class="button-row"><button type="button" class="danger" (click)="remove()">Delete the {{role.label}} role</button></div>
+        </section>
+      }
+    }
+  </div>
+</div>

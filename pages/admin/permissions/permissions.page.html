@@ -1,0 +1,67 @@
+<div class="app-layout">
+  <div class="tetra-admin admin-permissions" content>
+    @if (onlyRole) {
+      <p class="breadcrumb"><a routerLink="/admin/permissions">&larr; All roles' permissions</a></p>
+    }
+
+    @if (matrix) {
+      <form class="panel" (ngSubmit)="save()" aria-label="Permissions">
+        <p class="muted">Tick what each role can do. A greyed-out tick is a permission the role already has another way;
+          hover or focus it to see how. Roles and what they include are set on the
+          <a routerLink="/admin/roles">roles page</a>.</p>
+
+        <div class="table-wrap"><table class="data-table permission-matrix">
+          <thead>
+            <tr>
+              <th scope="col">Permission</th>
+              @for (role of roles; track role.id) {
+                <th scope="col" class="role">
+                  @if (onlyRole) {
+                    {{role.label}}
+                  } @else {
+                    <a [routerLink]="['/admin/permissions', role.id]">{{role.label}}</a>
+                  }
+                </th>
+              }
+            </tr>
+          </thead>
+          @for (group of groups; track group.dimension) {
+            <tbody>
+              <tr class="group">
+                <th scope="rowgroup" [attr.colspan]="roles.length + 1">{{group.label}}</th>
+              </tr>
+              @for (p of group.permissions; track p.id) {
+                <tr>
+                  <th scope="row" class="permission">
+                    {{p.title}}
+                    @if (p.description) { <span class="muted description">{{p.description}}</span> }
+                  </th>
+                  @for (role of roles; track role.id) {
+                    <td class="grant">
+                      @if (includedBy(role, p); as why) {
+                        <input type="checkbox" checked disabled [title]="why" [attr.aria-label]="p.title + ' for ' + role.label + ': ' + why">
+                      } @else {
+                        <input type="checkbox" [name]="'grant-' + role.id + '-' + p.id" [ngModel]="has(role, p)" (ngModelChange)="toggle(role, p, $event)"
+                          [disabled]="!canEdit()" [attr.aria-label]="p.title + ' for ' + role.label">
+                      }
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          }
+        </table></div>
+
+        @if (canEdit()) {
+          <div class="button-row">
+            <button type="submit" class="primary" [disabled]="saving || !changedRoles().length">Save permissions</button>
+            @if (changedRoles().length) {
+              <button type="button" (click)="discard()">Discard changes</button>
+              <span class="muted" role="status">Unsaved changes to {{changedRoles().length === 1 ? 'one role' : changedRoles().length + ' roles'}}.</span>
+            }
+          </div>
+        }
+      </form>
+    }
+  </div>
+</div>

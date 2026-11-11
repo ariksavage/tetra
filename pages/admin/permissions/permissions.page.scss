@@ -1,0 +1,37 @@
+// Only what a matrix needs; colours, fonts and rules come from the app's
+// theme through Tetra's base styles.
+.permission-matrix {
+  .role,
+  .grant {
+    text-align: center;
+    vertical-align: middle;
+  }
+
+  .role {
+    min-width: 6em;
+  }
+
+  .group th {
+    padding-top: .75lh;
+    font-size: 1.05em;
+  }
+
+  .permission {
+    font-family: inherit;
+    font-weight: normal;
+  }
+
+  .description {
+    display: block;
+    font-size: .85em;
+  }
+
+  input[type="checkbox"] {
+    width: 1.2em;
+    height: 1.2em;
+  }
+
+  input[disabled] {
+    cursor: help;
+  }
+}

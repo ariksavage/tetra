@@ -35,6 +35,9 @@ class UserRole extends \Core\Base\Models\Base {
    */
   public string $description = '';
 
+  /** Given to every new user. */
+  public bool $default = FALSE;
+
   public object $permissions;
 
   /**
@@ -69,6 +72,8 @@ class UserRole extends \Core\Base\Models\Base {
   public function prepareSave()
   {
     $data = parent::prepareSave();
+    // Worked out from roles_permissions, not a column.
+    unset($data['permissions']);
     return $data;
   }
 

@@ -1,15 +1,4 @@
-.config-page {
-  max-width: 60em;
-  margin: 0 auto;
-}
-
-.config-group {
-  margin: 0.5lh 0;
-  border: 1px solid rgb(0 0 0 / 60%);
-  padding: 0.5lh 1ex;
-  background: #fff;
-  box-shadow: 2px 2px 4px #000;
-}
+// Panels, buttons and type come from Tetra's base styles and the app's theme.
 
 .config-item {
   margin: 0.5lh 0;
@@ -17,11 +6,11 @@
   padding-left: 1ex;
 
   &.changed {
-    border-left-color: #c90;
+    border-left-color: var(--warning);
   }
 
   &.invalid {
-    border-left-color: #c00;
+    border-left-color: var(--danger);
   }
 
   .description {

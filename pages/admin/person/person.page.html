@@ -1,0 +1,112 @@
+<div class="app-layout">
+  <div class="tetra-admin admin-person" content>
+    <p class="breadcrumb"><a routerLink="/admin/people">&larr; People</a></p>
+
+    @if (loaded) {
+      <form class="person-form" (ngSubmit)="save()">
+        <section class="panel" aria-labelledby="person-account-heading">
+          <h2 id="person-account-heading">Account</h2>
+          <div class="form-grid">
+            <label class="inline">Username
+              <input name="username" [(ngModel)]="user.username" required autocomplete="off" [disabled]="!editable()">
+            </label>
+            <label class="inline">Email address
+              <input type="email" name="email" [(ngModel)]="user.email" required autocomplete="off" [disabled]="!editable()">
+            </label>
+            <label class="inline">First name
+              <input name="first_name" [(ngModel)]="user.first_name" required autocomplete="off" [disabled]="!editable()">
+            </label>
+            <label class="inline">Last name
+              <input name="last_name" [(ngModel)]="user.last_name" required autocomplete="off" [disabled]="!editable()">
+            </label>
+          </div>
+        </section>
+
+        @if (editable()) {
+          <section class="panel" aria-labelledby="person-password-heading">
+            <h2 id="person-password-heading">{{isNew() ? 'Password' : 'Change password'}}</h2>
+            <div class="form-grid">
+              <label class="inline">{{isNew() ? 'Password' : 'New password'}}
+                <input type="password" name="password" [(ngModel)]="password" autocomplete="new-password" minlength="8" [required]="isNew()">
+              </label>
+              <label class="inline">Confirm password
+                <input type="password" name="confirm_password" [(ngModel)]="confirmPassword" autocomplete="new-password" [required]="isNew()">
+              </label>
+            </div>
+            @if (passwordProblem(); as problem) {
+              <p class="muted" role="status">{{problem}}</p>
+            } @else if (!isNew()) {
+              <p class="muted">Leave these blank to keep the current password.</p>
+            }
+          </section>
+        }
+
+        <section class="panel" aria-labelledby="person-status-heading">
+          <fieldset [disabled]="!editable() || isMe()">
+            <legend id="person-status-heading"><h2>Status</h2></legend>
+            <ul class="checkbox-list">
+              @for (s of statuses; track s.value) {
+                <li><label class="checkbox-label">
+                  <input type="radio" name="status" [value]="s.value" [(ngModel)]="user.status">
+                  {{s.label}} <span class="muted">{{s.description}}</span>
+                </label></li>
+              }
+            </ul>
+          </fieldset>
+          @if (isMe()) {
+            <p class="muted">You can't change your own account's status.</p>
+          }
+        </section>
+
+        <section class="panel" aria-labelledby="person-roles-heading">
+          <fieldset [disabled]="!can('EDIT')">
+            <legend id="person-roles-heading"><h2>Roles</h2></legend>
+            <ul class="checkbox-list">
+              @for (role of roles; track role.id) {
+                <li><label class="checkbox-label">
+                  <input type="checkbox" [name]="'role-' + role.id" [ngModel]="roleIds.has(role.id)" (ngModelChange)="toggleRole(role.id, $event)">
+                  {{role.label}}
+                  @if (role.description || includes(role)) {
+                    <span class="muted">{{role.description}} {{includes(role)}}</span>
+                  }
+                </label></li>
+              }
+            </ul>
+          </fieldset>
+          @if (isMe()) {
+            <p class="muted">You can't take away your own access to manage users.</p>
+          }
+        </section>
+
+        @if (editable()) {
+          <div class="button-row">
+            <button type="submit" class="primary" [disabled]="!canSave()">{{isNew() ? 'Create account' : 'Save'}}</button>
+            <a class="button" routerLink="/admin/people">Cancel</a>
+          </div>
+        }
+      </form>
+
+      @if (!isNew() && can('EDIT')) {
+        <section class="panel reset-link" aria-labelledby="person-reset-heading">
+          <h2 id="person-reset-heading">Password reset link</h2>
+          @if (resetLink) {
+            <p>{{resetText}}</p>
+            <p><input class="link" readonly [value]="resetLink" aria-label="Password reset link" (focus)="$any($event.target).select()"></p>
+            <div class="button-row"><button type="button" (click)="copyResetLink()">Copy link</button></div>
+          } @else {
+            <p class="muted">A one-time link they can use to set a new password, for you to send them.</p>
+            <div class="button-row"><button type="button" (click)="getResetLink()">Get a reset link</button></div>
+          }
+        </section>
+      }
+
+      @if (!isNew() && !isMe() && can('DELETE')) {
+        <section class="panel danger-zone" aria-labelledby="person-delete-heading">
+          <h2 id="person-delete-heading">Delete account</h2>
+          <p class="muted">Deactivating keeps the account and its history; deleting removes it for good.</p>
+          <div class="button-row"><button type="button" class="danger" (click)="remove()">Delete account</button></div>
+        </section>
+      }
+    }
+  </div>
+</div>

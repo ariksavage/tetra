@@ -1,0 +1,59 @@
+<div class="app-layout">
+  <div class="tetra-admin admin-roles" content>
+    <section class="panel" aria-label="Roles">
+      <p class="muted">A role is a set of permissions. Give people roles on their account; choose what each role can do on the
+        @if (can('VIEW', 'permissions')) {<a routerLink="/admin/permissions">permissions page</a>} @else {permissions page}.
+        A role that includes others has their permissions too.</p>
+      @if (roles.length) {
+        <div class="table-wrap"><table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Role</th>
+              <th scope="col">Includes</th>
+              <th scope="col" class="number">People</th>
+              <th scope="col">Operations</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (role of roles; track role.id) {
+              <tr>
+                <td>
+                  <a [routerLink]="['/admin/roles', role.id]">{{role.label}}</a>
+                  @if (role.built_in) { <span class="tag">Built in</span> }
+                  @if (role.default) { <span class="tag">Given to new users</span> }
+                  @if (role.description) { <br><span class="muted">{{role.description}}</span> }
+                </td>
+                <td>{{includes(role)}}</td>
+                <td class="number">
+                  @if (can('VIEW', 'users')) {
+                    <a [routerLink]="['/admin/people']" [queryParams]="{role: role.id}">{{role.user_count}}<span class="sr-only"> with the {{role.label}} role</span></a>
+                  } @else {
+                    {{role.user_count}}
+                  }
+                </td>
+                <td class="actions">
+                  <a [routerLink]="['/admin/roles', role.id]">Edit<span class="sr-only"> {{role.label}}</span></a>
+                  @if (can('VIEW', 'permissions')) {
+                    &middot; <a [routerLink]="['/admin/permissions', role.id]">Permissions<span class="sr-only"> for {{role.label}}</span></a>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table></div>
+      } @else if (loaded) {
+        <p class="empty">No roles yet.</p>
+      }
+    </section>
+
+    @if (can('CREATE')) {
+      <section class="panel" aria-labelledby="add-role-heading">
+        <h2 id="add-role-heading">Add a role</h2>
+        <form class="form-grid" (ngSubmit)="add()">
+          <label class="inline">Role name <input name="label" [(ngModel)]="newLabel" required autocomplete="off"></label>
+          <div><button type="submit" class="primary" [disabled]="!newLabel.trim()">Add role</button></div>
+        </form>
+      </section>
+    }
+  </div>
+</div>

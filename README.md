@@ -24,6 +24,7 @@ moved over.
 | `migrations/` | Tetra's own migrations, such as its base tables. |
 | `app/`, `classes/`, `components/`, `guards/`, `pages/`, `services/`, `testing/` | The Angular half, imported as `@tetra/...`. |
 | `styles/_theme.scss` | Default values for every CSS variable Tetra's components read. |
+| `styles/_base.scss` | Base styles for forms, inputs, buttons, tables and panels, built on the theme. |
 
 ## Using Tetra in an app
 
@@ -36,20 +37,44 @@ moved over.
    app root or any folder above it. Keep it outside the web root in production. Never commit it.
 4. **Angular:** map `"@tetra/*": ["./tetra/*"]` in `tsconfig.json`, and start the app's routes
    from `TETRA_ROUTES` (`@tetra/app/tetra.routes`).
-5. **Styles:** `@use '../tetra/styles/theme';` at the top of the app's global stylesheet, then
-   set any variables to theme it:
+5. **Styles:** at the top of the app's global stylesheet:
+
+   ```scss
+   @use '../tetra/styles/theme';
+   @use '../tetra/styles/base';
+   ```
+
+   `base` styles forms, inputs, buttons, tables and panels for Tetra's pages (and any of the
+   app's) from the theme variables, so setting colours and fonts restyles all of it:
 
    ```scss
    :root {
      --primary: #eac11c;
      --primary-text: #282828;
+     --font-body: Georgia, serif;
+     --panel-shadow: 4px 4px 0 #000;
    }
    ```
+
+   Every base rule sits in `:where()`, which has no specificity, so any rule the app writes wins
+   with no `!important`: `button { ... }` replaces Tetra's buttons outright. Tetra's pages use a
+   shared set of class names (`panel`, `data-table`, `table-wrap`, `button-row`, `filters`,
+   `form-grid`, `label.inline`, `checkbox-label`, `checkbox-list`, `tag`, `muted`, `empty`);
+   style those and Tetra's pages match the app's. The full list is at the top of `_base.scss`.
 
 6. **Icons:** `npm install @fortawesome/fontawesome-free`, then `@use '../tetra/styles/icons';` in
    the same stylesheet. Tetra's buttons and notifications use its solid and regular icons.
 7. **User menu:** provide the app's links with `USER_MENU_ITEMS`
    (`@tetra/components/user-menu/user-menu-items`). Each can require a permission.
+8. **Admin pages:** Tetra brings People (`/admin/people`), Roles (`/admin/roles`),
+   Permissions (`/admin/permissions`) and Configuration (`/admin/config`). The user menu lists
+   the ones the logged-in user may open, under Administration: People needs `users VIEW`, Roles
+   `roles VIEW`, Permissions `permissions VIEW`, Configuration `config EDIT`. Admins get all four.
+   To add the app's own admin pages to that list, provide `ADMIN_MENU_ITEMS`
+   (`@tetra/components/user-menu/admin-menu-items`) as `[...TETRA_ADMIN_PAGES, ...yours]`;
+   `visibleMenuItems(items, user)` filters any list by permission, for the app's own navigation.
+   The admin role always keeps full control of users, roles and permissions, and no one can
+   deactivate, delete or remove their own access to manage users, so the site can't be locked.
 
 ## The app's own API
 

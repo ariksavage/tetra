@@ -1,0 +1,291 @@
+// Tetra's base styles: forms, inputs, buttons, tables and panels, for Tetra's
+// own pages (login, account, admin) and any app page that wants them.
+//
+// Two rules make these easy to live with:
+//
+// 1. Everything reads the theme variables in theme.scss, so an app restyles
+//    all of it by setting colours and fonts on :root:
+//
+//      :root { --font-body: Georgia, serif; --panel-shadow: 4px 4px 0 #000; }
+//
+// 2. Every selector is wrapped in :where(), which has no specificity. Any
+//    rule an app writes, even a bare `button { }`, beats these, so an app can
+//    replace a piece outright without !important or matching selectors.
+//
+//   @use 'tetra/styles/theme';
+//   @use 'tetra/styles/base';
+//
+// The class names here are Tetra's shared page vocabulary. Tetra's pages use
+// them, so an app that styles these classes styles those pages too:
+//
+//   .panel          a box of content
+//   .button-row     buttons side by side
+//   .data-table     a table of records (wrap it in .table-wrap to scroll)
+//   .filters        a row of filter fields above a list
+//   label.inline    a label with its input inside, stacked
+//   .checkbox-label a checkbox and its text on one line
+//   .checkbox-list  a list of checkbox-labels
+//   .muted, .empty, .sr-only, .danger (on a button)
+
+:where(body) {
+  font-family: var(--font-body);
+  color: var(--default-text);
+}
+
+:where(h1, h2, h3, h4, legend) {
+  font-family: var(--font-heading);
+}
+
+// Buttons
+:where(button, .button) {
+  display: inline-block;
+  padding: var(--button-pad);
+  border: var(--button-border);
+  border-radius: var(--button-radius);
+  background: var(--btn-secondary);
+  color: var(--btn-secondary-text);
+  box-shadow: var(--button-shadow);
+  font: inherit;
+  font-family: var(--font-ui);
+  font-weight: bold;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+:where(button.primary, .button.primary, button[type="submit"]) {
+  background: var(--btn-primary);
+  color: var(--btn-primary-text);
+}
+
+:where(button.danger, .button.danger) {
+  background: var(--danger);
+  color: var(--danger-text);
+  border-color: var(--danger);
+}
+
+:where(button:disabled, .button[aria-disabled="true"]) {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+:where(button, .button, input, select, textarea, a):focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: 2px;
+}
+
+// Inputs
+:where(input:not([type="checkbox"], [type="radio"], [type="range"], [type="color"]), select, textarea) {
+  max-width: 100%;
+  padding: var(--input-pad-y) var(--input-pad-x);
+  border: var(--input-border);
+  border-radius: var(--input-radius);
+  background: var(--input-background);
+  color: var(--input-text);
+  font: inherit;
+  line-height: var(--input-line-height);
+}
+
+:where(input[type="checkbox"], input[type="radio"]) {
+  accent-color: var(--primary);
+}
+
+:where(fieldset) {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+:where(legend) {
+  padding: 0;
+  margin-bottom: 0.25lh;
+  font-weight: bold;
+}
+
+// A label with its field inside it, the label text above the field.
+:where(label.inline) {
+  display: block;
+  font-family: var(--font-ui);
+  font-size: 0.85em;
+  font-weight: bold;
+}
+
+:where(label.inline) :where(input, select, textarea) {
+  display: block;
+  width: 100%;
+  margin-top: 0.2lh;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+:where(.checkbox-label) {
+  display: flex;
+  gap: 0.5ex;
+  align-items: center;
+  font-family: var(--font-ui);
+  font-size: 0.85em;
+  font-weight: bold;
+}
+
+:where(.checkbox-label .muted) {
+  font-weight: normal;
+}
+
+:where(.checkbox-list) {
+  display: grid;
+  gap: 0.25lh;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// Form layouts: fields side by side, wrapping on narrow screens.
+:where(.form-grid) {
+  display: grid;
+  gap: 0.5lh 1em;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14em), 1fr));
+  align-items: end;
+}
+
+:where(.filters) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5lh 1em;
+  align-items: end;
+  margin-bottom: 0.75lh;
+}
+
+:where(.filters label) {
+  min-width: 12em;
+}
+
+:where(.button-row) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75em;
+  align-items: center;
+  margin: 0.75lh 0 0;
+}
+
+// Panels
+:where(.panel) {
+  display: block;
+  min-width: 0;
+  margin: 0 0 var(--panel-gap);
+  padding: var(--panel-padding);
+  border: var(--panel-border);
+  border-radius: var(--panel-radius);
+  background: var(--panel-background);
+  color: var(--panel-text);
+  box-shadow: var(--panel-shadow);
+}
+
+:where(.panel > :first-child) {
+  margin-top: 0;
+}
+
+// Tables
+:where(.table-wrap) {
+  position: relative;
+  overflow-x: auto;
+}
+
+:where(.data-table) {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+:where(.data-table) :where(th, td) {
+  padding: 0.3lh 0.5em;
+  border-bottom: var(--table-rule);
+  text-align: left;
+  vertical-align: top;
+}
+
+:where(.data-table th) {
+  background: var(--table-head-background);
+  font-family: var(--font-ui);
+}
+
+:where(.data-table .number) {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+:where(.data-table .actions) {
+  white-space: nowrap;
+}
+
+// Small helpers
+:where(.muted) {
+  opacity: 0.75;
+}
+
+:where(.empty) {
+  font-style: italic;
+}
+
+:where(.sr-only) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// A short label beside a name, eg. a user's status or a built-in role.
+:where(.tag) {
+  display: inline-block;
+  padding: 0 0.5ex;
+  border: 1px solid var(--border);
+  border-radius: var(--input-radius);
+  font-family: var(--font-ui);
+  font-size: 0.8em;
+  white-space: nowrap;
+}
+
+// Tetra's own pages (admin, account): a readable width, centred.
+// The gap spaces its panels, whatever margins an app gives .panel.
+:where(.tetra-admin) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--panel-gap);
+  max-width: 64em;
+  margin-inline: auto;
+}
+
+:where(.tetra-admin > *) {
+  margin-block: 0;
+}
+
+:where(.tetra-admin form:not(.panel, .form-grid, .filters)) {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--panel-gap);
+}
+
+:where(.breadcrumb) {
+  margin: 0 0 0.75lh;
+  font-family: var(--font-ui);
+}
+
+:where(.page-actions) {
+  margin: 0 0 0.75lh;
+}
+
+:where(.tetra-admin input.link) {
+  width: 100%;
+}
+
+:where(.tetra-admin .panel h2) {
+  margin-top: 0;
+}
+
+:where(.danger-zone) {
+  border-color: var(--danger);
+}

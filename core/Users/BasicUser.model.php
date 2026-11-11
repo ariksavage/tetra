@@ -561,6 +561,15 @@ class BasicUser extends \Core\Base\Models\Base {
    *
    * @return String            Encrypted password
    */
+  /**
+   * Set a new password, hashed straight away (so a plain password that
+   * happens to be 60 characters long is never mistaken for a hash).
+   */
+  public function setPassword(string $password): void
+  {
+    $this->password = $this->passwordHash($password);
+  }
+
   protected function passwordHash(string $password)
   {
     $options = [

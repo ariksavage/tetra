@@ -22,9 +22,16 @@
           </li>
         }
       }
-      @if (loggedIn() && user && user.hasPermission('config', 'EDIT')) {
-        <li class="dropdown-item config">
-          <a class="dropdown-link" routerLink="/admin/config" (click)="open = false">Configuration</a>
+      @if (adminItems().length) {
+        <li class="dropdown-group admin">
+          <span class="dropdown-heading" id="user-menu-admin">Administration</span>
+          <ul class="dropdown-list" aria-labelledby="user-menu-admin">
+            @for (item of adminItems(); track item.route) {
+              <li class="dropdown-item {{item.key ?? ''}}">
+                <a class="dropdown-link" [routerLink]="item.route" (click)="open = false">{{item.label}}</a>
+              </li>
+            }
+          </ul>
         </li>
       }
       @if (loggedIn() && user) {

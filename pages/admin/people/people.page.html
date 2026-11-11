@@ -1,0 +1,73 @@
+<div class="app-layout">
+  <div class="tetra-admin admin-people" content>
+    @if (can('CREATE')) {
+      <p class="button-row page-actions"><a class="button primary" routerLink="/admin/people/new">Add user</a></p>
+    }
+
+    <section class="panel" aria-label="People">
+      <form class="filters" role="search" aria-label="Filter people" (ngSubmit)="filter()">
+        <label class="inline">Name, username or email
+          <input type="search" name="search" [(ngModel)]="search" autocomplete="off">
+        </label>
+        <label class="inline">Role
+          <select name="role" [(ngModel)]="role">
+            <option [ngValue]="0">Any role</option>
+            @for (r of roles; track r.id) {
+              <option [ngValue]="r.id">{{r.label}}</option>
+            }
+          </select>
+        </label>
+        <label class="inline">Status
+          <select name="status" [(ngModel)]="status">
+            <option value="">Any status</option>
+            @for (s of statuses; track s.value) {
+              <option [value]="s.value">{{s.label}}</option>
+            }
+          </select>
+        </label>
+        <div class="button-row">
+          <button type="submit" class="primary">Filter</button>
+          @if (filtered()) {
+            <button type="button" (click)="reset()">Reset</button>
+          }
+        </div>
+      </form>
+
+      @if (users.length) {
+        <div class="table-wrap"><table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Username</th>
+              <th scope="col">Name</th>
+              <th scope="col">Status</th>
+              <th scope="col">Roles</th>
+              <th scope="col">Member since</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users; track user.id) {
+              <tr>
+                <td><a [routerLink]="['/admin/people', user.id]">{{user.username}}</a>
+                  @if (user.id === currentUser?.id) {&nbsp;<span class="muted">(you)</span>}</td>
+                <td>{{name(user)}}<br><span class="muted">{{user.email}}</span></td>
+                <td><span class="tag status-{{user.status}}">{{statusLabel(user.status)}}</span></td>
+                <td>{{roleLabels(user)}}</td>
+                <td class="date">{{joined(user)}}</td>
+              </tr>
+            }
+          </tbody>
+        </table></div>
+      } @else if (loaded) {
+        <p class="empty">{{filtered() ? 'No one matches those filters.' : 'No users yet.'}}</p>
+      }
+
+      @if (pagination && pagination.last_page > 1) {
+        <nav class="button-row pager" aria-label="Pages">
+          <button type="button" [disabled]="!pagination.prev_page" (click)="goTo(pagination.prev_page)">Previous</button>
+          <span>Page {{pagination.current_page}} of {{pagination.last_page}} ({{pagination.total_results}} people)</span>
+          <button type="button" [disabled]="!pagination.next_page" (click)="goTo(pagination.next_page)">Next</button>
+        </nav>
+      }
+    </section>
+  </div>
+</div>

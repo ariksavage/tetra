@@ -1,7 +1,7 @@
 <div class="app-layout">
-  <div class="config-page" content>
+  <div class="tetra-admin config-page" content>
     @for (group of groups; track group.type) {
-      <section class="config-group section">
+      <section class="config-group panel">
         <h2 class="label">{{groupTitle(group.type)}}</h2>
         @for (item of group.items; track item.id) {
           <div class="config-item" [class.changed]="item.touched()" [class.invalid]="!isValid(item)">
@@ -37,7 +37,7 @@
     }
     @if (groups.length) {
       <div class="actions">
-        <button class="save" [disabled]="!canSave()" (click)="save()">Save Configuration</button>
+        <button class="save primary" [disabled]="!canSave()" (click)="save()">Save Configuration</button>
         <button class="reset-all" [disabled]="!changed().length || saving" (click)="resetAll()">Discard changes</button>
       </div>
     }

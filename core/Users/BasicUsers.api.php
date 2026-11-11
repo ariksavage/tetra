@@ -35,7 +35,168 @@ class BasicUsers extends \Core\Base\API\Base {
   public function listGET($flags = [])
   {
     $this->requirePermission('users', 'VIEW');
+    // Each user's role IDs, for the people screen's Roles column.
+    $userRoles = [];
+    foreach ($this->select(['user_id', 'role_id'])->from('users_roles')->execute() ?: [] as $row) {
+      $userRoles[intval($row->user_id)][] = intval($row->role_id);
+    }
+    $this->addData('user_roles', (object) $userRoles);
     parent::listGET($flags);
+  }
+
+  /**
+   * ?role= and ?status= narrow the list, as well as ?search=.
+   */
+  protected function searchQueryFilter(selectQuery &$query): selectQuery
+  {
+    parent::searchQueryFilter($query);
+    if ($roleId = $this->getValue('role', 0, 'integer')) {
+      $query->and('id', 'IN QUERY', 'SELECT `user_id` FROM `users_roles` WHERE `role_id` = ' . intval($roleId));
+    }
+    if ($status = $this->getValue('status', '', 'string')) {
+      $query->and('status', '=', $status);
+    }
+    if (!$this->getValue('orderBy', '', 'string')) {
+      $query->orderBy('username');
+    }
+    return $query;
+  }
+
+  /**
+   * A user for the admin screens, with the IDs of their roles.
+   *
+   * GET /core/users/account/{id}
+   */
+  public function accountGET(int $userId)
+  {
+    $this->requirePermission('users', 'VIEW');
+    $user = $this->getById($userId);
+    $this->addData('role_ids', $this->roleIds($userId));
+    $this->success('user', $user);
+  }
+
+  /**
+   * Create or update a user from the admin screens: their details, status,
+   * roles and, optionally, a new password.
+   *
+   * POST /core/users/account { "user": {...}, "role_ids": [1, 2], "password": "" }
+   */
+  public function accountPOST()
+  {
+    $data = $this->postValue('user', NULL, 'object');
+    $isNew = empty($data->id);
+    $this->requirePermission('users', $isNew ? 'CREATE' : 'EDIT');
+    $roleIds = array_values(array_unique(array_map('intval', (array) $this->postValue('role_ids', []))));
+    $password = strval($this->postValue('password', '', 'string'));
+
+    $user = new User();
+    if (!$isNew) {
+      $user->byId(intval($data->id));
+    }
+    foreach (['username', 'email', 'first_name', 'last_name', 'status'] as $field) {
+      if (isset($data->$field)) {
+        $user->$field = trim(strval($data->$field));
+      }
+    }
+    if (!$user->username || !$user->email || !$user->first_name || !$user->last_name) {
+      $this->error('A user needs a username, email address, first name and last name.', 400, 'Validation');
+    }
+    if (!filter_var($user->email, FILTER_VALIDATE_EMAIL)) {
+      $this->error("That email address doesn't look right.", 400, 'Validation');
+    }
+    $user->status = strtolower($user->status ?: 'active');
+    if (!in_array($user->status, ['active', 'pending', 'deactivated'], TRUE)) {
+      $this->error('Unknown status: ' . $user->status, 400, 'Validation');
+    }
+    $clash = $this->select(['id', 'username', 'email'])->from('users')
+      ->where('id', '!=', intval($user->id ?? 0))
+      ->andGroup()->where('username', '=', $user->username)->or('email', '=', $user->email)->endGroup()
+      ->execute(TRUE);
+    if ($clash) {
+      $what = strcasecmp($clash->username, $user->username) === 0 ? 'username' : 'email address';
+      $this->error("Another account already uses that {$what}.", 409, 'Conflict');
+    }
+    if ($isNew && strlen($password) < 8) {
+      $this->error('A new user needs a password of at least 8 characters.', 400, 'Validation');
+    }
+    if ($password && strlen($password) < 8) {
+      $this->error('Passwords need at least 8 characters.', 400, 'Validation');
+    }
+
+    // Guard against locking yourself out.
+    if (!$isNew && $this->isMe($user)) {
+      if ($user->status !== 'active') {
+        $this->error("You can't deactivate your own account.", 400, 'Validation');
+      }
+      if (!$this->rolesStillAdminister($roleIds)) {
+        $this->error("Those roles would take away your own access to manage users. Ask another administrator to change your roles.", 400, 'Validation');
+      }
+    }
+
+    if ($password) {
+      $user->setPassword($password);
+    }
+    if (!$user->save()) {
+      $this->error('Could not save the user.', 500);
+    }
+    // Roles can only be given out by someone who may edit roles; others keep what they had.
+    if ($this->currentUserCan('users', 'EDIT')) {
+      $roles = $this->select(['id'])->from('roles')->where('id', 'IN', $roleIds ?: [0])->execute();
+      $user->updateRoles(array_map(fn($r) => intval($r->id), $roles ?: []));
+    }
+    $this->addData('role_ids', $this->roleIds(intval($user->id)));
+    $this->success('user', $this->getById(intval($user->id)), ($isNew ? 'Created ' : 'Saved ') . $user->name() . '.');
+  }
+
+  /**
+   * Delete a user. You can't delete yourself.
+   */
+  public function idDELETE(int $id)
+  {
+    $this->requirePermission('users', 'DELETE');
+    $user = $this->getById($id);
+    if ($this->isMe($user)) {
+      $this->error("You can't delete your own account.", 400, 'Validation');
+    }
+    $name = $user->name();
+    if ($user->delete()) {
+      $this->successMsg("Deleted {$name}.");
+    }
+  }
+
+  /** @return int[] */
+  protected function roleIds(int $userId): array
+  {
+    $rows = $this->select(['role_id'])->from('users_roles')->where('user_id', '=', $userId)->execute() ?: [];
+    return array_map(fn($r) => intval($r->role_id), $rows);
+  }
+
+  protected function isMe($user): bool
+  {
+    $me = $this->getCurrentUser();
+    return $me && intval($me->id) === intval($user->id);
+  }
+
+  protected function currentUserCan(string $dimension, string $action): bool
+  {
+    $me = $this->getCurrentUser();
+    return $me && $me->hasPermission($dimension, $action);
+  }
+
+  /**
+   * Whether a set of roles, including the roles they inherit, still lets
+   * someone manage users.
+   */
+  protected function rolesStillAdminister(array $roleIds): bool
+  {
+    foreach ($roleIds as $roleId) {
+      $role = new UserRole();
+      $role->byId($roleId, FALSE);
+      if ($role->id && $role->hasPermission('users', 'EDIT')) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 
   protected function searchColumns(): Array

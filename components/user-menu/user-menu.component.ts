@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import {  UserService  } from '@tetra/services/user.service';
 import { User } from '@tetra/classes/user';
 import { USER_MENU_ITEMS, UserMenuItem } from './user-menu-items';
+import { ADMIN_MENU_ITEMS, visibleMenuItems } from './admin-menu-items';
 
 @Component({
     selector: '.user-menu',
@@ -16,6 +17,7 @@ export class UserMenuComponent {
   user?: User;
   open: boolean = false;
   readonly items: UserMenuItem[] = inject(USER_MENU_ITEMS);
+  readonly adminPages: UserMenuItem[] = inject(ADMIN_MENU_ITEMS);
 
   constructor(private userService: UserService) {
     userService.getUser().subscribe((user: User | null) => {
@@ -30,10 +32,12 @@ export class UserMenuComponent {
   }
 
   canSee(item: UserMenuItem): boolean {
-    if (!this.loggedIn() || !this.user) {
-      return false;
-    }
-    return !item.permission || this.user.hasPermission(item.permission.dimension, item.permission.action);
+    return visibleMenuItems([item], this.user).length > 0;
+  }
+
+  /** The admin pages this user may open. */
+  adminItems(): UserMenuItem[] {
+    return visibleMenuItems(this.adminPages, this.user);
   }
 
   logout(event?: Event) {
