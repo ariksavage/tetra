@@ -149,25 +149,28 @@ trait Common {
    */
   protected function getAuthToken()
   {
-    $authToken = '';
     if (isset($_SESSION['authorization_token'])) {
       return $_SESSION['authorization_token'];
-    } else if (isset($_COOKIE['auth'])) {
-      $_SESSION['authorization_token'] = $_COOKIE['auth'];
-      return $_COOKIE['auth'];
     }
+    // The header first: it's what the app sends for its own login. A cookie
+    // can belong to another app on the same host (cookies ignore the port).
+    $authToken = '';
     if (function_exists('apache_request_headers')) {
       $headers = \apache_request_headers();
-      $authToken = $headers['Authorization'] ?? NULL;
+      $authToken = $headers['Authorization'] ?? '';
     }
     if ($authToken) {
-      $authToken = str_replace('Bearer ', '', $authToken);
-      $authToken = trim($authToken);
+      $authToken = trim(str_replace('Bearer ', '', $authToken));
+    } elseif (isset($_COOKIE['auth'])) {
+      $authToken = $_COOKIE['auth'];
+    }
+    if ($authToken) {
       $_SESSION['authorization_token'] = $authToken;
       return $authToken;
     }
     return FALSE;
   }
+
 
   /**
    * Get the session's current user

@@ -137,7 +137,8 @@ class BasicUsers extends \Core\Base\API\Base {
       $currentUser->getRoles();
       $this->success('user', $currentUser);
     } else {
-      $this->error("User not found");
+      // Not logged in, or the token no longer matches a session.
+      $this->error('Not logged in', 401);
     }
   }
 

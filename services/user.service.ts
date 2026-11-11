@@ -21,6 +21,12 @@ export class UserService {
    * The session token the current user was loaded with
    */
   private loadedToken: string = '';
+
+  /**
+   * The login cookie's name, unique to this site: cookies ignore the port, so
+   * two Tetra apps on localhost would otherwise share (and break) one cookie.
+   */
+  private authCookie: string = 'auth';
   passwordRules = [
     {
       label: 'Password must be at least 8 characters long',
@@ -47,7 +53,11 @@ export class UserService {
     protected activeRoute: ActivatedRoute,
     @Inject(PLATFORM_ID) private platformId: Object,
     @Inject(DOCUMENT) private document: Document
-  ) {}
+  ) {
+    if (isPlatformBrowser(this.platformId)) {
+      this.authCookie = 'auth_' + this.document.location.host.replace(/[^a-zA-Z0-9]+/g, '_');
+    }
+  }
 
   validatePassword(password: string) {
     let valid = true;
@@ -73,9 +83,9 @@ export class UserService {
     const self = this;
     if (token){
       this.token = token;
-      self.cookies.delete('auth');
+      self.cookies.delete(self.authCookie);
     } else {
-      this.token = this.cookies.read('auth');
+      this.token = this.cookies.read(this.authCookie);
     }
 
 
@@ -91,7 +101,9 @@ export class UserService {
     this.core.setAuth(this.token);
     const requestedToken = this.token;
 
-    return this.core.get('users', 'current').then((data) => {
+    // Quietly: a token that no longer works (expired, or left by another
+    // app) just means nobody is logged in. The cookie is removed below.
+    return this.core.getQuietly('users', 'current').then((data: any) => {
       if (data && data.user){
         const user = new User(data.user);
         self.loadedToken = requestedToken;
@@ -109,7 +121,7 @@ export class UserService {
   }
 
   deleteAuthCookie() {
-    this.cookies.delete('auth');
+    this.cookies.delete(this.authCookie);
   }
 
   loginRedirect() {
@@ -125,7 +137,7 @@ export class UserService {
     // Stay on the login form when credentials are rejected.
     return this.core.post('app', 'login', data, false).then((data)=> {
       if (data.token){
-        self.cookies.set('auth', data.token, 100);
+        self.cookies.set(self.authCookie, data.token, 100);
         const user = new User(data.user);
         self.token = data.token;
         self.loadedToken = '';
@@ -141,7 +153,7 @@ export class UserService {
   logout() {
     const self = this;
     return this.core.get('users', 'logout').then((data)=> {
-      self.cookies.delete('auth');
+      self.cookies.delete(self.authCookie);
       self.token = '';
       self.loadedToken = '';
       self.core.setAuth('');
