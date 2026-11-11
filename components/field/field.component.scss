@@ -92,26 +92,55 @@
   }
 }
 
-.label { // as placeholder
+.label {
+  // A label sits small, above its field. Only on an empty, unfocused text
+  // field does it sit inside the input instead, like a placeholder. Driven by
+  // CSS, so it moves the moment the field is focused or filled. (Telling
+  // "empty" needs the input's blank placeholder; fields without one, such as
+  // selects and radios, keep their label above.)
   position: absolute;
-  top: 1.5lh;
-  left: 1ex;
+  top: 0;
+  left: 0;
   z-index: 5;
-  margin-left: var(--space);
-  padding-left: var(--space);
+  margin: 0;
+  padding: 0;
+  font-size: .8em;
   font-weight: bold;
   line-height: 1;
   color: var(--status-color, inherit);
-  opacity: .4;
-  transition: font-size 0.3s, top 0.3s, padding 0.3s, opacity 0.3s;
+  opacity: 1;
+  transition: font-size 0.3s, top 0.3s, left 0.3s, margin 0.3s, padding 0.3s, opacity 0.3s;
+}
 
+:host:has(.input:placeholder-shown):not(:focus-within) .label:not(.focus) {
+  // Lined up with the text the input would show: inside its border, after
+  // its padding, on the same line height.
+  top: calc(var(--label-top-space) + var(--input-pad-y) + 1px);
+  left: calc(var(--input-pad-x) + 1px);
+  max-width: calc(100% - 2 * var(--input-pad-x));
+  overflow: hidden;
+  font-size: 1em;
+  font-weight: normal;
+  line-height: var(--input-line-height);
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  // Faded, but still a readable label: keeps 4.5:1 contrast on white.
+  opacity: .75;
+  // Clicks go through to the input underneath.
+  pointer-events: none;
+}
 
-  &.focus {
-    top: 0;
-    left: 0;
-    padding: 0;
-    font-size: .8em;
-    opacity: 1;
+.input::placeholder {
+  opacity: 0;
+}
+
+:host:focus-within .input::placeholder {
+  opacity: .75;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .label {
+    transition: none;
   }
 }
 
@@ -119,6 +148,8 @@
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
+  padding: var(--input-pad-y) var(--input-pad-x);
+  line-height: var(--input-line-height);
   border: 1px solid var(--status-color);
   font-size: 1em;
   color: var(--status-color);

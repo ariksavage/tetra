@@ -23,24 +23,12 @@
   }
 
   ::ng-deep .input {
-    padding-top: var(--input-pad-y);
-    padding-bottom: var(--input-pad-y);
-    padding-left: var(--input-pad-x);
     font-family: inherit; // same face as the label, so baselines match
     font-size: 1rem;
     line-height: var(--input-line-height);
   }
-
-  // Label as placeholder: sit exactly where the input's text would be.
-  // top = field padding (1.2rem) + input border (1px) + input padding
-  ::ng-deep .label:not(.focus) {
-    top: calc(1.2rem + 1px + var(--input-pad-y));
-    left: calc(1px + var(--input-pad-x));
-    margin-left: 0;
-    padding-left: 0;
-    font-size: 1rem;
-    line-height: var(--input-line-height);
-  }
+  // The label's placement (inside the empty field, above once focused or
+  // filled) comes from the field component, using the padding set above.
 }
 
 .login-submit {

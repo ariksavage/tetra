@@ -3,6 +3,7 @@
 }
 <textarea #area
   [attr.id]="id()"
+  [attr.placeholder]="' '"
   class="input"
   [(ngModel)]="model"
   (change)="onChangeEvent($event)"

@@ -6,7 +6,7 @@
   [(ngModel)]="model"
   [style.width.ch]="model ? model.toString().length + 2 : 3"
   [attr.id]="id()"
-  [attr.placeholder]="placeholder"
+  [attr.placeholder]="placeholder || ' '"
   [attr.type]="type"
   (blur)="onBlurEvent($event)"
   (focus)="onFocusEvent($event)"

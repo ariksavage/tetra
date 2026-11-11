@@ -4,7 +4,7 @@
   class="input"
   [(ngModel)]="model"
   [attr.id]="id()"
-  [attr.placeholder]="placeholder"
+  [attr.placeholder]="placeholder || ' '"
   [attr.type]="type"
   (blur)="onBlur($event)"
   (focus)="onFocus($event)"
