@@ -192,19 +192,105 @@ trait Common {
     return $user;
   }
 
-  public function sendEmail(string $to, string $subject, string $message)
+  /**
+   * Send an HTML email (with a plain-text copy), wrapped in the app's layout.
+   *
+   * @param string $to      Recipient address, or several separated by commas.
+   * @param string $subject Subject line.
+   * @param string $message HTML body.
+   * @param array  $options Optional:
+   *   - cc:          address or list of addresses to copy
+   *   - reply_to:    where replies go (default: the From address)
+   *   - from:        sender address (default: the from_email setting)
+   *   - from_name:   sender name shown in mail clients
+   *   - attachments: list of ['filename' => ..., 'content' => raw bytes, 'type' => MIME type]
+   *   - plain:       TRUE to send the message as written, without the app's layout
+   *
+   * @return bool TRUE if the mail system accepted it.
+   */
+  public function sendEmail(string $to, string $subject, string $message, array $options = []): bool
   {
-    $boundary = uniqid("boundary_", TRUE);
+    // Header values can't carry line breaks, or they could add headers.
+    $clean = fn($value) => trim(preg_replace('/[\r\n]+/', ' ', strval($value)));
+    $list = fn($value) => implode(', ', array_filter(array_map($clean, is_array($value) ? $value : [$value])));
 
-    $from = $this->configValue('from_email');
-    if (!$from) {
-      $from = 'noreply@' .  $_SERVER['HTTP_HOST'];
+    $from = $clean($options['from'] ?? $this->configValue('from_email') ?: 'noreply@' . ($_SERVER['HTTP_HOST'] ?? 'localhost'));
+    $fromName = $clean($options['from_name'] ?? '');
+    $fromHeader = $fromName ? mb_encode_mimeheader($fromName, 'UTF-8') . " <{$from}>" : $from;
+    $replyTo = $list($options['reply_to'] ?? $from);
+    $cc = $list($options['cc'] ?? []);
+
+    $htmlBody = !empty($options['plain']) ? $this->plainEmailHtml($subject, $message) : $this->emailLayout($subject, $message);
+    // The plain-text copy: a line break per <br>, a blank line per paragraph.
+    $plainText = preg_replace('/<br\s*\/?>\s*/i', "\n", $message);
+    $plainText = preg_replace('/<\/p>\s*/i', "\n\n", $plainText);
+    $plainText = html_entity_decode(strip_tags($plainText), ENT_QUOTES, 'UTF-8');
+    $plainText = trim(preg_replace("/\n{3,}/", "\n\n", $plainText));
+
+    $headers = [
+      'MIME-Version: 1.0',
+      'From: ' . $fromHeader,
+      'Reply-To: ' . $replyTo,
+      'X-Mailer: PHP/' . phpversion(),
+    ];
+    if ($cc) {
+      $headers[] = 'Cc: ' . $cc;
     }
 
-    $host = isset($_GET['host']) ?? null;
+    // The text and HTML versions, as alternatives.
+    $alt = uniqid('alt_', TRUE);
+    $alternatives  = "--{$alt}\r\n";
+    $alternatives .= "Content-Type: text/plain; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n";
+    $alternatives .= chunk_split(base64_encode($plainText)) . "\r\n";
+    $alternatives .= "--{$alt}\r\n";
+    $alternatives .= "Content-Type: text/html; charset=UTF-8\r\nContent-Transfer-Encoding: base64\r\n\r\n";
+    $alternatives .= chunk_split(base64_encode($htmlBody)) . "\r\n";
+    $alternatives .= "--{$alt}--\r\n";
+
+    $attachments = $options['attachments'] ?? [];
+    if (!$attachments) {
+      $headers[] = "Content-Type: multipart/alternative; boundary=\"{$alt}\"";
+      $body = $alternatives;
+    } else {
+      // Attachments: the message and each file as parts of a mixed message.
+      $mixed = uniqid('mixed_', TRUE);
+      $headers[] = "Content-Type: multipart/mixed; boundary=\"{$mixed}\"";
+      $body  = "--{$mixed}\r\n";
+      $body .= "Content-Type: multipart/alternative; boundary=\"{$alt}\"\r\n\r\n";
+      $body .= $alternatives;
+      foreach ($attachments as $file) {
+        $name = str_replace('"', '', $clean($file['filename'] ?? 'attachment'));
+        $type = $clean($file['type'] ?? 'application/octet-stream');
+        $body .= "--{$mixed}\r\n";
+        $body .= "Content-Type: {$type}; name=\"{$name}\"\r\n";
+        $body .= "Content-Transfer-Encoding: base64\r\n";
+        $body .= "Content-Disposition: attachment; filename=\"{$name}\"\r\n\r\n";
+        $body .= chunk_split(base64_encode($file['content'] ?? '')) . "\r\n";
+      }
+      $body .= "--{$mixed}--";
+    }
+
+    return mail($list($to), mb_encode_mimeheader($clean($subject), 'UTF-8'), $body, implode("\r\n", $headers));
+  }
+
+  /**
+   * The message as its own HTML document, with no layout around it.
+   */
+  protected function plainEmailHtml(string $subject, string $message): string
+  {
+    return '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' . htmlspecialchars($subject) . '</title></head>'
+      . '<body style="font-family: Arial, sans-serif; line-height: 1.5;">' . trim($message) . '</body></html>';
+  }
+
+  /**
+   * The app's email layout: its logo and name above the message.
+   */
+  protected function emailLayout(string $subject, string $message): string
+  {
+    $host = $_GET['host'] ?? null;
     if (!$host) {
       $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-      $host = $protocol . "://" . $_SERVER['HTTP_HOST'];
+      $host = $protocol . "://" . ($_SERVER['HTTP_HOST'] ?? 'localhost');
       if (stristr($host, 'localhost')){
         $host = 'http://localhost:4200';
       }
@@ -217,7 +303,7 @@ trait Common {
     $htmlMessage[] = '<html>';
     $htmlMessage[] = '<head>';
     $htmlMessage[] = '<meta charset="UTF-8">';
-    $htmlMessage[] = '<title>' . $subject . '</title>';
+    $htmlMessage[] = '<title>' . htmlspecialchars($subject) . '</title>';
     $htmlMessage[] = '</head>';
     $htmlMessage[] = '<body style="margin:0; padding:0; background-color:' . $bodyColor . ';">';
     $htmlMessage[] = '<table width="100%" bgcolor="' . $bodyColor . '" cellpadding="0" cellspacing="0">';
@@ -252,33 +338,7 @@ trait Common {
     $htmlMessage[] = '</table>';
     $htmlMessage[] = '</body>';
     $htmlMessage[] = '</html>';
-    $htmlBody = implode("\r\n", $htmlMessage);
-    $plainText = strip_tags($htmlBody);
-    // Always set content-type when sending HTML email
-    $headers  = "MIME-Version: 1.0" . "\r\n";
-
-    // Additional headers
-    $headers .= 'From: ' . $from . "\r\n";
-    $headers .= 'Reply-To: ' . $from . "\r\n";
-    $headers .= 'X-Mailer: PHP/' . phpversion() . "\r\n";
-    $headers .= "Content-Type: multipart/alternative; boundary=\"$boundary\"\r\n";
-
-    // Multipart body
-    $body  = "--$boundary\r\n";
-    $body .= "Content-Type: text/plain; charset=UTF-8\r\n\r\n";
-    $body .= $plainText . "\r\n";
-    $body .= "--$boundary\r\n";
-    $body .= "Content-Type: text/html; charset=UTF-8\r\n\r\n";
-    $body .= $htmlBody . "\r\n";
-    $body .= "--$boundary--";
-
-    if (mail($to, $subject, $body, $headers)) {
-      // echo "HTML email sent successfully.";
-      return TRUE;
-    } else {
-      // echo "Failed to send HTML email.";
-      return FALSE;
-    }
+    return implode("\r\n", $htmlMessage);
   }
 
   /**
