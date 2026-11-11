@@ -10,11 +10,11 @@
   </label>
 <nav class="pagination-nav" *ngIf="pagination">
   <ul>
-    <li><button (click)="setPage(pagination.first_page)" [disabled]="pagination.first_page == pagination.current_page || loading()" [title]="'Page ' + pagination.first_page"><i class="fas fa-angles-left"></i></button></li>
-    <li><button (click)="setPage(pagination.prev_page)" [disabled]="!pagination.prev_page || loading()" [title]="'Page ' + pagination.prev_page"><i class="fas fa-angle-left"></i></button></li>
+    <li><button (click)="setPage(pagination.first_page)" [disabled]="pagination.first_page == pagination.current_page || loading()" [title]="'Page ' + pagination.first_page"><i class="fa-solid fa-angles-left"></i></button></li>
+    <li><button (click)="setPage(pagination.prev_page)" [disabled]="!pagination.prev_page || loading()" [title]="'Page ' + pagination.prev_page"><i class="fa-solid fa-angle-left"></i></button></li>
     <li><span>page {{pagination.current_page}} of {{pagination.last_page}}</span></li>
-    <li><button (click)="setPage(pagination.next_page)" [disabled]="!pagination.next_page || loading()" [title]="'Page ' + pagination.next_page"><i class="fas fa-angle-right"></i></button></li>
-    <li><button (click)="setPage(pagination.last_page)" [disabled]="pagination.last_page == pagination.current_page || loading()" [title]="'Page ' + pagination.last_page"><i class="fas fa-angles-right"></i></button></li>
+    <li><button (click)="setPage(pagination.next_page)" [disabled]="!pagination.next_page || loading()" [title]="'Page ' + pagination.next_page"><i class="fa-solid fa-angle-right"></i></button></li>
+    <li><button (click)="setPage(pagination.last_page)" [disabled]="pagination.last_page == pagination.current_page || loading()" [title]="'Page ' + pagination.last_page"><i class="fa-solid fa-angles-right"></i></button></li>
   </ul>
 </nav>
 </div>

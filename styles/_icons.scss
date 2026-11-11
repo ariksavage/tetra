@@ -1,0 +1,11 @@
+// Font Awesome Free: the core with the solid and regular styles, the icons
+// Tetra's components use (fa-solid fa-xmark, fa-regular fa-user, ...).
+//
+// The app installs it: npm install @fortawesome/fontawesome-free
+// and loads it once, in its global stylesheet:
+//   @use '../tetra/styles/icons';
+// The build finds the font files relative to Font Awesome's own Sass and
+// bundles the two it needs.
+@use '@fortawesome/fontawesome-free/scss/fontawesome';
+@use '@fortawesome/fontawesome-free/scss/solid';
+@use '@fortawesome/fontawesome-free/scss/regular';

@@ -31,7 +31,7 @@ export class IconComponent {
         cl = 'fa-calendar-days';
         break;
       case 'delete':
-        cl = 'fa-times';
+        cl = 'fa-xmark';
         break;
       case 'edit':
         cl = 'fa-pencil';

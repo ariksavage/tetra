@@ -16,7 +16,7 @@ const mockItem = {
   id: 1,
   title: 'Test Item',
   path: '/test',
-  icon: 'fa-home',
+  icon: 'fa-house',
   weight: 1,
   parent: 0,
   children: []
