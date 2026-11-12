@@ -8,6 +8,11 @@
 //   @use 'tetra/styles/theme';   // in the app's styles.scss
 //   :root { --primary: #eac11c; --primary-text: #282828; }
 //
+// The site menu (components/site-menu) collapses to a menu button below
+// this width. Set it with `@use 'tetra/styles/theme' with ($site-menu-breakpoint: 60rem);`
+// or with --site-menu-breakpoint on :root.
+$site-menu-breakpoint: 800px !default;
+
 // Text and background pairs (--primary / --primary-text and so on) are
 // chosen to pass WCAG AA contrast; keep that true when overriding them.
 
@@ -94,4 +99,14 @@
   // Tables
   --table-rule: 1px solid var(--border);
   --table-head-background: transparent;
+
+  // The site menu (components/site-menu): below the breakpoint, its list
+  // slides in full screen from a menu button.
+  --site-menu-breakpoint: #{$site-menu-breakpoint};
+  --site-menu-background: var(--body);
+  --site-menu-text: var(--default-text);
+  --site-menu-font-size: 1.5em;
+  --site-menu-align: center;
+  --site-menu-padding-x: 1.5rem;
+  --site-menu-speed: .3s;
 }

@@ -1,0 +1,85 @@
+// See site-menu.component.ts for the theme variables.
+
+:host {
+  display: block;
+}
+
+// Wide screens: only the list, styled by the site.
+.site-menu-toggle {
+  display: none;
+}
+
+:host(.collapsed) {
+  .site-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    // Above the open menu, so the X is always there to close it.
+    position: relative;
+    z-index: 101;
+    width: 2.5em;
+    height: 2.5em;
+    padding: 0;
+    font-size: 1em;
+    line-height: 1;
+  }
+
+  // Full screen, off to the left until opened.
+  .site-menu-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--site-menu-top, 4rem);
+    background: var(--site-menu-background, var(--body, #fff));
+    color: var(--site-menu-text, var(--default-text, inherit));
+    transform: translateX(-100%);
+    visibility: hidden;
+  }
+
+  // Only the list scrolls, below the X, when there are more links than fit.
+  .site-menu-scroll {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: .5lh var(--site-menu-padding-x, 1.5rem) 2lh;
+  }
+
+  // The site's list, one link to a line.
+  .site-menu-scroll ::ng-deep ul {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    // centre by default; start or end lines them up at a side.
+    align-items: var(--site-menu-align, center);
+    text-align: var(--site-menu-align, center);
+    gap: .5lh;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--site-menu-font-size, 1.5em);
+  }
+}
+
+:host(.collapsed.open) .site-menu-panel {
+  transform: none;
+  visibility: visible;
+}
+
+// Sliding in and out, only when opened or closed (see animate in the .ts).
+// Closing, it stays visible until it has slid away.
+:host(.collapsed.animate) .site-menu-panel {
+  transition: transform var(--site-menu-speed, .3s) ease, visibility 0s linear var(--site-menu-speed, .3s);
+}
+
+:host(.collapsed.animate.open) .site-menu-panel {
+  transition: transform var(--site-menu-speed, .3s) ease, visibility 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host(.collapsed.animate) .site-menu-panel,
+  :host(.collapsed.animate.open) .site-menu-panel {
+    transition: none;
+  }
+}

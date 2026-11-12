@@ -1,0 +1,15 @@
+<button
+  type="button"
+  class="site-menu-toggle icon"
+  [attr.aria-expanded]="open"
+  [attr.aria-controls]="panelId"
+  [attr.aria-label]="open ? 'Close menu' : 'Menu'"
+  [title]="open ? 'Close menu' : 'Menu'"
+  (click)="toggle()">
+  <i class="fa-solid" [ngClass]="open ? 'fa-xmark' : 'fa-bars'" aria-hidden="true"></i>
+</button>
+<div class="site-menu-panel" [id]="panelId" (click)="onPanelClick($event)">
+  <div class="site-menu-scroll">
+    <ng-content></ng-content>
+  </div>
+</div>
