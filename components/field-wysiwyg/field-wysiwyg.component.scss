@@ -79,7 +79,7 @@ button {
 
     // Hover state
     div:hover .tox-tinymce {
-      border-color: #ccc;
+      border-color: var(--border, #ccc);
 
       .tox-editor-header {
         opacity: 1;
@@ -88,13 +88,13 @@ button {
 
       .tox-edit-area,
       .tox-edit-area__iframe {
-        background: #fff !important;
+        background: var(--input-background, #fff) !important;
       }
     }
 
     // Focus state via class
     div.is-focused .tox-tinymce {
-      border-color: #ccc;
+      border-color: var(--border, #ccc);
 
       .tox-editor-header {
         opacity: 1;
@@ -103,8 +103,38 @@ button {
 
       .tox-edit-area,
       .tox-edit-area__iframe {
-        background: #fff !important;
+        background: var(--input-background, #fff) !important;
       }
+    }
+  }
+
+  // With its label outside the field (or none), no room is kept above it for one.
+  &.no-label {
+    padding-top: 0;
+  }
+
+  // Boxed: always looks like the theme's inputs, toolbar showing.
+  &.boxed ::ng-deep {
+    .tox-tinymce,
+    div:hover .tox-tinymce,
+    div.is-focused .tox-tinymce {
+      border: var(--input-border, 1px solid #ccc);
+      border-radius: var(--input-radius, 3px);
+
+      .tox-editor-header {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .tox-edit-area,
+      .tox-edit-area__iframe {
+        background: var(--input-background, #fff) !important;
+      }
+    }
+
+    div.is-focused .tox-tinymce {
+      outline: var(--focus-ring, 2px solid currentColor);
+      outline-offset: 1px;
     }
   }
 }

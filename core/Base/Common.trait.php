@@ -221,11 +221,8 @@ trait Common {
     $cc = $list($options['cc'] ?? []);
 
     $htmlBody = !empty($options['plain']) ? $this->plainEmailHtml($subject, $message) : $this->emailLayout($subject, $message);
-    // The plain-text copy: a line break per <br>, a blank line per paragraph.
-    $plainText = preg_replace('/<br\s*\/?>\s*/i', "\n", $message);
-    $plainText = preg_replace('/<\/p>\s*/i', "\n\n", $plainText);
-    $plainText = html_entity_decode(strip_tags($plainText), ENT_QUOTES, 'UTF-8');
-    $plainText = trim(preg_replace("/\n{3,}/", "\n\n", $plainText));
+    // The plain-text copy: a line per <br> and list item, a blank line per paragraph.
+    $plainText = \Core\Base\Helpers\Html::toText($message);
 
     $headers = [
       'MIME-Version: 1.0',
