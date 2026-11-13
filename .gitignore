@@ -22,3 +22,6 @@ yarn-error.log*
 
 *.sublime-project
 *.sublime-workspace
+
+# An app's images, linked or mounted into the web root (see .htaccess)
+/core/images
