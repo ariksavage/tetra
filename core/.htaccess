@@ -9,6 +9,13 @@ RewriteEngine On
   Require all granted
 </Files>
 
+# Nor any file whose name starts with a dot (eg. .user.ini, an app's PHP
+# settings). Apache's own default only covers .ht* files. Folders such as
+# /.well-known/ (certificate checks) aren't affected.
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+
 # Do not rewrite anything under /images
 RewriteRule ^images/ - [L]
 
