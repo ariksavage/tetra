@@ -10,11 +10,11 @@
   </label>
 <nav class="pagination-nav" *ngIf="pagination">
   <ul>
-    <li><button class="icon" (click)="setPage(pagination.first_page)" [disabled]="pagination.first_page == pagination.current_page || loading()" [title]="'Page ' + pagination.first_page" [attr.aria-label]="\'Page \' + pagination.PLACEHOLDER"><i class="fa-solid fa-angles-left" aria-hidden="true"></i></button></li>
-    <li><button class="icon" (click)="setPage(pagination.prev_page)" [disabled]="!pagination.prev_page || loading()" [title]="'Page ' + pagination.prev_page" [attr.aria-label]="\'Page \' + pagination.PLACEHOLDER"><i class="fa-solid fa-angle-left" aria-hidden="true"></i></button></li>
+    <li><button class="icon" (click)="setPage(pagination.first_page)" [disabled]="pagination.first_page == pagination.current_page || loading()" [title]="'Page ' + pagination.first_page" [attr.aria-label]="'First page (page ' + pagination.first_page + ')'"><i class="fa-solid fa-angles-left" aria-hidden="true"></i></button></li>
+    <li><button class="icon" (click)="setPage(pagination.prev_page)" [disabled]="!pagination.prev_page || loading()" [title]="'Page ' + pagination.prev_page" [attr.aria-label]="'Previous page (page ' + pagination.prev_page + ')'"><i class="fa-solid fa-angle-left" aria-hidden="true"></i></button></li>
     <li><span>page {{pagination.current_page}} of {{pagination.last_page}}</span></li>
-    <li><button class="icon" (click)="setPage(pagination.next_page)" [disabled]="!pagination.next_page || loading()" [title]="'Page ' + pagination.next_page" [attr.aria-label]="\'Page \' + pagination.PLACEHOLDER"><i class="fa-solid fa-angle-right" aria-hidden="true"></i></button></li>
-    <li><button class="icon" (click)="setPage(pagination.last_page)" [disabled]="pagination.last_page == pagination.current_page || loading()" [title]="'Page ' + pagination.last_page" [attr.aria-label]="\'Page \' + pagination.PLACEHOLDER"><i class="fa-solid fa-angles-right" aria-hidden="true"></i></button></li>
+    <li><button class="icon" (click)="setPage(pagination.next_page)" [disabled]="!pagination.next_page || loading()" [title]="'Page ' + pagination.next_page" [attr.aria-label]="'Next page (page ' + pagination.next_page + ')'"><i class="fa-solid fa-angle-right" aria-hidden="true"></i></button></li>
+    <li><button class="icon" (click)="setPage(pagination.last_page)" [disabled]="pagination.last_page == pagination.current_page || loading()" [title]="'Page ' + pagination.last_page" [attr.aria-label]="'Last page (page ' + pagination.last_page + ')'"><i class="fa-solid fa-angles-right" aria-hidden="true"></i></button></li>
   </ul>
 </nav>
 </div>
