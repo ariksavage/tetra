@@ -1,5 +1,10 @@
 RewriteEngine On
 
+# Pages come from index.php (the page renderer), which fills in the built
+# index.html's head for each URL, so crawlers that don't run JavaScript get
+# each page's title and metadata.
+DirectoryIndex index.php
+
 # The only PHP reached over the web is index.php (the API). Everything else,
 # such as cli/maintenance.php or a class file, is for PHP itself to include.
 <FilesMatch "\.php$">
@@ -19,6 +24,9 @@ RewriteEngine On
 # Do not rewrite anything under /images
 RewriteRule ^images/ - [L]
 
+# The bare shell is never served directly: a request for it is a page too.
+RewriteRule ^index\.html$ index.php [L]
+
 # Serve existing files or directories as-is
 RewriteCond %{REQUEST_FILENAME} -f [OR]
 RewriteCond %{REQUEST_FILENAME} -d
@@ -30,8 +38,8 @@ RewriteRule ^(core/)?index\.php$ - [END]
 # API routing: requires /core prefix, 1-4 segments
 RewriteRule ^core/([^/]+)(?:/([^/]+))?(?:/([^/]+))?(?:/([^/]+))?/?$ index.php?apitype=$1&action=$2&id=$3&id2=$4 [QSA,L,NC]
 
-# SPA fallback for anything else
-RewriteRule ^ index.html [L]
+# Anything else is a page: the page renderer (index.php, no apitype)
+RewriteRule ^ index.php [L]
 
 # --- Performance ---
 

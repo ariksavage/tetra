@@ -4,6 +4,13 @@
 namespace Core;
 require_once(__dir__ . '/bootstrap.php');
 
+// Not an API request (no /core/{type}/... in the URL): a page. The renderer
+// sends the app's index.html with the page's head filled in.
+if (!isset($_GET['apitype'])) {
+  $path = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+  (new \Core\Pages\Helpers\PageRenderer())->respond($path);
+}
+
 $core = new \Core\App\API\App();
 
 // Globals
