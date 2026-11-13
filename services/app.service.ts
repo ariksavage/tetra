@@ -204,9 +204,8 @@ export class AppService {
   }
 
   setConfig(config: any) {
-    if (config && config.name && this.isLocal()) {
-      config = { ...config, name: config.name + ' (DDEV)' };
-    }
+    // A local copy's own name (eg. "Thyme (DDEV)") is that site's setting on
+    // the Configuration page, overriding the app's tetra.json.
     this._config = config;
     this.config.next(this._config);
   }

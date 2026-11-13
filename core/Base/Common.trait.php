@@ -124,7 +124,10 @@ trait Common {
       ->and('key', '=', $key)
       ->execute(TRUE);
     if (!$config) {
-      return NULL;
+      // No value for this site: a setting the app's tetra.json (or Tetra's
+      // default) can supply. See Config/TetraConfig.helper.php.
+      $setting = \Core\Config\Helpers\TetraConfig::siteSetting($type, $key);
+      return $setting ? \Core\Config\Helpers\TetraConfig::get($setting->path) : NULL;
     }
     switch ($config->value_type) {
       case 'int':

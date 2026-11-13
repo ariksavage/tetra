@@ -734,63 +734,17 @@ public function testGET(){
 
   /**
    * Create base configuration
-   * @return [type] [description]
+   *
+   * Nothing to create since 2026-11-13: the application settings (name,
+   * copyright, session lengths) come from the app's tetra.json and Tetra's
+   * defaults (tetra.schema.json). A config row would mean "this site
+   * overrides it", which a fresh install doesn't. Kept so the install steps
+   * still complete.
    */
   public function defaultConfigPUT(): void
   {
     $this->testInstallKey();
-    $configs = [
-      [
-        'label' => 'After Copyright Text',
-        'description' => "Text to follow the footer’s ©{year}",
-        'type' => 'application',
-        'key' => 'copyright_after',
-        'value' => 'Author Name',
-        'value_type' => 'text',
-      ],
-      [
-        'label' => 'Before Copyright Text',
-        'description' => "Text to go before the footer’s ©{year}",
-        'type' => 'application',
-        'key' => 'copyright_before',
-        'value' => '',
-        'value_type' => 'text',
-      ],
-      [
-        'label' => 'Application Name',
-        'description' => "Name used in page title, logo, etc",
-        'type' => 'application',
-        'key' => 'name',
-        'value' => 'App',
-        'value_type' => 'text',
-      ],
-      [
-        'label' => 'Password Reset Expires (days)',
-        'description' => "The number of days that a password reset link will remain valid. After this number of days, the link will no longer work.",
-        'type' => 'application',
-        'key' => 'password_reset_expires_days',
-        'value' => 10,
-        'value_type' => 'number',
-      ],
-      [
-        'label' => 'Session Expires (days)',
-        'description' => "The number of days before a user session is automatically closed. Any activity within a session will restart this clock. If the time expires, the user will have to log in again.",
-        'type' => 'application',
-        'key' => 'session_expires_days',
-        'value' => 1,
-        'value_type' => 'number',
-      ],
-    ];
-    foreach($configs as $config){
-      if ($this->tableExists('config')){
-        $config = $this->select()->from('config')->where('key', '=', 'session_expires_days')->execute(TRUE);
-        $exists = !!$config;
-        if (!$exists){
-          $this->insert($config, 'config')->execute();
-        }
-        $this->successMsg("Configuration created.");
-      }
-    }
+    $this->successMsg("Configuration comes from tetra.json; nothing to create.");
   }
 
   public function configGET(): void

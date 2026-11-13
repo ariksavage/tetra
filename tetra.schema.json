@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ariksavage/tetra/tetra.schema.json",
+  "title": "Tetra Config (tetra.json)",
+  "description": "Decisions an app makes about how Tetra behaves, committed with the app's code. Not for keys or secrets: every value here ends up in the JavaScript sent to browsers. An app lists only what differs from these defaults. Settings marked x-tetra-site can also be overridden for one site on the Configuration page, which then wins.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Path to this schema, for editors."
+    },
+    "app": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "default": "Tetra",
+          "description": "The app's name: page titles, the logo text and emails.",
+          "x-tetra-site": "application.name",
+          "x-tetra-label": "Application name"
+        },
+        "copyright": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "before": {
+              "type": "string",
+              "default": "",
+              "description": "Text before the copyright year in the footer.",
+              "x-tetra-site": "application.copyright_before",
+              "x-tetra-label": "Copyright (before)"
+            },
+            "after": {
+              "type": "string",
+              "default": "",
+              "description": "Text after the copyright year in the footer.",
+              "x-tetra-site": "application.copyright_after",
+              "x-tetra-label": "Copyright (after)"
+            }
+          }
+        }
+      }
+    },
+    "sessions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "expiresDays": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 1,
+          "description": "Days before a login session ends. Any activity restarts the clock.",
+          "x-tetra-site": "application.session_expires_days",
+          "x-tetra-label": "Session expires (days)"
+        },
+        "passwordResetExpiresDays": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 10,
+          "description": "Days a password reset link keeps working.",
+          "x-tetra-site": "application.password_reset_expires_days",
+          "x-tetra-label": "Password reset expires (days)"
+        }
+      }
+    },
+    "siteMenu": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "collapse": {
+          "enum": ["auto", "always", "never"],
+          "default": "auto",
+          "description": "When the main menu (nav.site-menu) hides behind its menu button. auto: below the CSS breakpoint (--site-menu-breakpoint, 800px by default). always: on every screen, for a header that already holds a lot. never: always show the links."
+        }
+      }
+    },
+    "header": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "longTitle": {
+          "enum": ["wrap", "truncate"],
+          "default": "wrap",
+          "description": "What gives way when the site header's title and its menu and icons don't fit on one row. wrap: the menu and icons drop below the title, together. truncate: the header stays one row and the title is cut short with an ellipsis."
+        }
+      }
+    }
+  }
+}

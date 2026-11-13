@@ -1,8 +1,9 @@
-import { Component, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef, ElementRef, HostBinding, HostListener, OnInit, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, ChangeDetectorRef, DestroyRef, ElementRef, HostBinding, HostListener, Input, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationStart, Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { filter } from 'rxjs/operators';
+import { TETRA_CONFIG } from '@tetra/classes/tetra-config';
 
 let nextId = 0;
 
@@ -20,6 +21,12 @@ let nextId = 0;
  *
  * Where the menu button sits in the header is up to the site: the nav has
  * the class "collapsed" while it's showing (eg. `.main-nav.collapsed { order: 1 }`).
+ *
+ * When it collapses is the app's decision, in tetra.json:
+ *   "siteMenu": { "collapse": "auto" | "always" | "never" }
+ * auto (the default) collapses below the breakpoint; always, on every screen
+ * (for a header that already holds a lot); never keeps the links showing.
+ * One menu can differ from the app's setting: <nav class="site-menu" collapse="always">.
  *
  * Wide screens show the list as the site styles it. Below the breakpoint the
  * list is hidden behind a menu button; opening it slides the list in from
@@ -63,14 +70,20 @@ export class SiteMenuComponent implements OnInit {
    */
   @HostBinding('class.animate') animate = false;
 
+  private config = inject(TETRA_CONFIG);
+
+  /** This menu's own setting, instead of the app's siteMenu.collapse. */
+  @Input() collapse?: 'auto' | 'always' | 'never';
+
   private media?: MediaQueryList;
 
   ngOnInit() {
+    const mode = this.collapse ?? this.config.siteMenu.collapse;
     const breakpoint = getComputedStyle(this.host.nativeElement).getPropertyValue('--site-menu-breakpoint').trim() || '800px';
     this.media = window.matchMedia(`(width < ${breakpoint})`);
     const update = () => {
       this.animate = false;
-      this.collapsed = !!this.media?.matches;
+      this.collapsed = mode === 'always' || (mode === 'auto' && !!this.media?.matches);
       if (!this.collapsed) {
         this.close(false);
       }

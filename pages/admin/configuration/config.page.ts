@@ -1,4 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { LowerCasePipe } from '@angular/common';
 
 import { Page } from '@tetra/pages/page/page.component';
 import { Config } from '@tetra/classes/config';
@@ -20,6 +22,32 @@ export const FIELD_FOR_TYPE: { [valueType: string]: string } = {
   object: 'json'
 };
 
+/**
+ * A Tetra setting a site may override (tetra.schema.json, x-tetra-site): the
+ * value in use, where it came from, and the app's value (tetra.json, or
+ * Tetra's default) that "Use app default" goes back to.
+ */
+export interface TetraSetting {
+  path: string;
+  label: string;
+  description: string;
+  value_type: 'text' | 'number' | 'boolean';
+  options: string[] | null;
+  minimum: number | null;
+  value: any;
+  source: 'site' | 'tetra.json' | 'tetra';
+  app_value: any;
+  app_source: 'tetra.json' | 'tetra';
+  /** The value being edited. */
+  draft?: any;
+}
+
+export const SOURCE_LABELS: { [source: string]: string } = {
+  site: 'Set on this site',
+  'tetra.json': "From the app's tetra.json",
+  tetra: "Tetra's default",
+};
+
 export interface ConfigGroup {
   type: string;
   items: Config[];
@@ -27,7 +55,7 @@ export interface ConfigGroup {
 
 @Component({
     selector: 'config-page',
-    imports: [AppLayoutComponent, FieldTextComponent, FieldTextAreaComponent, FieldNumberComponent, FieldCheckboxComponent],
+    imports: [AppLayoutComponent, FormsModule, LowerCasePipe, FieldTextComponent, FieldTextAreaComponent, FieldNumberComponent, FieldCheckboxComponent],
     templateUrl: './config.page.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrl: './config.page.scss'
@@ -36,6 +64,9 @@ export class ConfigPageComponent extends Page {
   public override title = 'Configuration';
   config: Config[] = [];
   groups: ConfigGroup[] = [];
+  /** Tetra's settings this site may override. */
+  settings: TetraSetting[] = [];
+  readonly sourceLabels = SOURCE_LABELS;
   saving: boolean = false;
 
   override onLoad() {
@@ -48,7 +79,58 @@ export class ConfigPageComponent extends Page {
       if (data && data.config) {
         this.setConfig(data.config);
       }
+      if (data && data.settings) {
+        this.setSettings(data.settings);
+      }
     });
+  }
+
+  setSettings(settings: TetraSetting[]) {
+    this.settings = settings.map(setting => ({ ...setting, draft: setting.value }));
+  }
+
+  /** The setting's value is being changed from the one in use. */
+  settingChanged(setting: TetraSetting): boolean {
+    return String(setting.draft ?? '') !== String(setting.value ?? '');
+  }
+
+  settingValid(setting: TetraSetting): boolean {
+    if (setting.value_type === 'number') {
+      const n = Number(setting.draft);
+      return setting.draft !== '' && setting.draft !== null && Number.isInteger(n) && (setting.minimum === null || n >= setting.minimum);
+    }
+    return !setting.options || setting.options.includes(setting.draft);
+  }
+
+  /** Save this site's own value for a setting. */
+  saveSetting(setting: TetraSetting) {
+    if (!this.settingChanged(setting) || !this.settingValid(setting) || this.saving) {
+      return;
+    }
+    this.saving = true;
+    const value = setting.value_type === 'number' ? Number(setting.draft) : setting.draft;
+    return this.core.post('config', 'setting', { path: setting.path, value }).then((data: any) => {
+      this.saving = false;
+      if (data && data.settings) {
+        this.setSettings(data.settings);
+        this.app.fetchAppConfig();
+      }
+    }, () => { this.saving = false; });
+  }
+
+  /** Drop this site's value, back to the app's (tetra.json or Tetra's default). */
+  useAppDefault(setting: TetraSetting) {
+    if (this.saving) {
+      return;
+    }
+    this.saving = true;
+    return this.core.delete('config', 'setting', setting.path).then((data: any) => {
+      this.saving = false;
+      if (data && data.settings) {
+        this.setSettings(data.settings);
+        this.app.fetchAppConfig();
+      }
+    }, () => { this.saving = false; });
   }
 
   /**

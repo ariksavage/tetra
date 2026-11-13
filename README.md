@@ -25,6 +25,8 @@ moved over.
 | `app/`, `classes/`, `components/`, `guards/`, `pages/`, `services/`, `testing/` | The Angular half, imported as `@tetra/...`. |
 | `styles/_theme.scss` | Default values for every CSS variable Tetra's components read. |
 | `styles/_base.scss` | Base styles for forms, inputs, buttons, tables and panels, built on the theme. |
+| `tetra.schema.json` | Every Tetra Config setting (`tetra.json`), with its default. |
+| `scripts/check-tetra-json.mjs` | Checks an app's `tetra.json` against the schema. |
 
 ## Using Tetra in an app
 
@@ -79,6 +81,69 @@ moved over.
    `visibleMenuItems(items, user)` filters any list by permission, for the app's own navigation.
    The admin role always keeps full control of users, roles and permissions, and no one can
    deactivate, delete or remove their own access to manage users, so the site can't be locked.
+
+## Tetra Config (`tetra.json`)
+
+An app's **decisions** about how Tetra behaves, in `tetra.json` in the app's root, next to
+`angular.json`. Committed with the app's code. Not for keys or secrets: every value ends up in
+the JavaScript sent to browsers.
+
+```json
+{
+  "$schema": "./tetra/tetra.schema.json",
+  "app": { "name": "Thyme", "copyright": { "after": "Arik Savage" } },
+  "sessions": { "expiresDays": 100 },
+  "siteMenu": { "collapse": "always" },
+  "header": { "longTitle": "truncate" }
+}
+```
+
+An app lists only what differs from Tetra's defaults; with no `tetra.json` it gets them all.
+`tetra.schema.json` lists every setting, its allowed values, default and purpose, and editors
+use the `$schema` line for autocomplete and errors. Unknown settings are errors, which keeps
+stray values (secrets included) out.
+
+**Where a setting belongs:**
+
+| Kind of setting | Where |
+| --- | --- |
+| A decision about how the app behaves, changed by a commit | `tetra.json` |
+| A site's own value, changed by an admin without a deploy | The Configuration page (the `config` table) |
+| A secret | `config/` above the web root, never committed |
+| A colour, font, size or breakpoint | CSS variables (see `styles/_theme.scss`) |
+
+**Layers.** For each setting, the first of these with a value wins: this site's value on the
+Configuration page, then the app's `tetra.json`, then Tetra's default. Only settings the schema
+marks `x-tetra-site` (the name, copyright text, session lengths) can have a site value: the
+server reads them while running and sends them to the page already merged. Layout settings
+(`siteMenu`, `header`) are built into the app and act before the page renders, so they're
+`tetra.json` only. Example: Tetra's name is "Tetra", Thyme's `tetra.json` says "Thyme", and the
+local DDEV copy sets "Thyme (DDEV)" on its Configuration page.
+
+**Using it:**
+
+1. `"resolveJsonModule": true` in `tsconfig.json`, then in the app config:
+
+   ```ts
+   import { provideTetraConfig } from '@tetra/classes/tetra-config';
+   import tetraJson from '../../tetra.json';
+
+   providers: [provideTetraConfig(tetraJson), ...]
+   ```
+
+   Angular code reads it with `inject(TETRA_CONFIG)`. A site's own values (the name...) come
+   from `AppService.getConfig()` instead, already merged. A mistake in `tetra.json` is logged
+   in the browser and that setting keeps its default.
+2. PHP reads it with `\Core\Config\Helpers\TetraConfig::get('sessions.expiresDays')`, from
+   `tetra.json` in the app's root and `tetra.schema.json` beside Tetra's `core/`.
+   `configValue()` checks the site's value first and falls back to these, so existing callers
+   get the layers without changes.
+3. The deploy copies `tetra.json` into the app's root and `tetra/tetra.schema.json` beside
+   `tetra/core`, and runs `node tetra/scripts/check-tetra-json.mjs` first, so a mistake stops
+   the deploy before anything is copied.
+4. The site header: import `SiteHeaderDirective` (`@tetra/components/site-header/site-header.directive`)
+   where the app's `<header class="site-header">` is, so `header.longTitle` applies. The site
+   menu reads `siteMenu.collapse` itself; one menu can differ with `<nav class="site-menu" collapse="always">`.
 
 ## The app's own API
 

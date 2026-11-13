@@ -1,0 +1,60 @@
+<?php
+/**
+ * Migration: Clear config rows that match tetra.json
+ *
+ * Tetra's application settings (name, copyright, session and password reset
+ * lengths) now come from the app's tetra.json and Tetra's defaults, and a
+ * config row means "this site overrides it". Rows written before that, by
+ * the installer or the old seed migration, would otherwise pin each setting
+ * forever. This deletes the rows whose value is what the site would get
+ * anyway; rows that really differ (eg. "Thyme (DDEV)" on a local copy) stay
+ * as that site's own values.
+ *
+ * Deploy the app's tetra.json with it: without one, a row is only cleared
+ * when it matches Tetra's default.
+ *
+ * PHP version 8.4
+ *
+ * @category   Migration
+ * @package    Tetra
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @since      2026-11-13
+ */
+
+namespace Core\Migrations;
+
+use Core\Config\Helpers\TetraConfig;
+
+class ClearConfigMatchingTetraJson extends \Core\Migrations\Models\Migration
+{
+  public string $name = 'Clear config rows that match tetra.json';
+
+  /** Once only: it's logged when done. */
+  protected function isComplete(): bool
+  {
+    if (!$this->tableExists('config') || !$this->tableExists('migrations')) {
+      return TRUE;
+    }
+    $result = $this->raw("SELECT 1 FROM `migrations` WHERE `label` = '" . addslashes($this->name) . "' LIMIT 1")->execute();
+    return $result && $result->num_rows > 0;
+  }
+
+  protected function execute(): bool
+  {
+    foreach (TetraConfig::siteSettings() as $setting) {
+      $row = $this->select()->from('config')->where('type', '=', $setting->type)->and('key', '=', $setting->key)->execute(TRUE);
+      if (!$row) {
+        continue;
+      }
+      $appValue = TetraConfig::get($setting->path);
+      // Rows are stored as text; an empty string and NULL are the same here.
+      if (strval($row->value ?? '') === strval($appValue ?? '')) {
+        $this->raw("DELETE FROM `config` WHERE `id` = " . intval($row->id))->execute();
+        echo "  {$setting->path}: matched the app's value, row removed" . PHP_EOL;
+      } else {
+        echo "  {$setting->path}: kept as this site's own value" . PHP_EOL;
+      }
+    }
+    return TRUE;
+  }
+}

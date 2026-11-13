@@ -33,3 +33,21 @@
   gap: 1ex;
   margin: 0.5lh 0;
 }
+
+// Where an app setting's value came from
+.app-settings {
+  .source {
+    font-weight: bold;
+
+    &.site {
+      color: var(--primary);
+    }
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1ex;
+    align-items: baseline;
+  }
+}

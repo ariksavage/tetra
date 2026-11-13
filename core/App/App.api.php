@@ -42,7 +42,15 @@ class App extends \Core\Base\API\Base {
     else if (!$this->tableExists('config')) {
       $data->needsInstall = TRUE;
     } else {
-      $config = $this->select()->from('config')->where('type', '=', 'application')->execute(FALSE);
+      // The app's tetra.json (or Tetra's defaults) first, for the settings a
+      // site can override; then this site's own values on top.
+      foreach (\Core\Config\Helpers\TetraConfig::siteSettings() as $setting) {
+        if ($setting->type === 'application') {
+          $key = $setting->key;
+          $data->config->$key = \Core\Config\Helpers\TetraConfig::get($setting->path);
+        }
+      }
+      $config = $this->select()->from('config')->where('type', '=', 'application')->execute(FALSE) ?: [];
       foreach ($config as $item) {
         $key = $item->key;
         switch ($item->value_type) {

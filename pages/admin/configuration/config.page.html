@@ -1,5 +1,45 @@
 <div class="app-layout">
   <div class="tetra-admin config-page" content>
+    @if (settings.length) {
+      <section class="config-group panel app-settings" aria-labelledby="app-settings-heading">
+        <h2 class="label" id="app-settings-heading">App settings</h2>
+        <p class="muted">These come from the app's <code>tetra.json</code> (or Tetra's defaults). A value saved here is this site's own and wins; <strong>Use app default</strong> removes it again.</p>
+        @for (setting of settings; track setting.path) {
+          <div class="config-item setting" [class.changed]="settingChanged(setting)" [class.invalid]="!settingValid(setting)">
+            <label class="inline">{{setting.label}}
+              @if (setting.options) {
+                <select [name]="setting.path" [(ngModel)]="setting.draft">
+                  @for (option of setting.options; track option) { <option [value]="option">{{option}}</option> }
+                </select>
+              } @else if (setting.value_type === 'number') {
+                <input type="number" [name]="setting.path" [min]="setting.minimum" step="1" [(ngModel)]="setting.draft">
+              } @else {
+                <input type="text" [name]="setting.path" [(ngModel)]="setting.draft">
+              }
+            </label>
+            @if (setting.description) {
+              <p class="description">{{setting.description}}</p>
+            }
+            <p class="meta">
+              <span class="source {{setting.source}}">{{sourceLabels[setting.source]}}</span>
+              @if (setting.source === 'site') {
+                <span class="muted">(the app's value: {{setting.app_value === '' ? 'empty' : setting.app_value}}, {{sourceLabels[setting.app_source] | lowercase}})</span>
+              }
+              <code class="key">{{setting.path}}</code>
+            </p>
+            <div class="button-row">
+              @if (settingChanged(setting)) {
+                <button type="button" class="primary" [disabled]="!settingValid(setting) || saving" (click)="saveSetting(setting)">Save for this site</button>
+                <button type="button" [disabled]="saving" (click)="setting.draft = setting.value">Discard</button>
+              }
+              @if (setting.source === 'site' && !settingChanged(setting)) {
+                <button type="button" [disabled]="saving" (click)="useAppDefault(setting)">Use app default</button>
+              }
+            </div>
+          </div>
+        }
+      </section>
+    }
     @for (group of groups; track group.type) {
       <section class="config-group panel">
         <h2 class="label">{{groupTitle(group.type)}}</h2>

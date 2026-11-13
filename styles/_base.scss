@@ -39,6 +39,11 @@
 //                             to its menu button, it comes last
 //       .header-tools         messages, the account menu and other icons,
 //                             at the right edge
+//   header.site-header.title-truncate
+//                             one row: the title is cut short with an
+//                             ellipsis instead (tetra.json's
+//                             "header": {"longTitle": "truncate"}, applied by
+//                             components/site-header)
 
 :where(body) {
   font-family: var(--font-body);
@@ -352,4 +357,28 @@
   align-items: center;
   gap: .5em;
   margin-left: auto;
+}
+
+// One row, the title giving way ("header": {"longTitle": "truncate"} in
+// tetra.json): the title starts from no width of its own and takes whatever
+// the menu and icons leave, cut short with an ellipsis. The menu and icons
+// still drop below it if even the title's smallest (a logo) and they don't fit.
+:where(.site-header.title-truncate > .site-title) {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:where(.site-header.title-truncate > .site-header-main) {
+  flex: 0 1 auto;
+}
+
+// A title inside a wrapper (eg. a logo, then the page's heading)
+:where(.site-header.title-truncate > .site-title :is(h1, h2, .page-title)) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
