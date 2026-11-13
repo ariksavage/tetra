@@ -300,6 +300,14 @@ class PageRenderer
   {
     $e = fn($v) => self::escape(strval($v));
     $html = preg_replace('#<title>.*?</title>#is', '<title>' . $e($head->title) . '</title>', $shell, 1) ?? $shell;
+    // The shell's own versions of the tags written below (eg. a static
+    // noindex in an app's index.html) give way to this page's, so there's
+    // never two that could disagree.
+    $html = preg_replace([
+      '#\s*<meta\s+[^>]*name=["\'](description|robots|twitter:[a-z:_]+)["\'][^>]*>#i',
+      '#\s*<meta\s+[^>]*property=["\']og:[a-z:_]+["\'][^>]*>#i',
+      '#\s*<link\s+[^>]*rel=["\']canonical["\'][^>]*>#i',
+    ], '', $html) ?? $html;
     $url = $this->absolute($head->canonical);
     $image = $this->absolute($head->image);
     $tags = [];
