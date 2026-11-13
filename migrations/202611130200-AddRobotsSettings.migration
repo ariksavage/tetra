@@ -1,0 +1,37 @@
+<?php
+/**
+ * Migration: Add the site's robots.txt settings
+ *
+ * The Configuration page's place for a site's own robots.txt rules, the last
+ * of robots.txt's layers (see Pages/Discovery.helper.php): rules changed on a
+ * live site without a deploy, eg. blocking a misbehaving crawler today.
+ *
+ * PHP version 8.4
+ *
+ * @category   Migration
+ * @package    Tetra
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @since      2026-11-13
+ */
+
+namespace Core\Migrations;
+
+class AddRobotsSettings extends \Core\Migrations\Models\Migration
+{
+  public string $name = "Add the site's robots.txt settings";
+
+  protected function isComplete(): bool
+  {
+    $result = $this->raw("SELECT 1 FROM `config` WHERE `type` = 'seo' AND `key` = 'robots_rules' LIMIT 1")->execute();
+    return $result && $result->num_rows > 0;
+  }
+
+  protected function execute(): bool
+  {
+    return !!$this->raw(<<<'SQL'
+      INSERT IGNORE INTO `config` (`type`, `key`, `label`, `description`, `value`, `value_type`) VALUES
+        ('seo', 'robots_rules', 'Robots rules', 'This site''s own robots.txt lines, after Tetra''s and the app''s (tetra.json). Eg. "User-agent: GPTBot" then "Disallow: /" to block one crawler. Changes apply at once, without a deploy.', '', 'longtext'),
+        ('seo', 'robots_mode', 'Robots mode', '"add" (the default): these rules come after Tetra''s and the app''s. "replace": they''re the only rules, apart from the sitemap link.', 'add', 'text')
+      SQL)->execute();
+  }
+}

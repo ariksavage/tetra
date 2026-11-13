@@ -67,11 +67,14 @@ export class ConfigPageComponent extends Page {
   /** Tetra's settings this site may override. */
   settings: TetraSetting[] = [];
   readonly sourceLabels = SOURCE_LABELS;
+  /** The site's robots.txt as crawlers get it (its layers labelled), after the seo settings. */
+  robots: string = '';
   saving: boolean = false;
 
   override onLoad() {
     this.ready = true;
     this.fetch();
+    this.fetchRobots();
   }
 
   fetch() {
@@ -82,6 +85,12 @@ export class ConfigPageComponent extends Page {
       if (data && data.settings) {
         this.setSettings(data.settings);
       }
+    });
+  }
+
+  fetchRobots() {
+    return this.core.get('config', 'robots').then((data: any) => {
+      this.robots = data?.robots ?? '';
     });
   }
 
@@ -160,6 +169,9 @@ export class ConfigPageComponent extends Page {
   }
 
   groupTitle(type: string): string {
+    if (type === 'seo') {
+      return 'Search engines';
+    }
     return type.replace(/[_-]+/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
   }
 
@@ -221,6 +233,7 @@ export class ConfigPageComponent extends Page {
       if (data && data.config) {
         this.setConfig(data.config);
         this.app.fetchAppConfig();
+        this.fetchRobots();
       }
     });
   }

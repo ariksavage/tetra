@@ -125,6 +125,28 @@
           "type": "string",
           "default": "",
           "description": "The default share image for link previews, a path from the site's root (eg. /favicon/web-app-manifest-512x512.png) or a full URL. A PNG or JPEG: most previews don't show SVG."
+        },
+        "robots": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "enum": [
+                "add",
+                "replace"
+              ],
+              "default": "add",
+              "description": "add: these rules come after Tetra's (allow everything, disallow the route map's private pages). replace: they're the only rules, apart from the site's own and the sitemap link."
+            },
+            "rules": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "default": [],
+              "description": "robots.txt lines, eg. [\"User-agent: GPTBot\", \"Disallow: /\"]. A crawler obeys the group that names it, so a group for one crawler leaves the rest allowed. A site adds its own on the Configuration page (seo: Robots rules, Robots mode)."
+            }
+          }
         }
       }
     }

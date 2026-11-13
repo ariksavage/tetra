@@ -9,7 +9,7 @@ describe('Tetra Config', () => {
     expect(defaults.sessions).toEqual({ expiresDays: 1, passwordResetExpiresDays: 10 });
     expect(defaults.siteMenu.collapse).toBe('auto');
     expect(defaults.header.longTitle).toBe('wrap');
-    expect(defaults.seo).toEqual({ indexable: true, baseUrl: '', routes: 'src/page-routes.json', description: '', image: '' });
+    expect(defaults.seo).toEqual({ indexable: true, baseUrl: '', routes: 'src/page-routes.json', description: '', image: '', robots: { mode: 'add', rules: [] } });
     expect(defaults.$schema).toBeUndefined();
   });
 
@@ -29,12 +29,14 @@ describe('Tetra Config', () => {
       sessions: { expiresDays: 0 },
       app: { name: 3 },
       apiKey: 'secret',
+      seo: { robots: { rules: ['User-agent: GPTBot', 3] } },
     });
     expect(errors).toEqual([
       'siteMenu.collapse: "sometimes" isn\'t one of "auto", "always", "never"',
       'sessions.expiresDays: must be at least 1',
       'app.name: expected string, got integer',
       'apiKey: not a Tetra setting (see tetra.schema.json)',
+      'seo.robots.rules[1]: expected string, got integer',
     ]);
   });
 

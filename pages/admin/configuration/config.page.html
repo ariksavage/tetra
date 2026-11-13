@@ -73,6 +73,13 @@
             </p>
           </div>
         }
+        @if (group.type === 'seo' && robots) {
+          <div class="robots-preview">
+            <h3 class="label">robots.txt as crawlers get it</h3>
+            <p class="description">Tetra's rules, the route map's private pages, the app's (tetra.json) and this site's, each under a comment saying where it came from. Save to see a change here.</p>
+            <pre>{{robots}}</pre>
+          </div>
+        }
       </section>
     }
     @if (groups.length) {

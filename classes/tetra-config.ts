@@ -37,6 +37,10 @@ export interface TetraConfig {
     routes: string;
     description: string;
     image: string;
+    robots: {
+      mode: 'add' | 'replace';
+      rules: string[];
+    };
   };
 }
 
@@ -49,6 +53,7 @@ interface Rule {
   default?: unknown;
   properties?: Record<string, Rule>;
   additionalProperties?: boolean;
+  items?: Rule;
 }
 
 const SCHEMA = schema as unknown as Rule;
@@ -99,6 +104,9 @@ export function validateTetraConfig(value: unknown, rule: Rule = SCHEMA, path = 
   }
   if (rule.pattern && typeof value === 'string' && !new RegExp(rule.pattern).test(value)) {
     errors.push(`${path}: ${JSON.stringify(value)} doesn't match ${rule.pattern}`);
+  }
+  if (rule.type === 'array' && rule.items && Array.isArray(value)) {
+    value.forEach((item, i) => errors.push(...validateTetraConfig(item, rule.items!, `${path}[${i}]`)));
   }
   if (rule.type === 'object' && rule.properties && value && typeof value === 'object') {
     for (const [key, child] of Object.entries(value as Record<string, unknown>)) {

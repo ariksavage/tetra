@@ -122,6 +122,7 @@ class TetraConfig
       'integer' => is_int($value),
       'number' => is_int($value) || is_float($value),
       'boolean' => is_bool($value),
+      'array' => is_array($value) && (!isset($rule->items) || count(array_filter($value, fn($item) => !self::allowed($item, $rule->items))) === 0),
       NULL => TRUE,
       default => FALSE,
     };

@@ -51,3 +51,12 @@
     align-items: baseline;
   }
 }
+
+.robots-preview pre {
+  overflow-x: auto;
+  padding: .5lh 1ex;
+  border: var(--input-border, 1px solid);
+  background: var(--input-background, #fff);
+  font-size: .85em;
+  white-space: pre;
+}

@@ -38,6 +38,10 @@ class PageRenderer
    */
   public function respond(string $path): never
   {
+    // robots.txt and sitemap.xml are generated, never files (see Discovery).
+    if ($path === '/robots.txt' || $path === '/sitemap.xml') {
+      $this->discovery($path);
+    }
     $shell = is_file($this->shellPath()) ? file_get_contents($this->shellPath()) : NULL;
     if ($shell === NULL) {
       // A checkout that hasn't been built (eg. local development, where
@@ -121,6 +125,33 @@ class PageRenderer
       $head->robots = 'noindex, nofollow';
     }
     return $head;
+  }
+
+  /** The site's discovery files: Discovery, on this request's site address. */
+  public function discoveryFor(): Discovery
+  {
+    return new Discovery(fn(string $path) => $this->absolute($path));
+  }
+
+  protected function discovery(string $path): never
+  {
+    http_response_code(200);
+    header('Cache-Control: max-age=3600');
+    if ($path === '/robots.txt') {
+      header('Content-Type: text/plain; charset=utf-8');
+      echo $this->discoveryFor()->robotsTxt();
+      exit;
+    }
+    $xml = $this->discoveryFor()->sitemapXml();
+    if ($xml === NULL) {
+      http_response_code(404);
+      header('Content-Type: text/plain; charset=utf-8');
+      echo "This site isn't indexed.\n";
+      exit;
+    }
+    header('Content-Type: application/xml; charset=utf-8');
+    echo $xml;
+    exit;
   }
 
   /** Lay a mapper's PageMeta over the page's defaults. */
@@ -207,7 +238,7 @@ class PageRenderer
    * address (seo.baseUrl: this site's setting, else tetra.json), or the
    * request's own address when there's none.
    */
-  protected function absolute(string $pathOrUrl): string
+  public function absolute(string $pathOrUrl): string
   {
     if ($pathOrUrl === '' || preg_match('#^https?://#i', $pathOrUrl)) {
       return $pathOrUrl;

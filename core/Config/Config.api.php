@@ -38,6 +38,7 @@ use \Core\Config\Helpers\TetraConfig;
  * POST   /core/config/index                 {config: [{id, value}]}
  * POST   /core/config/setting               {path, value} This site's value for a Tetra setting
  * DELETE /core/config/setting/{path}        Back to the app's value (tetra.json or Tetra's default)
+ * GET    /core/config/robots                The site's robots.txt as crawlers get it, with its layers
  */
 class Config extends \Core\Base\API\Base {
 
@@ -108,6 +109,18 @@ class Config extends \Core\Base\API\Base {
       $this->notFound('Setting', $path);
     }
     return $settings[$path];
+  }
+
+  /**
+   * GET /core/config/robots
+   *
+   * The site's robots.txt as crawlers get it (each layer headed by where it
+   * came from), to check the site's own rules after changing them.
+   */
+  public function robotsGET(): void
+  {
+    $this->reqPermission('VIEW');
+    $this->success('robots', (new \Core\Pages\Helpers\PageRenderer())->discoveryFor()->robotsTxt());
   }
 
   /**
