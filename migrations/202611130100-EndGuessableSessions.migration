@@ -1,0 +1,42 @@
+<?php
+/**
+ * Migration: End sessions with guessable tokens
+ *
+ * Until 2026-11-13 a login's session token was md5(username + the time to the
+ * second): anyone who knew a username and roughly when that person logged in
+ * could work it out and use the session without the password. Tokens are now
+ * random (BasicUser::generateAuthToken). This ends every session started
+ * before that, so no guessable token stays valid; everyone logs in again once.
+ *
+ * PHP version 8.4
+ *
+ * @category   Migration
+ * @package    Tetra
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @since      2026-11-13
+ */
+
+namespace Core\Migrations;
+
+class EndGuessableSessions extends \Core\Migrations\Models\Migration
+{
+  public string $name = 'End sessions with guessable tokens';
+
+  /** Once only: it's logged when done. */
+  protected function isComplete(): bool
+  {
+    if (!$this->tableExists('users_sessions') || !$this->tableExists('migrations')) {
+      return TRUE;
+    }
+    $result = $this->raw("SELECT 1 FROM `migrations` WHERE `label` = '" . addslashes($this->name) . "' LIMIT 1")->execute();
+    return $result && $result->num_rows > 0;
+  }
+
+  /** Old tokens are 32 characters (md5); new ones are 64. */
+  protected function execute(): bool
+  {
+    $this->raw("UPDATE `users_sessions` SET `date_ended` = NOW() WHERE `date_ended` IS NULL AND CHAR_LENGTH(`token`) = 32")->execute();
+    echo "  Ended the open sessions with old, guessable tokens" . PHP_EOL;
+    return TRUE;
+  }
+}

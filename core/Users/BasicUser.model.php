@@ -293,6 +293,8 @@ class BasicUser extends \Core\Base\Models\Base {
         $data['password'] = $this->passwordHash($this->password);
       }
     }
+    // A new user with no password yet: a random value that isn't a password
+    // hash, so nothing can log in with it until a password is set.
     if (!$this->id && !isset($data['password'])) {
       $data['password'] = $this->generateAuthToken();
     }
@@ -600,14 +602,19 @@ class BasicUser extends \Core\Base\Models\Base {
   }
 
   /**
-   * Create a random auth token from the username and current timestamp
+   * A new auth token: 32 random bytes from the system's secure random source,
+   * as 64 hex characters. Unguessable, and never the same twice.
+   *
+   * (Until 2026-11-13 this was md5(username + the time to the second), which
+   * anyone knowing a username and roughly when they logged in could work out,
+   * and which two logins in the same second shared. The migration
+   * EndGuessableSessions ended the sessions made that way.)
+   *
    * @return string Auth token
    */
   private function generateAuthToken(): string
   {
-    $token = md5($this->username . date('Y-m-d-h-i-s'));
-    $_SESSION['authorization_token'] = $token;
-    return $token;
+    return bin2hex(random_bytes(32));
   }
 
   /**
