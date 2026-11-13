@@ -138,6 +138,8 @@
 
 :where(label.inline) :where(input, select, textarea) {
   display: block;
+  // Full width including its padding and border, whatever the app's box-sizing.
+  box-sizing: border-box;
   width: 100%;
   margin-top: 0.2lh;
   font-family: var(--font-body);
