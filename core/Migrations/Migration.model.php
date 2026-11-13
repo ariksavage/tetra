@@ -94,7 +94,8 @@ class Migration extends \Core\Base\Models\Base {
     if ($overwrite) {
       echo "\e[2A\e[K";
     }
-    echo $this->name  . str_repeat('.', $x) . $text . PHP_EOL;
+    // A long name leaves no room for dots: keep at least one, never fail.
+    echo $this->name  . str_repeat('.', max(1, $x)) . $text . PHP_EOL;
     echo str_repeat($char, $n) . PHP_EOL;
   }
 
