@@ -35,6 +35,9 @@ class Discovery
   use \Core\Base\Traits\Common;
   use \Core\Database\MySQL\Traits\Queries;
 
+  /** After sitemapXml(): when its newest page changed (unix time), or NULL. */
+  public ?int $lastModified = NULL;
+
   /** @param \Closure $absolute fn(string $path): string, a full URL on the site's address. */
   public function __construct(private \Closure $absolute) {}
 
@@ -106,6 +109,8 @@ class Discovery
         }
       }
     }
+    $dates = array_filter(array_map(fn($entry) => intval($entry['lastmod'] ?? 0), $entries));
+    $this->lastModified = $dates ? max($dates) : NULL;
     $e = fn($v) => htmlspecialchars(strval($v), ENT_XML1 | ENT_QUOTES, 'UTF-8');
     $xml = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'];
     foreach ($entries as $entry) {

@@ -49,7 +49,9 @@ class PageRenderer
       $this->send(503, '<!doctype html><title>Not built</title><p>This page needs the app\'s build (index.html beside tetra/core).</p>');
     }
     $head = $this->head($path);
-    $this->send($head->status, $this->fill($shell, $head));
+    // A record's page changed when the record did, or the build (the shell).
+    $lastModified = $head->modified ? max($head->modified, intval(filemtime($this->shellPath()))) : NULL;
+    $this->send($head->status, $this->fill($shell, $head), 'text/html; charset=utf-8', 'no-cache', $lastModified);
   }
 
   /**
@@ -85,6 +87,7 @@ class PageRenderer
       'jsonLd' => NULL,
       'content' => '',
       'path' => $path,
+      'modified' => NULL,
       'match' => $match,
     ];
 
@@ -99,6 +102,8 @@ class PageRenderer
         $meta = $mapper->meta($model);
         $meta->content = $meta->content !== '' ? $meta->content : $mapper->content($model);
         $this->apply($head, $meta, $path);
+        $modified = $model->date_modified ?? NULL;
+        $head->modified = is_numeric($modified) ? intval($modified) : (strtotime(strval($modified)) ?: NULL);
       }
     } elseif ($public && !empty($match->route->page) && ($meta = $this->pageMeta($match->route)) !== NULL) {
       // A public page that isn't one model (eg. a list): the mapper's page method.
@@ -135,23 +140,16 @@ class PageRenderer
 
   protected function discovery(string $path): never
   {
-    http_response_code(200);
-    header('Cache-Control: max-age=3600');
+    $discovery = $this->discoveryFor();
     if ($path === '/robots.txt') {
-      header('Content-Type: text/plain; charset=utf-8');
-      echo $this->discoveryFor()->robotsTxt();
-      exit;
+      $this->send(200, $discovery->robotsTxt(), 'text/plain; charset=utf-8', 'max-age=3600');
     }
-    $xml = $this->discoveryFor()->sitemapXml();
+    $xml = $discovery->sitemapXml();
     if ($xml === NULL) {
-      http_response_code(404);
-      header('Content-Type: text/plain; charset=utf-8');
-      echo "This site isn't indexed.\n";
-      exit;
+      $this->send(404, "This site isn't indexed.\n", 'text/plain; charset=utf-8', 'max-age=3600');
     }
-    header('Content-Type: application/xml; charset=utf-8');
-    echo $xml;
-    exit;
+    // The sitemap changed when its newest page did.
+    $this->send(200, $xml, 'application/xml; charset=utf-8', 'max-age=3600', $discovery->lastModified);
   }
 
   /** Lay a mapper's PageMeta over the page's defaults. */
@@ -363,13 +361,57 @@ class PageRenderer
     return htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE | ENT_HTML5, 'UTF-8');
   }
 
-  protected function send(int $status, string $html): never
+  /**
+   * Send a response, with an ETag (a hash of exactly what's sent) and, when
+   * given, Last-Modified. A client that already has this exact response
+   * (If-None-Match) gets 304 Not Modified and no body: a crawler or browser
+   * coming back to an unchanged page downloads nothing.
+   *
+   * Only the ETag decides a 304, never the date alone: a page also changes
+   * with things that have no date (the site's settings, tetra.json, the
+   * route map), and hashing the whole response catches all of them.
+   */
+  protected function send(int $status, string $body, string $type = 'text/html; charset=utf-8', string $cache = 'no-cache', ?int $lastModified = NULL): never
   {
+    $etag = 'W/"' . sha1($body) . '"';
+    header('Content-Type: ' . $type);
+    // Pages are checked every time (cheap with the ETag), so a new deploy is picked up at once.
+    header('Cache-Control: ' . $cache);
+    if ($status === 200) {
+      header('ETag: ' . $etag);
+      if ($lastModified) {
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $lastModified) . ' GMT');
+      }
+      if (self::etagMatches($_SERVER['HTTP_IF_NONE_MATCH'] ?? '', $etag)) {
+        http_response_code(304);
+        exit;
+      }
+    }
     http_response_code($status);
-    header('Content-Type: text/html; charset=utf-8');
-    // Like index.html: always checked, so a new deploy is picked up at once.
-    header('Cache-Control: no-cache');
-    echo $html;
+    echo $body;
     exit;
+  }
+
+  /**
+   * Whether an If-None-Match header names this ETag. Compared weakly
+   * (ignoring W/), and ignoring the -gzip or -br Apache's compression adds
+   * to an ETag it compresses, which the client then sends back.
+   */
+  public static function etagMatches(string $ifNoneMatch, string $etag): bool
+  {
+    if (trim($ifNoneMatch) === '') {
+      return FALSE;
+    }
+    if (trim($ifNoneMatch) === '*') {
+      return TRUE;
+    }
+    $bare = fn(string $tag) => preg_replace('/-(gzip|br|deflate)$/', '', trim(preg_replace('#^W/#', '', trim($tag)), '"'));
+    $want = $bare($etag);
+    foreach (explode(',', $ifNoneMatch) as $tag) {
+      if ($bare(trim(trim($tag), '"')) === $want || $bare(trim($tag)) === $want) {
+        return TRUE;
+      }
+    }
+    return FALSE;
   }
 }
