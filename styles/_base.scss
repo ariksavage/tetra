@@ -27,6 +27,18 @@
 //   .checkbox-list  a list of checkbox-labels
 //   .muted, .empty, .sr-only, .danger (on a button)
 //   .icon           an icon-only button; its icon is centred
+//
+// And for the site's header:
+//
+//   header.site-header        the header: its title, then the rest
+//     .site-title             the site's name or logo
+//     .site-header-main       the menu and icons, kept together: beside the
+//                             title while they fit, below it when they don't
+//                             (a narrow phone, or a long site name)
+//       nav.site-menu         the main menu (components/site-menu); collapsed
+//                             to its menu button, it comes last
+//       .header-tools         messages, the account menu and other icons,
+//                             at the right edge
 
 :where(body) {
   font-family: var(--font-body);
@@ -297,4 +309,47 @@
 
 :where(.danger-zone) {
   border-color: var(--danger);
+}
+
+// ---- The site's header ----
+
+:where(.site-header) {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .25lh 1.5em;
+}
+
+:where(.site-title) {
+  flex: 0 1 auto;
+}
+
+// Starts with no width of its own and grows to fill the line, so it only
+// wraps below the title when even its narrowest (the menu button and icons,
+// or the longest menu link) doesn't fit beside it.
+:where(.site-header-main) {
+  display: flex;
+  flex: 1 1 0;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: .5em 1.5em;
+  min-width: min-content;
+}
+
+:where(.site-header-main > nav) {
+  flex: 1 1 auto;
+}
+
+:where(.site-header-main > nav.site-menu.collapsed) {
+  flex: 0 0 auto;
+  order: 1;
+}
+
+:where(.header-tools) {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: .5em;
+  margin-left: auto;
 }
