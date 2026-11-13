@@ -80,6 +80,7 @@ class PageRenderer
       'robots' => $public ? NULL : 'noindex',
       'jsonLd' => NULL,
       'content' => '',
+      'path' => $path,
       'match' => $match,
     ];
 
@@ -303,7 +304,14 @@ class PageRenderer
     if ($head->jsonLd) {
       $json = json_encode($this->absoluteLinks($head->jsonLd), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
       if ($json !== FALSE) {
-        $tags[] = '<script type="application/ld+json">' . $json . '</script>';
+        // For the app (Tetra's PageDataService): the path this was written for,
+        // and the route's converter back to the app's model, if it has one.
+        $attrs = ' data-tetra-path="' . $e($head->path) . '"';
+        $fromSchema = $head->status === 200 ? strval($head->match?->route->fromSchema ?? '') : '';
+        if ($fromSchema !== '') {
+          $attrs .= ' data-tetra-from-schema="' . $e($fromSchema) . '"';
+        }
+        $tags[] = '<script type="application/ld+json"' . $attrs . '>' . $json . '</script>';
       }
     }
     // Just before </head>, after the shell's own tags.
