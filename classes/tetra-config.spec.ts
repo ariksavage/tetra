@@ -9,6 +9,7 @@ describe('Tetra Config', () => {
     expect(defaults.sessions).toEqual({ expiresDays: 1, passwordResetExpiresDays: 10 });
     expect(defaults.siteMenu.collapse).toBe('auto');
     expect(defaults.header.longTitle).toBe('wrap');
+    expect(defaults.seo).toEqual({ indexable: true, routes: 'src/page-routes.json', description: '', image: '' });
     expect(defaults.$schema).toBeUndefined();
   });
 

@@ -9,8 +9,12 @@
  * misspelled or has a value the schema doesn't allow, so a deploy stops
  * before copying anything.
  *
- * It knows the parts of JSON Schema that tetra.schema.json uses: objects
- * (with additionalProperties false), enum, type and minimum.
+ * It also checks the app's route map (tetra.json's seo.routes, by default
+ * src/page-routes.json) against page-routes.schema.json, when there is one.
+ *
+ * It knows the parts of JSON Schema that Tetra's schemas use: objects (with
+ * additionalProperties false and required), arrays of items, enum, type,
+ * minimum and pattern.
  */
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -58,12 +62,25 @@ function check(value, rule, path) {
   if (rule.minimum !== undefined && typeof value === 'number' && value < rule.minimum) {
     errors.push(`${path}: must be at least ${rule.minimum}`);
   }
+  if (rule.pattern && typeof value === 'string' && !new RegExp(rule.pattern).test(value)) {
+    errors.push(`${path}: ${JSON.stringify(value)} doesn't match ${rule.pattern}`);
+  }
+  if (rule.type === 'array' && rule.items && Array.isArray(value)) {
+    value.forEach((item, i) => check(item, rule.items, `${path}[${i}]`));
+  }
+  if (rule.type === 'object' && rule.required && value && typeof value === 'object') {
+    for (const key of rule.required) {
+      if (!(key in value)) {
+        errors.push(`${path ? path + '.' : ''}${key}: required`);
+      }
+    }
+  }
   if (rule.type === 'object' && rule.properties) {
     for (const [key, child] of Object.entries(value)) {
       const childRule = rule.properties[key];
       if (!childRule) {
         if (rule.additionalProperties === false) {
-          errors.push(`${path ? path + '.' : ''}${key}: not a Tetra setting (see tetra.schema.json)`);
+          errors.push(`${path ? path + '.' : ''}${key}: not a known setting (see the schema)`);
         }
         continue;
       }
@@ -73,6 +90,25 @@ function check(value, rule, path) {
 }
 
 check(config, schema, '');
+
+// The route map, if the app has one.
+const routesFile = resolve(dirname(file), config?.seo?.routes ?? 'src/page-routes.json');
+if (existsSync(routesFile)) {
+  const routesSchema = JSON.parse(readFileSync(join(here, '..', 'page-routes.schema.json'), 'utf8'));
+  let routes;
+  try {
+    routes = JSON.parse(readFileSync(routesFile, 'utf8'));
+  } catch (e) {
+    errors.push(`${routesFile} isn't valid JSON: ${e.message}`);
+  }
+  if (routes !== undefined) {
+    const before = errors.length;
+    check(routes, routesSchema, 'routes file');
+    if (errors.length === before) {
+      console.log(`${routesFile}: OK`);
+    }
+  }
+}
 
 if (errors.length) {
   console.error(`${file} has ${errors.length} problem${errors.length > 1 ? 's' : ''}:`);

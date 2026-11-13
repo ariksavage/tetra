@@ -31,6 +31,12 @@ export interface TetraConfig {
   header: {
     longTitle: 'wrap' | 'truncate';
   };
+  seo: {
+    indexable: boolean;
+    routes: string;
+    description: string;
+    image: string;
+  };
 }
 
 /** A schema rule: the parts of JSON Schema that tetra.schema.json uses. */

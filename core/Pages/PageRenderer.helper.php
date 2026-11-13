@@ -49,16 +49,41 @@ class PageRenderer
   }
 
   /**
-   * The head for a path. For now, the site's name as the title; the route
-   * map and the models' metadata fill in the rest.
+   * The head for a path, from the route map (PageRoutes):
    *
-   * @return object {title}
+   * - The site's name and description (tetra.json's seo.description) for
+   *   every page; a public route may name its own title and description.
+   * - robots: noindex for a URL no route matches or a route that isn't
+   *   public (nothing is exposed unless a route says so), and noindex,
+   *   nofollow everywhere when tetra.json's seo.indexable is false.
+   *
+   * @return object {title, description, robots, match}
    */
   protected function head(string $path): object
   {
-    return (object) [
-      'title' => $this->siteName(),
+    $match = PageRoutes::match($path);
+    $public = PageRoutes::isPublic($match);
+    $site = $this->siteName();
+    $head = (object) [
+      'title' => $site,
+      'description' => strval(TetraConfig::get('seo.description')),
+      'robots' => NULL,
+      'match' => $match,
     ];
+    if (!TetraConfig::get('seo.indexable')) {
+      $head->robots = 'noindex, nofollow';
+    } elseif (!$public) {
+      $head->robots = 'noindex';
+    }
+    if ($public) {
+      if (!empty($match->route->title)) {
+        $head->title = "{$match->route->title} | {$site}";
+      }
+      if (!empty($match->route->description)) {
+        $head->description = $match->route->description;
+      }
+    }
+    return $head;
   }
 
   /** The site's name: this site's setting, else tetra.json, else Tetra's default. */
@@ -72,11 +97,25 @@ class PageRenderer
     }
   }
 
-  /** The shell with its <title> replaced; values escaped for HTML. */
+  /** The shell with its <title> replaced and the head's tags added; values escaped for HTML. */
   protected function fill(string $shell, object $head): string
   {
     $title = '<title>' . self::escape($head->title) . '</title>';
-    return preg_replace('#<title>.*?</title>#is', $title, $shell, 1) ?? $shell;
+    $html = preg_replace('#<title>.*?</title>#is', $title, $shell, 1) ?? $shell;
+    $tags = [];
+    if ($head->description !== '') {
+      $tags[] = '<meta name="description" content="' . self::escape($head->description) . '">';
+    }
+    if ($head->robots) {
+      $tags[] = '<meta name="robots" content="' . self::escape($head->robots) . '">';
+    }
+    if (!$tags) {
+      return $html;
+    }
+    // Just before </head>, after the shell's own tags.
+    $insert = '  ' . implode("\n  ", $tags) . "\n";
+    $pos = stripos($html, '</head>');
+    return $pos === FALSE ? $html : substr($html, 0, $pos) . $insert . substr($html, $pos);
   }
 
   public static function escape(string $value): string

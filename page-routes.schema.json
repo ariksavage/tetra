@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/ariksavage/tetra/page-routes.schema.json",
+  "title": "Tetra route map (page-routes.json)",
+  "description": "Which of the app's URLs are public pages, and where each one's metadata comes from. Read by the page renderer (PHP), which fills in each page's head before sending it, and by Angular. The first route that matches a URL is used. A URL no route matches, or a route not marked public, gets only the site's default head and noindex: nothing is exposed unless a route says public.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["routes"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Path to this schema, for editors."
+    },
+    "routes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["path"],
+        "properties": {
+          "path": {
+            "type": "string",
+            "pattern": "^/",
+            "description": "The URL path. A segment starting with : matches any one segment and names it (/recipes/:alias); a final /* matches anything below (/admin/*). Order matters: put /recipes/new before /recipes/:alias."
+          },
+          "public": {
+            "type": "boolean",
+            "default": false,
+            "description": "Crawlers may see this page's metadata and index it. Leave it out (or false) for anything tied to an account."
+          },
+          "model": {
+            "type": "string",
+            "description": "The model a public page shows, as its class under Core (eg. Recipes\\Models\\Recipe), found by key."
+          },
+          "key": {
+            "type": "string",
+            "default": "id",
+            "description": "The model property the path's parameter matches (eg. alias for /recipes/:alias). The parameter is the path's only :name segment."
+          },
+          "schema": {
+            "type": "string",
+            "description": "The mapper class (under Core) that turns the model into the page's metadata, JSON-LD and minimal content. Without one, the model's own pageMeta() and schema() are used, if it has them."
+          },
+          "fromSchema": {
+            "type": "string",
+            "description": "The name of the Angular converter (registered with Tetra) that turns this page's JSON-LD back into the app's model, so the page can use it instead of its first API call."
+          },
+          "page": {
+            "type": "string",
+            "description": "A public page that isn't one model (eg. a list): the name of its mapper's page method."
+          },
+          "title": {
+            "type": "string",
+            "description": "The page's title, for a public page without a model (eg. Recipes)."
+          },
+          "description": {
+            "type": "string",
+            "description": "The page's description, for a public page without a model."
+          }
+        }
+      }
+    }
+  }
+}

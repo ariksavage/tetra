@@ -70,7 +70,11 @@
       "additionalProperties": false,
       "properties": {
         "collapse": {
-          "enum": ["auto", "always", "never"],
+          "enum": [
+            "auto",
+            "always",
+            "never"
+          ],
           "default": "auto",
           "description": "When the main menu (nav.site-menu) hides behind its menu button. auto: below the CSS breakpoint (--site-menu-breakpoint, 800px by default). always: on every screen, for a header that already holds a lot. never: always show the links."
         }
@@ -81,9 +85,38 @@
       "additionalProperties": false,
       "properties": {
         "longTitle": {
-          "enum": ["wrap", "truncate"],
+          "enum": [
+            "wrap",
+            "truncate"
+          ],
           "default": "wrap",
           "description": "What gives way when the site header's title and its menu and icons don't fit on one row. wrap: the menu and icons drop below the title, together. truncate: the header stays one row and the title is cut short with an ellipsis."
+        }
+      }
+    },
+    "seo": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "indexable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether search engines may index the site at all. false (eg. a private tool like Work): every page says noindex and robots.txt disallows everything."
+        },
+        "routes": {
+          "type": "string",
+          "default": "src/page-routes.json",
+          "description": "The route map, from the app's root: which URLs are public pages and where their metadata comes from (see tetra/page-routes.schema.json). Read by the page renderer (PHP) and by Angular."
+        },
+        "description": {
+          "type": "string",
+          "default": "",
+          "description": "The site's description, for pages without their own: search results and link previews."
+        },
+        "image": {
+          "type": "string",
+          "default": "",
+          "description": "The default share image for link previews, a path from the site's root (eg. /favicon/web-app-manifest-512x512.png) or a full URL. A PNG or JPEG: most previews don't show SVG."
         }
       }
     }
