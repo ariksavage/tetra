@@ -128,6 +128,9 @@ class TetraConfig
     if ($ok && isset($rule->minimum) && is_numeric($value) && $value < $rule->minimum) {
       return FALSE;
     }
+    if ($ok && isset($rule->pattern) && is_string($value) && !preg_match('#' . str_replace('#', '\\#', $rule->pattern) . '#u', $value)) {
+      return FALSE;
+    }
     return $ok;
   }
 

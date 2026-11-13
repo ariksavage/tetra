@@ -79,6 +79,7 @@ class PageRenderer
       'canonical' => $path,
       'robots' => $public ? NULL : 'noindex',
       'jsonLd' => NULL,
+      'content' => '',
       'match' => $match,
     ];
 
@@ -89,14 +90,14 @@ class PageRenderer
         $head->title = "Not found | {$site}";
         $head->robots = 'noindex';
       } else {
-        $meta = $this->mapper($match->route)->meta($model);
-        $head->title = $meta->title !== '' ? "{$meta->title} | {$site}" : $site;
-        $head->description = $meta->description !== '' ? $meta->description : $head->description;
-        $head->image = $meta->image !== '' ? $meta->image : $head->image;
-        $head->type = $meta->type;
-        $head->canonical = $meta->canonical !== '' ? $meta->canonical : $path;
-        $head->jsonLd = $meta->jsonLd;
+        $mapper = $this->mapper($match->route);
+        $meta = $mapper->meta($model);
+        $meta->content = $meta->content !== '' ? $meta->content : $mapper->content($model);
+        $this->apply($head, $meta, $path);
       }
+    } elseif ($public && !empty($match->route->page) && ($meta = $this->pageMeta($match->route)) !== NULL) {
+      // A public page that isn't one model (eg. a list): the mapper's page method.
+      $this->apply($head, $meta, $path);
     } elseif ($public) {
       if (!empty($match->route->title)) {
         $head->title = "{$match->route->title} | {$site}";
@@ -119,6 +120,39 @@ class PageRenderer
       $head->robots = 'noindex, nofollow';
     }
     return $head;
+  }
+
+  /** Lay a mapper's PageMeta over the page's defaults. */
+  protected function apply(object $head, PageMeta $meta, string $path): void
+  {
+    $head->title = $meta->title !== '' ? "{$meta->title} | {$head->site}" : $head->site;
+    $head->description = $meta->description !== '' ? $meta->description : $head->description;
+    $head->image = $meta->image !== '' ? $meta->image : $head->image;
+    $head->type = $meta->type;
+    $head->canonical = $meta->canonical !== '' ? $meta->canonical : $path;
+    $head->jsonLd = $meta->jsonLd;
+    $head->content = $meta->content;
+  }
+
+  /**
+   * A public page that isn't one model: the route's "page" names a method on
+   * its mapper ("schema") that returns the page's PageMeta, eg. a list.
+   */
+  protected function pageMeta(object $route): ?PageMeta
+  {
+    $mapper = $this->mapper($route);
+    $method = strval($route->page);
+    if (!preg_match('/^[a-z_][a-z0-9_]*$/i', $method) || !method_exists($mapper, $method)) {
+      error_log("Page renderer: the mapper for {$route->path} has no page method {$method}");
+      return NULL;
+    }
+    try {
+      $meta = $mapper->$method();
+      return $meta instanceof PageMeta ? $meta : NULL;
+    } catch (\Throwable $e) {
+      error_log("Page renderer: {$method} failed for {$route->path}: " . $e->getMessage());
+      return NULL;
+    }
   }
 
   /**
@@ -167,15 +201,53 @@ class PageRenderer
     return new DefaultMapper();
   }
 
-  /** A full URL for a path on this site (or a URL as it is). */
+  /**
+   * A full URL for a path on this site (or a URL as it is), on the site's
+   * address (seo.baseUrl: this site's setting, else tetra.json), or the
+   * request's own address when there's none.
+   */
   protected function absolute(string $pathOrUrl): string
   {
     if ($pathOrUrl === '' || preg_match('#^https?://#i', $pathOrUrl)) {
       return $pathOrUrl;
     }
+    try {
+      $base = strval($this->configValue('base_url') ?? '');
+    } catch (\Throwable $e) {
+      $base = strval(TetraConfig::get('seo.baseUrl'));
+    }
+    if (preg_match('#^https?://[^/\s]+$#i', $base)) {
+      return $base . '/' . ltrim($pathOrUrl, '/');
+    }
     $https = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https';
     $host = preg_replace('/[^a-z0-9.:\-]/i', '', $_SERVER['HTTP_HOST'] ?? 'localhost');
     return ($https ? 'https' : 'http') . '://' . $host . '/' . ltrim($pathOrUrl, '/');
+  }
+
+  /**
+   * The JSON-LD with its links made full URLs: values of url, image, @id and
+   * item that are paths from the site's root ("/recipes/..."), at any depth.
+   * A mapper writes paths; the site's address is the renderer's business.
+   * Prefixed keys (an app's own terms, eg. thyme:recipe) are left exactly as
+   * they are.
+   */
+  protected function absoluteLinks(mixed $value, string $key = ''): mixed
+  {
+    if (str_contains($key, ':')) {
+      return $value;
+    }
+    if (is_string($value)) {
+      return in_array($key, ['url', 'image', '@id', 'item'], TRUE) && str_starts_with($value, '/') ? $this->absolute($value) : $value;
+    }
+    if (is_array($value)) {
+      $out = [];
+      foreach ($value as $k => $v) {
+        // A list (eg. image: [...]) keeps its parent's key.
+        $out[$k] = $this->absoluteLinks($v, is_int($k) ? $key : strval($k));
+      }
+      return $out;
+    }
+    return $value;
   }
 
   /** The site's name: this site's setting, else tetra.json, else Tetra's default. */
@@ -229,7 +301,7 @@ class PageRenderer
       }
     }
     if ($head->jsonLd) {
-      $json = json_encode($head->jsonLd, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      $json = json_encode($this->absoluteLinks($head->jsonLd), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
       if ($json !== FALSE) {
         $tags[] = '<script type="application/ld+json">' . $json . '</script>';
       }
@@ -237,7 +309,14 @@ class PageRenderer
     // Just before </head>, after the shell's own tags.
     $insert = "\n  " . implode("\n  ", $tags) . "\n";
     $pos = stripos($html, '</head>');
-    return $pos === FALSE ? $html : substr($html, 0, $pos) . $insert . substr($html, $pos);
+    $html = $pos === FALSE ? $html : substr($html, 0, $pos) . $insert . substr($html, $pos);
+    // The page's minimal content inside the app's root element (the <body
+    // app-root> of Angular's shell), which Angular replaces when it starts.
+    if ($head->content !== '' && preg_match('#<body[^>]*>#i', $html, $m, PREG_OFFSET_CAPTURE)) {
+      $at = $m[0][1] + strlen($m[0][0]);
+      $html = substr($html, 0, $at) . "\n" . $head->content . "\n" . substr($html, $at);
+    }
+    return $html;
   }
 
   public static function escape(string $value): string

@@ -25,6 +25,8 @@ class PageMeta
    * @param string $type        Open Graph type: "article" for a page about one thing, "website" otherwise.
    * @param string $canonical   The page's preferred path (eg. /recipes/mac-n-cheese); '' for the requested path.
    * @param array|null $jsonLd  The page's structured data (eg. a schema.org Recipe), encoded as JSON-LD.
+   * @param string $content     Minimal HTML for crawlers that don't run JavaScript, placed in the app's
+   *                            root element and replaced when Angular starts; already escaped. '' for none.
    */
   public function __construct(
     public string $title = '',
@@ -33,6 +35,7 @@ class PageMeta
     public string $type = 'website',
     public string $canonical = '',
     public ?array $jsonLd = NULL,
+    public string $content = '',
   ) {}
 
   /** Plain text for a description: no tags, single spaces, at most $max characters, cut at a word. */

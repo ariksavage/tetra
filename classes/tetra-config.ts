@@ -33,6 +33,7 @@ export interface TetraConfig {
   };
   seo: {
     indexable: boolean;
+    baseUrl: string;
     routes: string;
     description: string;
     image: string;
@@ -44,6 +45,7 @@ interface Rule {
   type?: string;
   enum?: unknown[];
   minimum?: number;
+  pattern?: string;
   default?: unknown;
   properties?: Record<string, Rule>;
   additionalProperties?: boolean;
@@ -94,6 +96,9 @@ export function validateTetraConfig(value: unknown, rule: Rule = SCHEMA, path = 
   }
   if (rule.minimum !== undefined && typeof value === 'number' && value < rule.minimum) {
     errors.push(`${path}: must be at least ${rule.minimum}`);
+  }
+  if (rule.pattern && typeof value === 'string' && !new RegExp(rule.pattern).test(value)) {
+    errors.push(`${path}: ${JSON.stringify(value)} doesn't match ${rule.pattern}`);
   }
   if (rule.type === 'object' && rule.properties && value && typeof value === 'object') {
     for (const [key, child] of Object.entries(value as Record<string, unknown>)) {

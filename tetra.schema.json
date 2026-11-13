@@ -103,6 +103,14 @@
           "default": true,
           "description": "Whether search engines may index the site at all. false (eg. a private tool like Work): every page says noindex and robots.txt disallows everything."
         },
+        "baseUrl": {
+          "type": "string",
+          "pattern": "^(https?://[^/\\s]+)?$",
+          "default": "",
+          "description": "The site's address, eg. https://thyme.ariksavage.com (no trailing slash), for canonical and share URLs, so they never depend on the request. Empty: the request's own address. A local copy sets its own on the Configuration page.",
+          "x-tetra-site": "application.base_url",
+          "x-tetra-label": "Site address (for canonical and share links)"
+        },
         "routes": {
           "type": "string",
           "default": "src/page-routes.json",
