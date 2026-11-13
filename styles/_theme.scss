@@ -77,7 +77,8 @@ $site-menu-breakpoint: 800px !default;
   --panel-padding: 0.75lh 1em;
   --panel-gap: 1lh;
 
-  // Inputs, selects and textareas
+  // Inputs, selects and textareas. Their font is the page's unless an app
+  // sets --input-font (eg. to keep the browser's form font).
   --input-background: #ffffff;
   --input-text: var(--default-text);
   --input-border: 1px solid var(--border);

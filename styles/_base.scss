@@ -108,6 +108,8 @@
   background: var(--input-background);
   color: var(--input-text);
   font: inherit;
+  // The page's font unless the app sets --input-font (see theme.scss).
+  font-family: var(--input-font, inherit);
   line-height: var(--input-line-height);
 }
 
