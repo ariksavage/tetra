@@ -43,7 +43,7 @@
           },
           "fromSchema": {
             "type": "string",
-            "description": "The name of the Angular converter (registered with Tetra) that turns this page's JSON-LD back into the app's model, so the page can use it instead of its first API call."
+            "description": "The name of the Angular converter (registered with Tetra) that turns this page's data (its mapper's PageMeta data, written as a plain JSON block beside the JSON-LD) into the app's model, so the page can use it instead of its first API call. Without it, no page data is written."
           },
           "page": {
             "type": "string",

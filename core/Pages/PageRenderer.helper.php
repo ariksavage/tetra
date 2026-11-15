@@ -68,7 +68,7 @@ class PageRenderer
    * - A public route without a model: its own title and description from
    *   the route map. The home page also gets the site's WebSite JSON-LD.
    *
-   * @return object {status, title, description, image, type, canonical, robots, jsonLd, match}
+   * @return object {status, title, description, image, type, canonical, robots, jsonLd, content, data, path, modified, match}
    */
   protected function head(string $path): object
   {
@@ -86,6 +86,7 @@ class PageRenderer
       'robots' => $public ? NULL : 'noindex',
       'jsonLd' => NULL,
       'content' => '',
+      'data' => NULL,
       'path' => $path,
       'modified' => NULL,
       'match' => $match,
@@ -162,6 +163,7 @@ class PageRenderer
     $head->canonical = $meta->canonical !== '' ? $meta->canonical : $path;
     $head->jsonLd = $meta->jsonLd;
     $head->content = $meta->content;
+    $head->data = $meta->data;
   }
 
   /**
@@ -258,7 +260,7 @@ class PageRenderer
    * The JSON-LD with its links made full URLs: values of url, image, @id and
    * item that are paths from the site's root ("/recipes/..."), at any depth.
    * A mapper writes paths; the site's address is the renderer's business.
-   * Prefixed keys (an app's own terms, eg. thyme:recipe) are left exactly as
+   * Prefixed keys (an app's own JSON-LD terms, eg. app:thing) are left exactly as
    * they are.
    */
   protected function absoluteLinks(mixed $value, string $key = ''): mixed
@@ -341,14 +343,20 @@ class PageRenderer
     if ($head->jsonLd) {
       $json = json_encode($this->absoluteLinks($head->jsonLd), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
       if ($json !== FALSE) {
-        // For the app (Tetra's PageDataService): the path this was written for,
-        // and the route's converter back to the app's model, if it has one.
-        $attrs = ' data-tetra-path="' . $e($head->path) . '"';
-        $fromSchema = $head->status === 200 ? strval($head->match?->route->fromSchema ?? '') : '';
-        if ($fromSchema !== '') {
-          $attrs .= ' data-tetra-from-schema="' . $e($fromSchema) . '"';
-        }
-        $tags[] = '<script type="application/ld+json"' . $attrs . '>' . $json . '</script>';
+        $tags[] = '<script type="application/ld+json">' . $json . '</script>';
+      }
+    }
+    // For the app (Tetra's PageDataService), not for search engines: the
+    // page's own data, eg. the record as the API sends it, so the page needn't
+    // make its first API call. Plain JSON in its own block, so structured-data
+    // parsers (Google's included) don't read it as part of the JSON-LD. Marked
+    // with the path it was written for and the route's converter.
+    $fromSchema = $head->status === 200 ? strval($head->match?->route->fromSchema ?? '') : '';
+    if ($head->data !== NULL && $fromSchema !== '') {
+      $json = json_encode($head->data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+      if ($json !== FALSE) {
+        $tags[] = '<script type="application/json" id="tetra-page-data" data-tetra-path="' . $e($head->path)
+          . '" data-tetra-from-schema="' . $e($fromSchema) . '">' . $json . '</script>';
       }
     }
     // Just before </head>, after the shell's own tags.

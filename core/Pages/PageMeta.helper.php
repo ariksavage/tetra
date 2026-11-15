@@ -4,7 +4,8 @@
  *
  * What a mapper says about one public page: what the page renderer writes
  * into its head (title, description, canonical URL, Open Graph and Twitter
- * tags) and its JSON-LD. Values are plain text; the renderer escapes them.
+ * tags), its JSON-LD, and the app's own data for the page. Values are plain
+ * text; the renderer escapes them.
  *
  * PHP version 8.4
  *
@@ -27,6 +28,10 @@ class PageMeta
    * @param array|null $jsonLd  The page's structured data (eg. a schema.org Recipe), encoded as JSON-LD.
    * @param string $content     Minimal HTML for crawlers that don't run JavaScript, placed in the app's
    *                            root element and replaced when Angular starts; already escaped. '' for none.
+   * @param mixed $data         The app's own data for the page, eg. the record exactly as its API sends it,
+   *                            so the page can use it instead of its first API call. Written as a separate
+   *                            application/json block, not structured data; only with the route's
+   *                            "fromSchema" converter. NULL for none.
    */
   public function __construct(
     public string $title = '',
@@ -36,6 +41,7 @@ class PageMeta
     public string $canonical = '',
     public ?array $jsonLd = NULL,
     public string $content = '',
+    public mixed $data = NULL,
   ) {}
 
   /** Plain text for a description: no tags, single spaces, at most $max characters, cut at a word. */
