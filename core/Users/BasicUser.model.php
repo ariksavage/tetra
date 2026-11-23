@@ -682,6 +682,20 @@ class BasicUser extends \Core\Base\Models\Base {
   }
 
   /**
+   * End every open session, eg. once the password changes, so anyone logged
+   * in with the old one is logged out everywhere.
+   *
+   * @return bool  Success
+   */
+  public function endAllSessions(): bool
+  {
+    return !!$this->update(['date_ended' => date('Y-m-d H:i:s')], 'users_sessions')
+      ->where('user_id', '=', $this->id)
+      ->and('date_ended', 'IS NULL')
+      ->execute();
+  }
+
+  /**
    * End any outstanding sessions
    *
    * @return bool  Success

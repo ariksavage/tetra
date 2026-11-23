@@ -17,33 +17,8 @@
  * @since      2026-11-11
  */
 
-if (PHP_SAPI !== 'cli') {
-  http_response_code(404);
-  exit;
-}
-
+require_once(__DIR__ . '/cli-helpers.php');
 require_once(__DIR__ . '/../bootstrap.php');
-
-function fail(string $message): never
-{
-  fwrite(STDERR, $message . PHP_EOL);
-  exit(1);
-}
-
-function askHidden(string $prompt): string
-{
-  fwrite(STDOUT, $prompt);
-  $tty = stream_isatty(STDIN);
-  if ($tty) {
-    shell_exec('stty -echo');
-  }
-  $value = rtrim(strval(fgets(STDIN)), "\r\n");
-  if ($tty) {
-    shell_exec('stty echo');
-    fwrite(STDOUT, PHP_EOL);
-  }
-  return $value;
-}
 
 $options = getopt('', ['username:', 'email:', 'first:', 'last:', 'role:']);
 foreach (['username', 'email', 'first', 'last'] as $required) {
@@ -92,13 +67,7 @@ if ($helper->taken($options['username'], $options['email'])) {
   fail('A user with that username or email address already exists.');
 }
 
-$password = askHidden('Password (at least 8 characters): ');
-if (strlen($password) < 8) {
-  fail('Passwords need at least 8 characters.');
-}
-if (askHidden('Same password again: ') !== $password) {
-  fail("The passwords don't match.");
-}
+$password = askNewPassword();
 
 $user = new \Core\Users\Models\User();
 $user->username = $options['username'];
