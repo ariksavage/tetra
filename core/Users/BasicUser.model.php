@@ -456,26 +456,84 @@ class BasicUser extends \Core\Base\Models\Base {
   }
 
   /**
-   * Start a new session and generate a link to
-   * allow a user to reset their password.
+   * A new password reset link, good for $minutes. It carries a one-time
+   * token that can only set a new password (see resetPasswordWithToken); only
+   * its hash is stored. Any earlier unused link for this user stops working.
    *
-   * @var String $host  Base URL of the request.
+   * @param string $origin  The site's address, eg. https://work.example.com
+   * @param int    $minutes How long the link keeps working
    *
-   * @return String     Reset Link
+   * @return string The link
    */
-  public function passwordResetLink(string $host)
+  public function passwordResetLink(string $origin, int $minutes): string
   {
-    // end any open sessions
-    $now = date('Y-m-d H:i:s');
-    $this->update(['date_ended' => $now], 'users_sessions')
-    ->where('user_id', '=', $this->id)
-    ->and('date_ended', 'IS NULL')
-    ->execute();
-    // start a new reset session
-    $expiresDays = $this->configValue('password_reset_expires_days');
-    $token = $this->startSession($expiresDays);
-    $link = "{$host}/password-reset/{$this->id}/{$token}";
-    return $link;
+    $this->endPasswordResets();
+    $token = $this->generateAuthToken();
+    $this->insert([
+      'user_id' => $this->id,
+      'token_hash' => hash('sha256', $token),
+      'date_expires' => date('Y-m-d H:i:s', strtotime("+{$minutes} minutes")),
+    ], 'password_resets')->execute();
+    return rtrim($origin, '/') . "/password-reset/{$this->id}/{$token}";
+  }
+
+  /**
+   * Whether a reset link was made for this user in the last $minutes and is
+   * still unused: to send at most one email that often.
+   */
+  public function recentPasswordReset(int $minutes): bool
+  {
+    return !!$this->select(['id'])->from('password_resets')
+      ->where('user_id', '=', $this->id)
+      ->and('date_used', 'IS NULL')
+      ->and('date_created', '>', date('Y-m-d H:i:s', strtotime("-{$minutes} minutes")))
+      ->execute(TRUE);
+  }
+
+  /**
+   * Whether this reset token is this user's, unused and unexpired.
+   */
+  public function validResetToken(string $token): bool
+  {
+    if (!$this->id || !preg_match('/^[0-9a-f]{64}$/', $token)) {
+      return FALSE;
+    }
+    return !!$this->select(['id'])->from('password_resets')
+      ->where('user_id', '=', $this->id)
+      ->and('token_hash', '=', hash('sha256', $token))
+      ->and('date_used', 'IS NULL')
+      ->and('date_expires', '>', date('Y-m-d H:i:s'))
+      ->execute(TRUE);
+  }
+
+  /**
+   * Set a new password with a reset link's token. The token is used up, and
+   * the user is logged out everywhere, so a session started with the old
+   * password ends too.
+   *
+   * @return bool FALSE if the token isn't valid (wrong, used or expired)
+   */
+  public function resetPasswordWithToken(string $token, string $password): bool
+  {
+    if (!$this->validResetToken($token)) {
+      return FALSE;
+    }
+    $this->endPasswordResets();
+    $this->setPassword($password);
+    if (!$this->save()) {
+      return FALSE;
+    }
+    $this->endAllSessions();
+    return TRUE;
+  }
+
+  /** Use up this user's unused reset links. */
+  protected function endPasswordResets(): void
+  {
+    $this->update(['date_used' => date('Y-m-d H:i:s')], 'password_resets')
+      ->where('user_id', '=', $this->id)
+      ->and('date_used', 'IS NULL')
+      ->execute();
   }
 
   /**
@@ -677,6 +735,20 @@ class BasicUser extends \Core\Base\Models\Base {
     return $this->update($data, 'users_sessions')
       ->where('token', '=', $token)
       ->and('user_id', '=', $this->id)
+      ->and('date_ended', 'IS NULL')
+      ->execute();
+  }
+
+  /**
+   * End every open session, eg. once the password changes, so anyone logged
+   * in with the old one is logged out everywhere.
+   *
+   * @return bool  Success
+   */
+  public function endAllSessions(): bool
+  {
+    return !!$this->update(['date_ended' => date('Y-m-d H:i:s')], 'users_sessions')
+      ->where('user_id', '=', $this->id)
       ->and('date_ended', 'IS NULL')
       ->execute();
   }

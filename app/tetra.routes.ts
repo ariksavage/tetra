@@ -8,6 +8,7 @@ export const TETRA_ROUTES: Routes = [
   { path: 'home', loadComponent: () => import('@tetra/pages/home/home.page').then(m => m.HomePageComponent), title: 'Home' },
   { path: 'install', loadComponent: () => import('@tetra/pages/install/install.page').then(m => m.InstallPageComponent), title: 'Install' },
   { path: 'login', loadComponent: () => import('@tetra/pages/login/login.page').then(m => m.LoginPageComponent), title: 'Login' },
+  { path: 'forgot-password', loadComponent: () => import('@tetra/pages/forgot-password/forgot-password.page').then(m => m.ForgotPasswordPageComponent), title: 'Forgot password' },
   { path: 'password-reset/:id/:token', loadComponent: () => import('@tetra/pages/password-reset/password-reset.page').then(m => m.PasswordResetPage), title: 'Password Reset'},
   { path: 'my', children: [
     { path: '', redirectTo: 'account', pathMatch: 'full' },

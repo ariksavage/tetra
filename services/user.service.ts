@@ -163,20 +163,23 @@ export class UserService {
     })
   }
 
-  forgotPassword(username: string) {
-    const host = window.location.origin;
-    const params = {
-      username,
-      host
-    };
-    return this.core.getParams(params, 'users', 'password-reset');
+  /**
+   * Email a reset link to the account with this username or email address.
+   * Resolves to the server's answer, the same whether or not there is one.
+   */
+  forgotPassword(login: string) {
+    return this.core.post('users', 'forgot-password', { login, host: window.location.origin }, false);
   }
 
-  resetPassword(newPassword: string, repeatNewPassword: string) {
-    const payload = {
-      newPassword,
-      repeatNewPassword
-    };
-    return this.core.post('users', 'password-reset', payload);
+  /** Whether a reset link's token still works. */
+  checkResetToken(userId: number, token: string): Promise<boolean> {
+    return this.core.getQuietly('users', `password-reset-check?user_id=${userId}&token=${encodeURIComponent(token)}`)
+      .then((data: any) => !!data?.valid);
+  }
+
+  /** Set a new password with a reset link. Resolves to the username, or false. */
+  resetPassword(userId: number, token: string, password: string, password2: string) {
+    return this.core.post('users', 'password-reset', { user_id: userId, token, password, password2 }, false)
+      .then((data: any) => data?.username ?? false);
   }
 }
