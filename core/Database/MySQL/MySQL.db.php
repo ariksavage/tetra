@@ -33,6 +33,17 @@ class MySQL extends \mysqli
   private static ?object $config = NULL;
 
   /**
+   * Why the connection failed, eg. the database server isn't running, or ''
+   * when it's connected. A failed mysqli can't be used at all, so this is
+   * checked first.
+   * @var string
+   */
+  public string $unavailable = '';
+
+  /** MySQL's error number when it failed, eg. 2002 (no server), 1049 (no such database). */
+  public int $unavailableCode = 0;
+
+  /**
    * Number of queries run in this request, and the time spent on them (seconds).
    * Reported in the Server-Timing response header.
    */
@@ -49,8 +60,11 @@ class MySQL extends \mysqli
    */
   public static function shared(): MySQL
   {
-    if (!self::$shared || self::$shared->connect_error) {
+    if (!self::$shared || !self::$shared->test()) {
       self::$shared = new MySQL();
+    }
+    if (self::$shared->unavailable) {
+      self::$shared->unavailableError();
     }
     return self::$shared;
   }
@@ -81,8 +95,45 @@ class MySQL extends \mysqli
     $password = $config->password;
     $name = $config->name;
     $port = $config->port ?? 3306;
-    @parent::__construct($host, $user, $password, $name, $port);
+    try {
+      @parent::__construct($host, $user, $password, $name, $port);
+    } catch (\mysqli_sql_exception $ex) {
+      $this->unavailable = $ex->getMessage() ?: 'Could not connect.';
+      $this->unavailableCode = intval($ex->getCode());
+    }
     // mysqli_report($old); // restore previous mode
+  }
+
+  /**
+   * Whether the site has its database settings (config/db.config). Without
+   * them it hasn't been installed; with them, a failed connection means the
+   * database is down, not that the site needs installing.
+   */
+  public static function isConfigured(): bool
+  {
+    return file_exists(CONFIG_PATH . '/db.config');
+  }
+
+  /**
+   * Whether the database server answered, but turned the connection down,
+   * eg. the database isn't there yet (1049, or 1044 for a user who can't see
+   * it): what installing fixes. Errors the server sends are numbered below
+   * 2000; 2000 and up are the client's own, eg. 2002 when no server answers.
+   */
+  public function serverHasNoDatabase(): bool
+  {
+    return $this->unavailableCode > 0 && $this->unavailableCode < 2000;
+  }
+
+  /**
+   * Answer 503: the database isn't available. The app shows a warning until
+   * it's back. The reason is logged, not sent.
+   */
+  public function unavailableError(): never
+  {
+    error_log('Tetra: database unavailable: ' . $this->unavailable);
+    $this->error("The database isn't available.", 503, 'Database');
+    exit(1);
   }
 
   /**
@@ -111,6 +162,12 @@ class MySQL extends \mysqli
     } else {
       // $this->error("Tetra config not found.", "Tetra", 500, ["config_file" => $tetraConfig]);
     }
+    // In DDEV, "db" is also every other running project's database on the
+    // shared network, so with this project's stopped it quietly answers as
+    // another site's. Its own container name is only ever this project's.
+    if (($config->host ?? '') === 'db' && getenv('IS_DDEV_PROJECT') === 'true' && ($project = getenv('DDEV_PROJECT'))) {
+      $config->host = "ddev-{$project}-db";
+    }
     if (isset($config->user)) {
       self::$config = $config;
     }
@@ -123,8 +180,7 @@ class MySQL extends \mysqli
    */
   public function test(): bool
   {
-    if ($this->connect_error) {
-      // echo "Not connected, error: " . $this->connect_error;
+    if ($this->unavailable || $this->connect_error) {
       return FALSE;
     } else {
        // echo "Connected.";
@@ -222,6 +278,9 @@ class MySQL extends \mysqli
    */
   public function query(string $query, int $resultMode = MYSQLI_STORE_RESULT): \mysqli_result|bool
   {
+    if ($this->unavailable) {
+      $this->unavailableError();
+    }
     $started = microtime(TRUE);
     try {
       $result = parent::query($query, $resultMode);

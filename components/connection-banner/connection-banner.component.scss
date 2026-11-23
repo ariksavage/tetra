@@ -1,0 +1,50 @@
+:host {
+  display: contents;
+}
+
+.connection-banner {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .25lh 1em;
+  padding: .4lh 1em;
+  background: #b00020;
+  color: #fff;
+  font-family: var(--font-ui, sans-serif);
+
+  p {
+    margin: 0;
+  }
+
+  code {
+    padding: 0 .4ex;
+    background: rgba(0, 0, 0, .3);
+    color: inherit;
+  }
+
+  .auto {
+    opacity: .85;
+  }
+
+  button {
+    flex: none;
+    border: 2px solid #fff;
+    background: transparent;
+    color: #fff;
+    box-shadow: none;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: .7;
+    }
+
+    &:focus-visible {
+      outline: 2px solid #fff;
+      outline-offset: 2px;
+    }
+  }
+}

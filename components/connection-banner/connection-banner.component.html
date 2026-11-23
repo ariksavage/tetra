@@ -1,0 +1,11 @@
+@if (message(); as m) {
+  <div class="connection-banner" role="alert">
+    <p>
+      <strong>{{m.title}}</strong>
+      {{m.detail}}
+      @if (m.command) { <code>{{m.command}}</code>. }
+      <span class="auto">This clears by itself once it's back.</span>
+    </p>
+    <button type="button" (click)="retry()" [disabled]="checking">{{checking ? 'Checking…' : 'Check now'}}</button>
+  </div>
+}

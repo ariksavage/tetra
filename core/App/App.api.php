@@ -24,6 +24,19 @@ class App extends \Core\Base\API\Base {
   }
 
   /**
+   * Whether the API and its database are up: 200, or 503 when the database
+   * isn't available. The app checks this while it shows that warning.
+   */
+  public function healthGET()
+  {
+    $db = new DB();
+    if (!$db->test()) {
+      $db->unavailableError();
+    }
+    $this->success('health', (object) ['database' => TRUE]);
+  }
+
+  /**
    * Load basic configuration and menu data
    * needed to initialize the application.
    */
@@ -34,6 +47,12 @@ class App extends \Core\Base\API\Base {
     // Test DB connection
     $db = new DB();
     if (!$db->test()){
+      // Install only when the database server answers but the database
+      // isn't there yet (or nothing's set up). A server that doesn't answer
+      // is down, and installing would be the wrong fix: say so instead.
+      if (DB::isConfigured() && !$db->serverHasNoDatabase()) {
+        $db->unavailableError();
+      }
       $data->needsInstall = TRUE;
       $data->noDB = TRUE;
     }
