@@ -1,18 +1,14 @@
 <div class="login-form">
+  @if (notice) {
+    <p class="login-notice" role="status">{{notice}}</p>
+  }
   <div class="field text" label="Username" [(model)]="username" (onEnter)="loginSubmit()"></div>
   <div class="field password" label="Password" [(model)]="password" (onEnter)="loginSubmit()"></div>
   @if (loginError) {
     <p class="login-error" role="alert">{{loginError}}</p>
   }
-  @if (forgotPasswordMessage) {
-    <p>{{forgotPasswordMessage}}</p>
-  }
-  @if (username && !password) {
-    <button (click)="forgotPassword()">Forgot Password?</button>
-  }
-  <button class="login-submit" type="button" (click)="loginSubmit()">Log In</button>
+  <div class="login-actions">
+    <a class="forgot-link" routerLink="/forgot-password" [queryParams]="username ? {login: username} : {}">Forgot your password?</a>
+    <button class="login-submit" type="button" (click)="loginSubmit()">Log In</button>
+  </div>
 </div>
-
-
-
-

@@ -46,10 +46,17 @@ describe('PasswordResetPage', () => {
     expect(fixture.componentInstance.canSavePassword()).toBeFalsy();
   });
 
-  it('should return true from canSavePassword when passwords match', () => {
+  it('should return false from canSavePassword when the password is too short', () => {
     const fixture = TestBed.createComponent(PasswordResetPage);
     fixture.componentInstance.password = 'abc123';
     fixture.componentInstance.password2 = 'abc123';
+    expect(fixture.componentInstance.canSavePassword()).toBeFalsy();
+  });
+
+  it('should return true from canSavePassword when passwords match', () => {
+    const fixture = TestBed.createComponent(PasswordResetPage);
+    fixture.componentInstance.password = 'abc12345';
+    fixture.componentInstance.password2 = 'abc12345';
     expect(fixture.componentInstance.canSavePassword()).toBeTruthy();
   });
 });

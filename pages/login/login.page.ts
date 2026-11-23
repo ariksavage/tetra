@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
+import { RouterLink } from '@angular/router';
 
 import { FieldTextComponent } from '@tetra/components/field-text/field-text.component';
 import { FieldPasswordComponent } from '@tetra/components/field-password/field-password.component';
@@ -7,7 +8,7 @@ import { ConnectionService } from '@tetra/services/connection.service';
 
 @Component({
     selector: 'login-page',
-    imports: [FieldTextComponent, FieldPasswordComponent],
+    imports: [FieldTextComponent, FieldPasswordComponent, RouterLink],
     templateUrl: './login.page.html',
     changeDetection: ChangeDetectionStrategy.Eager,
     styleUrls: ['./login.page.scss']
@@ -18,7 +19,8 @@ export class LoginPageComponent extends Page {
   protected override requiresLogin = false;
   username: string = '';
   password: string = '';
-  forgotPasswordMessage: string = '';
+  /** eg. after setting a new password: "Your new password is set." */
+  notice: string = '';
   loginError: string = '';
   private connection = inject(ConnectionService);
 
@@ -41,16 +43,15 @@ export class LoginPageComponent extends Page {
     })
   }
 
-  forgotPassword() {
-    this.core.get('users', `password-reset?username=${this.username}&host=${encodeURI(window.location.origin) }`).then(response => {
-      console.log('forgot password response', response);
-      this.forgotPasswordMessage = response.message;
-    })
-  }
-
   override load() {
     if (this.currentUser && this.currentUser.id){
       this.goHome();
+    }
+    // Back from setting a new password: /login?username=arik&reset=1
+    const params = this.activeRoute.snapshot.queryParamMap;
+    this.username = params.get('username') ?? this.username;
+    if (params.get('reset')) {
+      this.notice = 'Your new password is set. Log in with it.';
     }
   }
 

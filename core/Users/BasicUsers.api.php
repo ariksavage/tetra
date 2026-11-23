@@ -374,8 +374,34 @@ class BasicUsers extends \Core\Base\API\Base {
     }
   }
 
+  /** How long an emailed reset link keeps working. */
+  const RESET_EMAIL_MINUTES = 60;
+
+  /** Send at most one reset email per user this often. */
+  const RESET_EMAIL_EVERY_MINUTES = 5;
+
   /**
-   * Get a password reset link for the given user.
+   * The address reset links point to: the site's own (Site address,
+   * base_url), never one from the request, which anyone could set to their
+   * own site to receive a working link. A local copy in DDEV may use the
+   * local address it's open at (localhost, 127.0.0.1 or *.ddev.site).
+   *
+   * @param string $requested The address the app is open at
+   * @return string The origin, or '' if the site's address isn't set
+   */
+  protected function resetOrigin(string $requested = ''): string
+  {
+    $requested = rtrim($requested, '/');
+    if (getenv('IS_DDEV_PROJECT') === 'true'
+      && preg_match('#^https?://(localhost|127\.0\.0\.1|[a-z0-9-]+(\.[a-z0-9-]+)*\.ddev\.site)(:\d+)?$#i', $requested)) {
+      return $requested;
+    }
+    return rtrim(strval($this->configValue('base_url') ?? ''), '/');
+  }
+
+  /**
+   * Make a password reset link for a user, to send them yourself. It works
+   * for the Password reset expires (days) setting, once.
    * @param  int    $userId User ID
    * @return never          JSON response includes link and text.
    */
@@ -383,68 +409,97 @@ class BasicUsers extends \Core\Base\API\Base {
   {
     $this->requirePermission('users', 'EDIT');
     $user = $this->getById($userId);
-    $host = $this->getValue('host');
-
-    $link = $user->passwordResetLink($host);
-    $this->data->link = $link;
-    $expiresDays = $this->configValue('password_reset_expires_days');
+    $origin = $this->resetOrigin($this->getValue('host', '', 'string'));
+    if (!$origin) {
+      $this->error("Set the site's address (Site address, on the Configuration page) to make reset links.", 400, 'Validation');
+    }
+    $expiresDays = intval($this->configValue('password_reset_expires_days')) ?: 10;
+    $this->data->link = $user->passwordResetLink($origin, $expiresDays * 24 * 60);
     $this->data->text  = "Copy the link below to send to the user.";
-    $this->data->text .= " This link will expire in <strong>{$expiresDays}</strong> days.";
+    $this->data->text .= " It works once, for <strong>{$expiresDays}</strong> days.";
     $this->success();
   }
 
   /**
-   * Email a user with a password reset link.
-   * @param  int    $userId User ID
-   * @return never          Response message
+   * Forgot password: email a reset link to the user with this username or
+   * email address (login). Answers the same whether or not there is one, so
+   * it can't be used to find out who has an account.
    */
-  public function passwordResetGET(): never
+  public function forgotPasswordPOST(): never
   {
-    $username = $this->getValue('username');
+    $login = trim($this->postValue('login', '', 'string'));
+    $answer = 'If that matches an account, a link to set a new password is on its way to its email address. It works for an hour.';
+    if (!$login) {
+      $this->error('Enter your username or email address.', 400, 'Validation');
+    }
     $user = $this->select()->from('users')
-    ->where('username', '=', $username)
-    ->execute(TRUE, '\Core\Users\Models\User');
-    if ($user) {
-      $appName = $this->configValue('name');
-      $supportEmail = $this->configValue('support_email');
-      $host = $this->getValue('host');
-      if (!$host) {
-        $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https" : "http";
-        $host = $protocol . "://" . $_SERVER['HTTP_HOST'];
-      }
-      $resetLink = $user->passwordResetLink($host);
-      $subject = "Password reset for " . $appName;
-      $supportLink = '<a href="mailto:' . $supportEmail . '?subject=password%20reset%20request">contact support</a>';
-      $supportLink .= ' if you have questions.';
-      $lines = array();
-      $lines[] = '<h2>Password Reset Request</h2>';
-      $lines[] = '<p>Hello ' . $user->name() . ',</p>';
-      $lines[] = '<p>You recently requested to reset your password for your <strong>'.$appName.'</strong> account.</p>';
-      $lines[] = '<p><a href="' . $resetLink . '">Reset your password</a></p>';
-      $lines[] = '<p>If you did not request a password reset, please ignore this email or '.$supportLink.'</p>';
-      $message = implode("\r\n", $lines);
-      if (!$user->message($subject, $message)) {
-        $this->error("Password reset could not be sent");
+      ->where('username', '=', $login)->or('email', '=', $login)
+      ->execute(TRUE, '\Core\Users\Models\User');
+    if ($user && $user->status === 'active' && $user->email && !$user->recentPasswordReset(self::RESET_EMAIL_EVERY_MINUTES)) {
+      $origin = $this->resetOrigin($this->postValue('host', '', 'string'));
+      if (!$origin) {
+        error_log("Tetra: no reset email for user {$user->id}: the site's address (base_url) isn't set.");
+      } else {
+        $this->sendResetEmail($user, $user->passwordResetLink($origin, self::RESET_EMAIL_MINUTES));
       }
     }
-    // Sends success message regardless of whether user exists, to prevent brute force guessing usernames
-    $this->success('message', 'A password reset link has been sent to your email address.');
+    $this->success('message', $answer);
+  }
+
+  protected function sendResetEmail($user, string $link): void
+  {
+    $appName = htmlspecialchars(strval($this->configValue('name')));
+    $name = htmlspecialchars($user->name());
+    $href = htmlspecialchars($link);
+    $lines = [
+      "<p>Hello {$name},</p>",
+      "<p>Someone asked to set a new password for your {$appName} account. If it was you, use this link within an hour:</p>",
+      "<p><a href=\"{$href}\">Set a new password</a></p>",
+      "<p>If it wasn't you, ignore this email: your password stays as it is.</p>",
+    ];
+    if (!$user->message("Set a new password for {$appName}", implode("\r\n", $lines))) {
+      error_log("Tetra: the reset email to user {$user->id} could not be sent.");
+    }
   }
 
   /**
-   * Updates the current user's password
-   * @return never        Response message
+   * Whether a reset link is still good, so the page can say so before
+   * asking for a new password: ?user_id=&token=
+   */
+  public function passwordResetCheckGET(): never
+  {
+    $this->success('valid', $this->resetUser()?->validResetToken($this->getValue('token', '', 'string')) ?? FALSE);
+  }
+
+  /**
+   * Set a new password with a reset link: { user_id, token, password,
+   * password2 }. Then log in with it as usual.
    */
   public function passwordResetPOST(): never
   {
-    $currentUser = $this->getCurrentUser();
-    $password = $this->postValue('newPassword', '', 'string');
-    $password2 = $this->postValue('repeatNewPassword', '', 'string');
-    if ($password && $password2 && $password == $password2) {
-      if ($currentUser->resetPassword($password, $password2)) {
-        $this->success('message', "Password updated for {$currentUser->name()}");
-      }
+    $password = $this->postValue('password', '', 'string');
+    if (strlen($password) < 8) {
+      $this->error('Passwords need at least 8 characters.', 400, 'Validation');
     }
+    if ($password !== $this->postValue('password2', '', 'string')) {
+      $this->error("The passwords don't match.", 400, 'Validation');
+    }
+    $user = $this->resetUser(TRUE);
+    if (!$user || !$user->resetPasswordWithToken($this->postValue('token', '', 'string'), $password)) {
+      $this->error('This link has expired or been used. Ask for a new one.', 400, 'Validation');
+    }
+    $this->success('username', $user->username, 'Your new password is set. Log in with it.');
+  }
+
+  /** The user a reset link names, or NULL. */
+  protected function resetUser(bool $posted = FALSE)
+  {
+    $userId = $posted ? $this->postValue('user_id', 0, 'integer') : $this->getValue('user_id', 0, 'integer');
+    if ($userId < 1) {
+      return NULL;
+    }
+    return $this->select()->from('users')->where('id', '=', $userId)->and('status', '=', 'active')
+      ->execute(TRUE, '\Core\Users\Models\User') ?: NULL;
   }
 
   /**

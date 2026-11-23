@@ -31,8 +31,21 @@
   // filled) comes from the field component, using the padding set above.
 }
 
-.login-submit {
-  float: right;
+.login-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .5lh 1em;
+}
+
+.forgot-link {
+  font-size: .9em;
+}
+
+.login-notice {
+  margin-top: 0;
+  font-weight: bold;
 }
 
 .login-error {
