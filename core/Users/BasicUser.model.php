@@ -569,7 +569,7 @@ class BasicUser extends \Core\Base\Models\Base {
       }
       $data = $this->select()->where('id', '=', $key->user_id)->execute(TRUE);
       // Only an active person's keys work.
-      if (!$data || ($data->status ?? '') !== 'Active') {
+      if (!$data || strtolower($data->status ?? '') !== 'active') {
         return FALSE;
       }
       $this->mapData($data);
