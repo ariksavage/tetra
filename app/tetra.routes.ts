@@ -12,7 +12,9 @@ export const TETRA_ROUTES: Routes = [
   { path: 'password-reset/:id/:token', loadComponent: () => import('@tetra/pages/password-reset/password-reset.page').then(m => m.PasswordResetPage), title: 'Password Reset'},
   { path: 'my', children: [
     { path: '', redirectTo: 'account', pathMatch: 'full' },
-    { path: 'account', loadComponent: () => import('@tetra/pages/my/account/account.page').then(m => m.MyAccountPageComponent), title: 'My Account' }
+    { path: 'account', loadComponent: () => import('@tetra/pages/my/account/account.page').then(m => m.MyAccountPageComponent), title: 'My Account' },
+    { path: 'api-keys', loadComponent: () => import('@tetra/pages/my/api-keys/api-keys.page').then(m => m.MyApiKeysPageComponent), title: 'API keys', canActivate: [permissionGuard('api_keys', 'VIEW')] },
+    { path: 'api-keys/:id', loadComponent: () => import('@tetra/pages/my/api-key/api-key.page').then(m => m.MyApiKeyPageComponent), title: 'API key', canActivate: [permissionGuard('api_keys', 'VIEW')] }
   ]},
   { path: 'admin', children: [
     { path: '', redirectTo: 'config', pathMatch: 'full' },

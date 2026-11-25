@@ -1,0 +1,46 @@
+.new-token {
+  border-width: 2px;
+}
+
+.token-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: .5em 1em;
+  margin: 0 0 .75lh;
+}
+
+.token {
+  flex: 1 1 20em;
+  min-width: 0;
+  padding: .4em .6em;
+  overflow-wrap: anywhere;
+  border: var(--input-border, 1px solid #000);
+  background: var(--input-background, #fff);
+  font-size: .9em;
+  user-select: all;
+}
+
+.command {
+  margin: 0 0 .75lh;
+  padding: .5em .75em;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  border: var(--table-rule, 1px solid #000);
+  font-size: .85em;
+}
+
+.access {
+  margin: 0 0 .5lh;
+  padding-left: 1.25em;
+}
+
+.refused {
+  font-weight: bold;
+}
+
+h3 {
+  margin: .75lh 0 .25lh;
+  font-size: 1em;
+}

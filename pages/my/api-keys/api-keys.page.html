@@ -1,0 +1,54 @@
+<div class="app-layout">
+  <div class="tetra-admin my-api-keys" content>
+    <p class="breadcrumb"><a routerLink="/my/account">&larr; My Account</a></p>
+
+    <section class="panel" aria-labelledby="keys-heading">
+      <h2 id="keys-heading">{{showAll ? 'Everyone\'s API keys' : 'Your API keys'}}</h2>
+      <p class="muted">A key lets a program, eg. Claude, use this site's API as you: only what you allow it on its page, and never more than you can do yourself. It can't change accounts, roles, permissions, settings or keys.</p>
+      @if (keys.length) {
+        <div class="table-wrap"><table class="data-table">
+          <thead>
+            <tr>
+              <th scope="col">Name</th>
+              @if (showAll) { <th scope="col">Owner</th> }
+              <th scope="col">Key</th><th scope="col">Last used</th><th scope="col">Expires</th><th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (key of keys; track key.id) {
+              <tr>
+                <td><a [routerLink]="['/my/api-keys', key.id]">{{key.name}}</a></td>
+                @if (showAll) { <td>{{key.owner}}</td> }
+                <td><code>{{key.display}}</code></td>
+                <td>{{key.date_last_used ? formatKeyDate(key.date_last_used, true) : 'Never'}}</td>
+                <td>{{key.date_expires ? formatKeyDate(key.date_expires) : 'Never'}}</td>
+                <td><span class="tag key-status {{key.status}}">{{key.status === 'active' ? 'Active' : key.status === 'expired' ? 'Expired' : 'Revoked'}}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table></div>
+      } @else if (loaded) {
+        <p class="empty">No API keys yet.</p>
+      }
+      @if (canManageAll()) {
+        <label class="checkbox-label"><input type="checkbox" name="showAll" [(ngModel)]="showAll" (ngModelChange)="fetch()"> Show everyone's keys</label>
+      }
+    </section>
+
+    @if (canCreate()) {
+      <section class="panel" aria-labelledby="new-key-heading">
+        <h2 id="new-key-heading">Make a key</h2>
+        <form (ngSubmit)="create()" class="form-grid">
+          <label class="inline">Name <input name="name" [(ngModel)]="newKey.name" required placeholder="eg. Claude: proposals" autocomplete="off"></label>
+          <label class="inline">Expires
+            <select name="expires" [(ngModel)]="newKey.expires_days">
+              @for (choice of expiry; track choice.days) { <option [ngValue]="choice.days">{{choice.label}}</option> }
+            </select>
+          </label>
+          <div class="button-row"><button type="submit" class="primary" [disabled]="creating || !newKey.name.trim()">Make key</button></div>
+        </form>
+        <p class="muted">A new key can't do anything until you choose what it may do, on its page.</p>
+      </section>
+    }
+  </div>
+</div>

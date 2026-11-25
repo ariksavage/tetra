@@ -1,0 +1,139 @@
+<div class="app-layout">
+  <div class="tetra-admin my-api-key" content>
+    <p class="breadcrumb"><a routerLink="/my/api-keys">&larr; API keys</a></p>
+
+    @if (key) {
+      @if (token) {
+        <section class="panel new-token" aria-labelledby="token-heading" role="status">
+          <h2 id="token-heading">Your new key</h2>
+          <p><strong>Copy it now: it won't be shown again.</strong> Only a scrambled copy is kept, to check it against.</p>
+          <div class="token-row">
+            <code class="token">{{token}}</code>
+            <button type="button" (click)="copyToken()">{{copied ? 'Copied' : 'Copy'}}</button>
+          </div>
+          <p class="muted">For Claude on your Mac: copy it, then run this, which saves it where only you can read it:</p>
+          <pre class="command">mkdir -p ~/.config/work-api && pbpaste &gt; ~/.config/work-api/token && chmod 600 ~/.config/work-api/token</pre>
+          <p class="muted">It can't do anything yet: choose what it may do below, and save.</p>
+        </section>
+      }
+
+      <form (ngSubmit)="save()">
+        <section class="panel" aria-labelledby="key-details-heading">
+          <h2 id="key-details-heading">Details</h2>
+          <p>
+            <code>{{key.display}}</code>
+            <span class="tag key-status {{key.status}}">{{key.status === 'active' ? 'Active' : key.status === 'expired' ? 'Expired' : 'Revoked'}}</span>
+          </p>
+          <p class="muted">
+            Made {{formatKeyDate(key.date_created)}} &middot;
+            {{key.date_last_used ? 'last used ' + formatKeyDate(key.date_last_used, true) + (key.last_used_ip ? ' from ' + key.last_used_ip : '') : 'never used'}} &middot;
+            {{key.date_revoked ? 'revoked ' + formatKeyDate(key.date_revoked) : key.date_expires ? 'expires ' + formatKeyDate(key.date_expires) : 'never expires'}}
+          </p>
+          <fieldset [disabled]="!can('EDIT') || key.status === 'revoked'">
+            <div class="form-grid">
+              <label class="inline">Name <input name="name" [(ngModel)]="name" required autocomplete="off"></label>
+              <label class="inline">Expires
+                <select name="expires" [(ngModel)]="expiresDays">
+                  <option [ngValue]="-1">{{key.date_expires ? 'Keep: ' + formatKeyDate(key.date_expires) : 'Keep: never'}}</option>
+                  @for (choice of expiry; track choice.days) { <option [ngValue]="choice.days">{{choice.days ? choice.label + ' from now' : choice.label}}</option> }
+                </select>
+              </label>
+            </div>
+          </fieldset>
+        </section>
+
+        <section class="panel" aria-labelledby="key-inherits-heading">
+          <fieldset [disabled]="!can('EDIT') || key.status === 'revoked'">
+            <legend id="key-inherits-heading"><h2>Includes</h2></legend>
+            <p class="muted">This key also gets every permission of the roles ticked here.</p>
+            <ul class="checkbox-list">
+              @for (role of key.roles; track role.id) {
+                <li><label class="checkbox-label">
+                  <input type="checkbox" [name]="'inherits-' + role.id" [ngModel]="inherits.has(role.id)" (ngModelChange)="toggle(inherits, role.id, $event)">
+                  {{role.label}}
+                </label></li>
+              }
+            </ul>
+          </fieldset>
+        </section>
+
+        <section class="panel" aria-labelledby="key-permissions-heading">
+          <fieldset [disabled]="!can('EDIT') || key.status === 'revoked'">
+            <legend id="key-permissions-heading"><h2>Permissions</h2></legend>
+            <p class="muted">And these, on their own. Ticked and greyed out: it already has them from a role it includes. Keys never reach accounts, roles, permissions, settings or other keys, so those aren't listed.</p>
+            @for (group of groups; track group.dimension) {
+              <h3>{{group.label}}</h3>
+              <ul class="checkbox-list">
+                @for (p of group.permissions; track p.id) {
+                  <li><label class="checkbox-label" [title]="p.description">
+                    @if (isInherited(p.id)) {
+                      <input type="checkbox" [name]="'perm-' + p.id" [ngModel]="true" disabled>
+                    } @else {
+                      <input type="checkbox" [name]="'perm-' + p.id" [ngModel]="permissions.has(p.id)" (ngModelChange)="toggle(permissions, p.id, $event)">
+                    }
+                    {{p.title}} <span class="muted">({{p.action}})</span>
+                  </label></li>
+                }
+              </ul>
+            }
+          </fieldset>
+        </section>
+
+        @if (can('EDIT') && key.status !== 'revoked') {
+          <div class="button-row"><button type="submit" class="primary" [disabled]="saving || !name.trim()">Save</button></div>
+        }
+      </form>
+
+      <section class="panel" aria-labelledby="key-can-heading">
+        <h2 id="key-can-heading">What it can do</h2>
+        @if (accessLines(key.can).length) {
+          <ul class="access">
+            @for (line of accessLines(key.can); track line.label) { <li><strong>{{line.label}}:</strong> {{line.actions}}</li> }
+          </ul>
+        } @else {
+          <p class="empty">Nothing yet.</p>
+        }
+        @if (accessLines(key.beyond_owner).length) {
+          <p class="muted">Its role also allows these, but its owner can't do them, so it can't either:
+            @for (line of accessLines(key.beyond_owner); track line.label; let last = $last) { {{line.label}} ({{line.actions}})@if (!last) {; } }
+          </p>
+        }
+        <p class="muted">As saved. A program can check what its key can do at <code>GET /core/api-keys/me</code>.</p>
+      </section>
+
+      <section class="panel" aria-labelledby="key-log-heading">
+        <h2 id="key-log-heading">Activity</h2>
+        <p class="muted">Every change it has made or tried in the last 90 days, newest first. Reading isn't listed.</p>
+        @if (log.length) {
+          <div class="table-wrap"><table class="data-table">
+            <thead><tr><th scope="col">When</th><th scope="col">Request</th><th scope="col" class="number">Result</th></tr></thead>
+            <tbody>
+              @for (entry of log; track entry.id) {
+                <tr>
+                  <td>{{formatKeyDate(entry.date, true)}}</td>
+                  <td><code>{{entry.method}} {{entry.path}}</code></td>
+                  <td class="number" [class.refused]="entry.status >= 400">{{entry.status}}</td>
+                </tr>
+              }
+            </tbody>
+          </table></div>
+        } @else {
+          <p class="empty">No changes yet.</p>
+        }
+      </section>
+
+      @if (can('DELETE')) {
+        <section class="panel danger-zone" aria-labelledby="key-end-heading">
+          <h2 id="key-end-heading">{{key.status === 'revoked' ? 'Delete' : 'Revoke'}}</h2>
+          @if (key.status === 'revoked') {
+            <p>Revoked: it no longer works. Deleting it also deletes its activity log.</p>
+            <div class="button-row"><button type="button" class="danger" (click)="remove()">Delete this key</button></div>
+          } @else {
+            <p>Revoking stops it working at once, for good. Its activity log is kept until you delete it.</p>
+            <div class="button-row"><button type="button" class="danger" (click)="revoke()">Revoke this key</button></div>
+          }
+        </section>
+      }
+    }
+  </div>
+</div>
