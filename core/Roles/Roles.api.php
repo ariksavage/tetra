@@ -42,7 +42,8 @@ class Roles extends \Core\Base\API\Base
   public function listGET($flags = [])
   {
     $this->reqPermission('VIEW');
-    $roles = $this->select()->from('roles')->orderBy('id')->execute() ?: [];
+    // An API key's role is managed on its key, not here.
+    $roles = $this->select()->from('roles')->where('api_key', '=', 0)->orderBy('id')->execute() ?: [];
     $counts = [];
     foreach ($this->raw('SELECT `role_id`, COUNT(*) AS `n` FROM `users_roles` GROUP BY `role_id`')->executeSelect() ?: [] as $row) {
       $counts[intval($row->role_id)] = intval($row->n);
@@ -73,6 +74,9 @@ class Roles extends \Core\Base\API\Base
     $role = new UserRole();
     if (!$isNew) {
       $role->byId(intval($data->id));
+      if ($role->api_key) {
+        $this->error('That role belongs to an API key: change it on the key\'s page.', 400, 'Validation');
+      }
     }
     $role->label = trim(strval($data->label ?? $role->label));
     $role->description = trim(strval($data->description ?? $role->description));
@@ -113,6 +117,9 @@ class Roles extends \Core\Base\API\Base
     $this->reqPermission('DELETE');
     $role = new UserRole();
     $role->byId($id);
+    if ($role->api_key) {
+      $this->error('That role belongs to an API key: delete the key instead.', 400, 'Validation');
+    }
     if (in_array($role->key, self::BUILT_IN, TRUE)) {
       $this->error("The {$role->label} role is built in and can't be deleted.", 400, 'Validation');
     }
@@ -132,6 +139,11 @@ class Roles extends \Core\Base\API\Base
   protected function setInherits(int $roleId, array $inherits): void
   {
     $inherits = array_values(array_unique(array_filter($inherits, fn($id) => $id && $id !== $roleId)));
+    // No role inherits an API key's role.
+    if ($inherits) {
+      $keyRoles = array_map(fn($r) => intval($r->id), $this->raw('SELECT `id` FROM `roles` WHERE `api_key` = 1')->executeSelect() ?: []);
+      $inherits = array_values(array_diff($inherits, $keyRoles));
+    }
     $all = $this->inheritance();
     $all[$roleId] = $inherits;
     foreach ($inherits as $start) {
@@ -149,10 +161,9 @@ class Roles extends \Core\Base\API\Base
         $queue = array_merge($queue, $all[$next] ?? []);
       }
     }
-    $this->raw('DELETE FROM `roles_inheritance` WHERE `role_id` = ' . intval($roleId))->execute();
-    foreach ($inherits as $parent) {
-      $this->insert(['role_id' => $roleId, 'inherits_role' => $parent], 'roles_inheritance')->execute();
-    }
+    $role = new UserRole();
+    $role->id = $roleId;
+    $role->setInherits($inherits);
   }
 
   /** @return array<int, int[]> Each role's directly inherited roles. */

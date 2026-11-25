@@ -64,7 +64,8 @@ class Users extends BasicUsers {
   public function rolesGET()
   {
     $this->requirePermission('roles', 'VIEW');
-    $roles = $this->select()->from('roles')->orderBy('label')->execute(FALSE, '\Core\Users\Models\UserRole');
+    // Not API keys' roles: those are only ever their key's.
+    $roles = $this->select()->from('roles')->where('api_key', '=', 0)->orderBy('label')->execute(FALSE, '\Core\Users\Models\UserRole');
     $this->success('roles', $roles);
   }
 }

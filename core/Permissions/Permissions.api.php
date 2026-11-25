@@ -51,14 +51,17 @@ class Permissions extends \Core\Base\API\Base
       $p->description = strval($p->description ?? '');
       $p->locked = in_array($p->dimension, self::ADMIN_KEEPS, TRUE) && $p->action === '*';
     }
-    $roles = $this->select(['id', 'key', 'label'])->from('roles')->orderBy('id')->execute() ?: [];
+    // An API key's role is managed on its key, not here.
+    $roles = $this->select(['id', 'key', 'label'])->from('roles')->where('api_key', '=', 0)->orderBy('id')->execute() ?: [];
     $grants = [];
     foreach ($roles as $role) {
       $role->id = intval($role->id);
       $grants[$role->id] = [];
     }
     foreach ($this->raw('SELECT `role_id`, `permission_id` FROM `roles_permissions`')->executeSelect() ?: [] as $row) {
-      $grants[intval($row->role_id)][] = intval($row->permission_id);
+      if (isset($grants[intval($row->role_id)])) {
+        $grants[intval($row->role_id)][] = intval($row->permission_id);
+      }
     }
     $this->success('matrix', (object) [
       'permissions' => $permissions,
@@ -87,7 +90,7 @@ class Permissions extends \Core\Base\API\Base
 
     foreach ($grants as $roleId => $permissionIds) {
       $roleId = intval($roleId);
-      $role = $this->select(['id', 'key'])->from('roles')->where('id', '=', $roleId)->execute(TRUE);
+      $role = $this->select(['id', 'key'])->from('roles')->where('id', '=', $roleId)->and('api_key', '=', 0)->execute(TRUE);
       if (!$role) {
         continue;
       }
