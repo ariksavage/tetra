@@ -58,6 +58,8 @@ try {
 }
 
 if ($exists) {
+  // So an API can tell which action it's for while it's being made (see Base::allowsApiKeys).
+  \Core\Base\API\Base::$requestAction = $action;
   $api = new $className();
 } else {
   $core->error($type ? "$type is not a valid type" : '', 404);

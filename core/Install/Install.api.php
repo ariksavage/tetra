@@ -26,6 +26,12 @@ use \Core\Config\Models\Config;
  */
 class Install extends \Core\Base\API\Base {
 
+  /** API keys never reach installing: log in to change these yourself. */
+  public function allowsApiKeys(string $action): bool
+  {
+    return FALSE;
+  }
+
   public function __construct()
   {
     $this->data = new \stdClass();

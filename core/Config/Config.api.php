@@ -42,6 +42,12 @@ use \Core\Config\Helpers\TetraConfig;
  */
 class Config extends \Core\Base\API\Base {
 
+  /** API keys never reach settings: log in to change these yourself. */
+  public function allowsApiKeys(string $action): bool
+  {
+    return FALSE;
+  }
+
   public function __construct()
   {
     parent::__construct('config', '\Core\Config\Models\Config', 'Config', 'Config');

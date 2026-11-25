@@ -38,6 +38,12 @@ class UserRole extends \Core\Base\Models\Base {
   /** Given to every new user. */
   public bool $default = FALSE;
 
+  /**
+   * An API key's own role: edited on the key's page, never given to a person,
+   * inherited by another role, or listed on the Roles and Permissions pages.
+   */
+  public bool $api_key = FALSE;
+
   public object $permissions;
 
   /**
@@ -132,6 +138,56 @@ class UserRole extends \Core\Base\Models\Base {
    * @param  string  $action    Specific action being tested
    * @return boolean            TRUE if the role contains this permission
    */
+  /**
+   * Replace the roles this role inherits. API key roles are never inherited.
+   * (Roles::setInherits checks for loops first; an API key's role can't
+   * start one, since nothing inherits it.)
+   *
+   * @param int[] $roleIds
+   */
+  public function setInherits(array $roleIds): void
+  {
+    $id = intval($this->id);
+    $roleIds = array_values(array_unique(array_filter(array_map('intval', $roleIds), fn($r) => $r && $r !== $id)));
+    if ($roleIds) {
+      $roleIds = array_map(fn($r) => intval($r->id), $this->raw('SELECT `id` FROM `roles` WHERE `api_key` = 0 AND `id` IN (' . implode(',', $roleIds) . ')')->executeSelect() ?: []);
+    }
+    $this->raw("DELETE FROM `roles_inheritance` WHERE `role_id` = {$id}")->execute();
+    foreach ($roleIds as $parent) {
+      $this->insert(['role_id' => $id, 'inherits_role' => $parent], 'roles_inheritance')->execute();
+    }
+  }
+
+  /**
+   * Replace this role's own permissions (not the ones it inherits).
+   *
+   * @param int[] $permissionIds Unknown IDs are ignored.
+   */
+  public function setPermissions(array $permissionIds): void
+  {
+    $id = intval($this->id);
+    $permissionIds = array_values(array_unique(array_filter(array_map('intval', $permissionIds))));
+    if ($permissionIds) {
+      $permissionIds = array_map(fn($p) => intval($p->id), $this->raw('SELECT `id` FROM `permissions` WHERE `id` IN (' . implode(',', $permissionIds) . ')')->executeSelect() ?: []);
+    }
+    $this->raw("DELETE FROM `roles_permissions` WHERE `role_id` = {$id}")->execute();
+    foreach ($permissionIds as $permissionId) {
+      $this->insert(['role_id' => $id, 'permission_id' => $permissionId], 'roles_permissions')->execute();
+    }
+  }
+
+  /** IDs of the roles this role inherits, directly. */
+  public function inheritedRoleIds(): array
+  {
+    return array_map(fn($r) => intval($r->inherits_role), $this->raw('SELECT `inherits_role` FROM `roles_inheritance` WHERE `role_id` = ' . intval($this->id))->executeSelect() ?: []);
+  }
+
+  /** IDs of this role's own permissions, not inherited ones. */
+  public function ownPermissionIds(): array
+  {
+    return array_map(fn($r) => intval($r->permission_id), $this->raw('SELECT `permission_id` FROM `roles_permissions` WHERE `role_id` = ' . intval($this->id))->executeSelect() ?: []);
+  }
+
   public function hasPermission(string $dimension, string $action = ''): bool
   {
     $this->getPermissions();

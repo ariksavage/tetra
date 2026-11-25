@@ -27,6 +27,12 @@ namespace Core\Permissions\API;
 
 class Permissions extends \Core\Base\API\Base
 {
+
+  /** API keys never reach permissions: log in to change these yourself. */
+  public function allowsApiKeys(string $action): bool
+  {
+    return FALSE;
+  }
   /** Dimensions whose '*' permission the admin role always keeps. */
   const ADMIN_KEEPS = ['users', 'roles', 'permissions'];
 

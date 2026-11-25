@@ -25,6 +25,12 @@ use \Core\Users\Models\UserRole;
 
 class Roles extends \Core\Base\API\Base
 {
+
+  /** API keys never reach roles: log in to change these yourself. */
+  public function allowsApiKeys(string $action): bool
+  {
+    return FALSE;
+  }
   /** Tetra's own roles: their keys never change, and they can't be deleted. */
   const BUILT_IN = ['root', 'admin', 'user'];
 
