@@ -14,6 +14,11 @@
         <li class="dropdown-item my-account">
           <a class="dropdown-link" routerLink="/my/account" (click)="open = false">My Account</a>
         </li>
+        @if (user.hasPermission('api_keys', 'VIEW')) {
+          <li class="dropdown-item api-keys">
+            <a class="dropdown-link" routerLink="/my/api-keys" (click)="open = false">API keys</a>
+          </li>
+        }
       }
       @for (item of items; track item.route) {
         @if (canSee(item)) {

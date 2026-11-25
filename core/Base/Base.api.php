@@ -123,8 +123,21 @@ class Base {
   protected function checkAuth(): bool
   {
     $user = $this->getCurrentUser();
+    $key = $user ? $user->apiKey() : NULL;
+    if ($key) {
+      // An API key: only where keys are allowed, whatever its role says.
+      if (!$this->allowsApiKeys(self::$requestAction)) {
+        $this->error('API keys can\'t use this. Log in to do it yourself.', 403, 'Forbidden');
+      }
+      $this->noteApiKeyUse($key);
+      return TRUE;
+    }
     if ($this->requiresAuth()) {
       if (!$user) {
+        $token = $this->getAuthToken();
+        if ($token && str_starts_with($token, \Core\ApiKeys\Models\ApiKey::PREFIX)) {
+          $this->error('This API key isn\'t valid: it may have been revoked or have expired.', 401);
+        }
         $this->error('Login required', 401);
         return FALSE;
       } else {
@@ -134,6 +147,47 @@ class Base {
     } else {
       return TRUE;
     }
+  }
+
+  /**
+   * The action this request asks for (eg. "list", "save"), as the router
+   * found it, before the API was made: see index.php.
+   */
+  public static string $requestAction = '';
+
+  /** Once a request has noted its API key's use (more than one API may be made). */
+  private static bool $apiKeyNoted = FALSE;
+
+  /**
+   * Whether an API key may call this API's $action. Yes by default: an app's
+   * APIs check permissions, and a key's role limits those. Tetra's account,
+   * user, role, permission, settings, install and key APIs say no, since some
+   * of them act on your own account without a permission check.
+   */
+  public function allowsApiKeys(string $action): bool
+  {
+    return TRUE;
+  }
+
+  /**
+   * An API key was used: note when and from where, and log a change (any
+   * request but a GET) with the status it ends with, even an error.
+   */
+  private function noteApiKeyUse(\Core\ApiKeys\Models\ApiKey $key): void
+  {
+    if (self::$apiKeyNoted) {
+      return;
+    }
+    self::$apiKeyNoted = TRUE;
+    $key->touch();
+    $method = strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET');
+    if ($method === 'GET' || $method === 'OPTIONS' || php_sapi_name() === 'cli') {
+      return;
+    }
+    $path = parse_url($_SERVER['REQUEST_URI'] ?? '', PHP_URL_PATH) ?: '';
+    register_shutdown_function(function () use ($key, $method, $path) {
+      $key->log($method, $path, intval(http_response_code() ?: 200));
+    });
   }
 
   /**

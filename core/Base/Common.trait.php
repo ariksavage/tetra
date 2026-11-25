@@ -73,6 +73,10 @@ trait Common {
     } else if ( !$user->hasPermission($dimension, $action)) {
       // ensure the permission exists
       $this->permissionExists($dimension, $action);
+      if ($user->apiKey()) {
+        // Logged in fine; the key just isn't allowed this. Say what it needs.
+        $this->error("This API key may not do this: it needs {$dimension}" . ($action ? " {$action}" : '') . '.', 403, 'Forbidden');
+      }
       $this->error("Permission Denied", 401);
       return FALSE;
     }
@@ -168,7 +172,11 @@ trait Common {
       $authToken = $_COOKIE['auth'];
     }
     if ($authToken) {
-      $_SESSION['authorization_token'] = $authToken;
+      // An API key is sent with every request and checked every time, never
+      // remembered in the session (so revoking one stops it at once).
+      if (!str_starts_with($authToken, \Core\ApiKeys\Models\ApiKey::PREFIX)) {
+        $_SESSION['authorization_token'] = $authToken;
+      }
       return $authToken;
     }
     return FALSE;
@@ -184,10 +192,17 @@ trait Common {
   {
     if (isset($_SESSION['user'])) {
       $user = $_SESSION['user'];
+    } elseif (\Core\Base\Helpers\RequestUser::$user) {
+      $user = \Core\Base\Helpers\RequestUser::$user;
     } else {
       $user = new User();
       if ($user->byToken()) {
-        $_SESSION['user'] = $user;
+        if ($user->apiKey()) {
+          // An API key's user lasts for this request only: see getAuthToken.
+          \Core\Base\Helpers\RequestUser::$user = $user;
+        } else {
+          $_SESSION['user'] = $user;
+        }
       } else {
         return FALSE;
       }

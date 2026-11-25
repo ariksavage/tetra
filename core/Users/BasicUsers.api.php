@@ -11,6 +11,12 @@ use \Core\Database\MySQL\Query\Select as selectQuery;
 
 class BasicUsers extends \Core\Base\API\Base {
 
+  /** API keys never reach accounts and people: log in to change these yourself. */
+  public function allowsApiKeys(string $action): bool
+  {
+    return FALSE;
+  }
+
   public function __construct()
   {
     parent::__construct('users', '\Core\Users\Models\User', 'Users', 'User');

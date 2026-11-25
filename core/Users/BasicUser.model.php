@@ -136,6 +136,18 @@ class BasicUser extends \Core\Base\Models\Base {
 
 
   /**
+   * The API key this request came with, when it did (see byToken). Never
+   * saved or sent: see hiddenProps.
+   */
+  protected ?\Core\ApiKeys\Models\ApiKey $apiKey = NULL;
+
+  /** The API key this request came with, or NULL for a login. */
+  public function apiKey(): ?\Core\ApiKeys\Models\ApiKey
+  {
+    return $this->apiKey;
+  }
+
+  /**
    * Construct the user
    *
    * @param string      $label Singular name for this item, eg "User"
@@ -171,6 +183,7 @@ class BasicUser extends \Core\Base\Models\Base {
   {
     $props = parent::hiddenProps();
     $props[] = 'password';
+    $props[] = 'apiKey';
     return $props;
   }
 
@@ -548,6 +561,21 @@ class BasicUser extends \Core\Base\Models\Base {
     if (!$token) {
       return FALSE;
     }
+    // An API key (tetra_…): its owner, limited to what the key may do.
+    if (str_starts_with($token, \Core\ApiKeys\Models\ApiKey::PREFIX)) {
+      $key = \Core\ApiKeys\Models\ApiKey::fromToken($token);
+      if (!$key) {
+        return FALSE;
+      }
+      $data = $this->select()->where('id', '=', $key->user_id)->execute(TRUE);
+      // Only an active person's keys work.
+      if (!$data || strtolower($data->status ?? '') !== 'active') {
+        return FALSE;
+      }
+      $this->mapData($data);
+      $this->apiKey = $key;
+      return TRUE;
+    }
     $sessionQuery = $this->select(['user_id'], 'users_sessions')
       ->where('token', '=', $token)
       ->and('date_expires', '>', $now)
@@ -797,8 +825,13 @@ class BasicUser extends \Core\Base\Models\Base {
   public function updateRoles(array $roles): bool
   {
     $roles = array_map(function ($role) {
-      return is_int($role) ? $role : $role->id;
+      return intval(is_object($role) ? $role->id : $role);
     }, $roles);
+    // An API key's role is only ever its key's.
+    if ($roles) {
+      $keyRoles = array_map(fn($r) => intval($r->id), $this->raw('SELECT `id` FROM `roles` WHERE `api_key` = 1 AND `id` IN (' . implode(',', $roles) . ')')->executeSelect() ?: []);
+      $roles = array_values(array_diff($roles, $keyRoles));
+    }
     $existingRolesQuery = $this->select()->from('users_roles')->where('user_id', '=', $this->id);
     $existing = $existingRolesQuery->execute();
     $existingRoles = array_map( function ($item) {
@@ -905,6 +938,11 @@ class BasicUser extends \Core\Base\Models\Base {
    */
   public function hasPermission(string $dimension, string $action = ''): bool
   {
+    // With an API key, the key's role has to allow it too: a key never does
+    // more than its owner may.
+    if ($this->apiKey && !$this->apiKey->role()->hasPermission($dimension, $action)) {
+      return FALSE;
+    }
     $this->getRoles();
     foreach ($this->roles as $role) {
       if ($role->hasPermission($dimension, $action)) {

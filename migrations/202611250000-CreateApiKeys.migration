@@ -1,0 +1,116 @@
+<?php
+/**
+ * Migration: Create API keys
+ *
+ * Long-lived keys a person makes for a program (eg. Claude) to use the API
+ * as them. Each key has a role of its own (roles.api_key = 1), edited on the
+ * key's page and left out of the Roles and Permissions screens. Only a hash
+ * of each key is stored. Its changes are logged in api_key_log.
+ *
+ * PHP version 8.4
+ *
+ * @category   Migration
+ * @package    Tetra
+ * @author     Arik Savage <ariksavage@gmail.com>
+ * @since      2026-11-25
+ */
+
+namespace Core\Migrations;
+
+class CreateApiKeys extends \Core\Migrations\Models\Migration
+{
+  public string $name = 'Create API keys';
+
+  /** What the api_keys permissions are called, by action. */
+  const PERMISSIONS = [
+    '*' => ['Manage all API keys', 'Make, change and revoke anyone\'s API keys.'],
+    'VIEW' => ['See API keys', 'See your own API keys and what they did.'],
+    'CREATE' => ['Make API keys', 'Make API keys for yourself.'],
+    'EDIT' => ['Change API keys', 'Change what your own API keys may do.'],
+    'DELETE' => ['Revoke API keys', 'Revoke and delete your own API keys.'],
+  ];
+
+  protected function isComplete(): bool
+  {
+    return $this->tableExists('api_keys') && $this->tableExists('api_key_log')
+      && $this->columnExists('roles', 'api_key')
+      && $this->raw("SELECT 1 FROM `permissions` WHERE `dimension` = 'api_keys' LIMIT 1")->execute()->num_rows > 0;
+  }
+
+  protected function execute(): bool
+  {
+    if (!$this->tableExists('api_keys')) {
+      $columns = [
+        "`id` int(11) unsigned NOT NULL AUTO_INCREMENT",
+        // Whose key: it acts as them, never with more than they have.
+        "`user_id` int(11) NOT NULL",
+        // Its own role (roles.api_key = 1): what it may do.
+        "`role_id` int(11) NOT NULL DEFAULT 0",
+        "`name` varchar(255) NOT NULL",
+        // The key's first characters after tetra_, to tell keys apart.
+        "`prefix` varchar(16) NOT NULL",
+        // SHA-256 of the key, as hex: the key itself is shown once and never stored.
+        "`token_hash` char(64) NOT NULL",
+        "`date_created` timestamp NOT NULL DEFAULT current_timestamp()",
+        "`created_by` int(11) NOT NULL DEFAULT 0 COMMENT 'User ID, 0 for System'",
+        "`date_modified` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()",
+        "`modified_by` int(11) DEFAULT 0 COMMENT 'User ID, 0 for System'",
+        "`date_last_used` timestamp NULL DEFAULT NULL",
+        "`last_used_ip` varchar(45) NULL DEFAULT NULL",
+        // NULL: it never expires.
+        "`date_expires` timestamp NULL DEFAULT NULL",
+        "`date_revoked` timestamp NULL DEFAULT NULL",
+      ];
+      $keys = [
+        "PRIMARY KEY (`id`)",
+        "UNIQUE KEY `token_hash` (`token_hash`)",
+        "KEY `user_id` (`user_id`)",
+      ];
+      if (!$this->createTable('api_keys', $columns, $keys)) {
+        return FALSE;
+      }
+    }
+
+    if (!$this->tableExists('api_key_log')) {
+      $columns = [
+        "`id` int(11) unsigned NOT NULL AUTO_INCREMENT",
+        "`api_key_id` int(11) unsigned NOT NULL",
+        "`method` varchar(10) NOT NULL",
+        "`path` varchar(512) NOT NULL",
+        // The HTTP status it got: 200, or eg. 403 if refused.
+        "`status` smallint(5) unsigned NOT NULL DEFAULT 0",
+        "`date_created` timestamp NOT NULL DEFAULT current_timestamp()",
+      ];
+      $keys = [
+        "PRIMARY KEY (`id`)",
+        "KEY `key_date` (`api_key_id`, `date_created`)",
+      ];
+      if (!$this->createTable('api_key_log', $columns, $keys)) {
+        return FALSE;
+      }
+    }
+
+    if (!$this->columnExists('roles', 'api_key')) {
+      // A key's own role: managed on its key, left out of Roles and Permissions.
+      if (!$this->raw("ALTER TABLE `roles` ADD COLUMN `api_key` tinyint(1) NOT NULL DEFAULT 0 AFTER `default`")->execute()) {
+        return FALSE;
+      }
+    }
+
+    foreach (self::PERMISSIONS as $action => [$title, $description]) {
+      $exists = $this->raw("SELECT 1 FROM `permissions` WHERE `dimension` = 'api_keys' AND `action` = '{$action}' LIMIT 1")->execute();
+      if ($exists && $exists->num_rows) {
+        continue;
+      }
+      // Raw SQL: the query builder mangles a '*' value.
+      $quote = fn($s) => "'" . str_replace("'", "''", $s) . "'";
+      $this->raw("INSERT INTO `permissions` (`dimension`, `action`, `title`, `description`) VALUES
+        ('api_keys', {$quote($action)}, {$quote($title)}, {$quote($description)})")->execute();
+    }
+    // Admins (and root) may manage every key.
+    $this->raw("INSERT IGNORE INTO `roles_permissions` (`role_id`, `permission_id`)
+      SELECT `r`.`id`, `p`.`id` FROM `roles` `r`, `permissions` `p`
+      WHERE `r`.`key` IN ('root', 'admin') AND `p`.`dimension` = 'api_keys' AND `p`.`action` = '*'")->execute();
+    return TRUE;
+  }
+}
